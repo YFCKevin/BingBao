@@ -1,0 +1,59 @@
+server:
+  port: 8098
+  servlet:
+    contextPath: /bingBao
+  error:
+    whitelabel:
+      enabled: false
+spring:
+  application:
+    name: bing_bao
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 100MB
+      max-request-size: 100MB
+  resources:
+    static-locations: file:/Users/chenyifan/Documents/workspace-fan/bingBao/src/main/resources/static/
+  thymeleaf:
+    mode: HTML
+    encoding: UTF-8
+    cache: true
+    prefix: file:/Users/chenyifan/Documents/workspace-fan/bingBao/src/main/resources/templates/
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: pigmonkey0921929239@gmail.com
+    password: lxdb hkku hlxa yjwa
+    properties:
+      mail:
+        transport:
+          protocol: smtp
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  security:
+    user:
+      name: your_name
+      password: your_password
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017
+
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: DEBUG
+config:
+  jsonPath: /Users/chenyifan/Documents/workspace-fan/bingBao/src/main/resources/static/js/
+  globalDomain: http://localhost:8098/bingBao/
+  picSavePath: /Users/chenyifan/Documents/workspace-fan/bingBao/bingBao_images/
+  picShowPath: http://localhost:8098/bingBao/bingBao_images/
+  fileSavePath: /Users/chenyifan/Documents/workspace-fan/bingBao/bingBao_files/
+  fileShowPath: http://localhost:8098/bingBao/bingBao_files/
+  apiKey: your_secret_key

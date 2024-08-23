@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- debug為true 可查看logaback運行狀況 -->
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+    <contextName>eventWeb</contextName>
+    
+    <!-- 上線時要改path位置 -->
+<!--    <property name="log.path" value="/opt/bingBao" />-->
+    <property name="log.path" value="/Users/chenyifan/Documents/workspace-fan/bingBao" />
+    <property name="log.name" value="bingBao" />
+
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+     <!-- <logger name="org.springframework.web" level="DEBUG"/> -->
+    <jmxConfigurator/>
+ 
+    <!--输出到控制台 -->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+       
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %contextName [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+<!--    <appender name="errorAlert" class="com.yfckevin.badmintonPairing.controller.MailUtil">-->
+<!--        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">-->
+<!--            <level>ERROR</level>-->
+<!--        </filter>-->
+<!--    </appender>-->
+    <logger name="com.net.ubn" level="DEBUG" additivity="false">
+       <appender-ref ref="errorAlert"/>
+        <appender-ref ref="console" />
+    </logger>
+<logger name="org.springframework.security" level="WARN" additivity="true">
+
+    <appender-ref ref="console" />
+</logger>
+
+<!-- 输出到文件   每天產生log  -->
+<appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${log.path}/${log.name}.log</file>
+   
+   <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log.path}/logback.%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <!-- log檔只保留30天 -->
+            <maxHistory>30</maxHistory>
+            <!-- 所有歷史log檔的總大小 -->
+            <totalSizeCap>100MB</totalSizeCap>
+             <!-- 每5MB就切分(非必要，可自訂大小) --> 
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>5MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+   </rollingPolicy>
+ 
+ <!-- log的格式   18:52:33.574 FirstBootWeb [http-nio-8081-exec-10] INFO  com.ubn.controller.TestController - kevin test info..... -->   
+    <encoder>
+        <pattern>%d{HH:mm:ss.SSS} %contextName [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+</appender>
+
+
+
+ 
+
+
+
+
+
+<root level="INFO">
+   <!--  <appender-ref ref="console" /> -->
+    <appender-ref ref="file" />
+</root>
+    <logger name="com.net.ubn" level="DEBUG" additivity="false">
+        <appender-ref ref="console"/>
+    </logger>
+    
+    
+</configuration>
