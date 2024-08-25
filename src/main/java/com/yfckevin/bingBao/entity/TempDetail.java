@@ -1,31 +1,24 @@
 package com.yfckevin.bingBao.entity;
 
-import com.yfckevin.bingBao.enums.*;
+import com.yfckevin.bingBao.enums.MainCategory;
+import com.yfckevin.bingBao.enums.PackageForm;
+import com.yfckevin.bingBao.enums.PackageUnit;
 import jakarta.persistence.Id;
 import jakarta.persistence.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "product")
-public class Product {
+@Document(collection = "tempDetail")
+public class TempDetail {
     @Id
     private String id;
-    private String serialNumber; //序號
     private String name;    //名稱
     private String description; //商品描述
-    private String coverName;   //圖片檔名
     private int price;
     private MainCategory mainCategory;  //商品種類 (水果、青菜、海鮮、藥品等等)
     private PackageForm packageForm;    //包裝形式 (完整包裝、散裝)
     private PackageUnit packageUnit;    //包裝單位 (包、瓶、個等等)
     private String packageQuantity;     //包裝數量
-    private StorePlace storePlace;  //存放位置
     private String expiryDay;  //效期 (天數)
-    private String overdueNotice;   //通知過期天數
-    private String creationDate;
-    private String modificationDate;
-    private String deletionDate;
-    private String creator;
-    private String modifier;
     @Version
     private long version;
 
@@ -35,14 +28,6 @@ public class Product {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getSerialNumber() {
-        return serialNumber;
-    }
-
-    public void setSerialNumber(String serialNumber) {
-        this.serialNumber = serialNumber;
     }
 
     public String getName() {
@@ -59,14 +44,6 @@ public class Product {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getCoverName() {
-        return coverName;
-    }
-
-    public void setCoverName(String coverName) {
-        this.coverName = coverName;
     }
 
     public int getPrice() {
@@ -109,68 +86,12 @@ public class Product {
         this.packageQuantity = packageQuantity;
     }
 
-    public StorePlace getStorePlace() {
-        return storePlace;
-    }
-
-    public void setStorePlace(StorePlace storePlace) {
-        this.storePlace = storePlace;
-    }
-
     public String getExpiryDay() {
         return expiryDay;
     }
 
     public void setExpiryDay(String expiryDay) {
         this.expiryDay = expiryDay;
-    }
-
-    public String getOverdueNotice() {
-        return overdueNotice;
-    }
-
-    public void setOverdueNotice(String overdueNotice) {
-        this.overdueNotice = overdueNotice;
-    }
-
-    public String getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(String creationDate) {
-        this.creationDate = creationDate;
-    }
-
-    public String getModificationDate() {
-        return modificationDate;
-    }
-
-    public void setModificationDate(String modificationDate) {
-        this.modificationDate = modificationDate;
-    }
-
-    public String getDeletionDate() {
-        return deletionDate;
-    }
-
-    public void setDeletionDate(String deletionDate) {
-        this.deletionDate = deletionDate;
-    }
-
-    public String getCreator() {
-        return creator;
-    }
-
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
-
-    public String getModifier() {
-        return modifier;
-    }
-
-    public void setModifier(String modifier) {
-        this.modifier = modifier;
     }
 
     public long getVersion() {

@@ -1,22 +1,17 @@
-package com.yfckevin.bingBao.entity;
+package com.yfckevin.bingBao.dto;
 
-import jakarta.persistence.Id;
-import jakarta.persistence.Version;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.yfckevin.bingBao.entity.Product;
 
-@Document(collection = "order_item")
-public class OrderItem {
-    @Id
+public class ReceiveItemDTO {
     private String id;
     private String productId;
     private int amount;
+    private String expiryDate;  //產品有效期限日期
     private String creationDate;
     private String modificationDate;
     private String deletionDate;
     private String creator;
     private String modifier;
-    @Version
-    private long version;
 
     public String getId() {
         return id;
@@ -24,6 +19,14 @@ public class OrderItem {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getProductId() {
+        return productId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
     }
 
     public int getAmount() {
@@ -74,19 +77,26 @@ public class OrderItem {
         this.modifier = modifier;
     }
 
-    public long getVersion() {
-        return version;
+    public String getExpiryDate() {
+        return expiryDate;
     }
 
-    public void setVersion(long version) {
-        this.version = version;
+    public void setExpiryDate(String expiryDate) {
+        this.expiryDate = expiryDate;
     }
 
-    public String getProductId() {
-        return productId;
-    }
-
-    public void setProductId(String productId) {
-        this.productId = productId;
+    @Override
+    public String toString() {
+        return "ReceiveItemDTO{" +
+                "id='" + id + '\'' +
+                ", productId='" + productId + '\'' +
+                ", amount=" + amount +
+                ", expiryDate='" + expiryDate + '\'' +
+                ", creationDate='" + creationDate + '\'' +
+                ", modificationDate='" + modificationDate + '\'' +
+                ", deletionDate='" + deletionDate + '\'' +
+                ", creator='" + creator + '\'' +
+                ", modifier='" + modifier + '\'' +
+                '}';
     }
 }

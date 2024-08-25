@@ -4,10 +4,9 @@ public class InventoryDTO {
     private String id;
     private String name;    //產品名稱
     private String serialNumber;    //產品序號
-
-    private String orderFormId; //訂單唯一編號
-    private String orderFormNumber; //訂單編號
-    private String orderItemId; //訂單明細唯一編號
+    private String receiveFormId; //收貨唯一編號
+    private String receiveFormNumber; //收貨編號
+    private String receiveItemId; //收貨明細唯一編號
     private String quantity;    //庫存數量
     private String usedDate;    //用產品日期
     private String storeDate;   //入庫日期
@@ -45,28 +44,28 @@ public class InventoryDTO {
         this.serialNumber = serialNumber;
     }
 
-    public String getOrderFormId() {
-        return orderFormId;
+    public String getReceiveFormId() {
+        return receiveFormId;
     }
 
-    public void setOrderFormId(String orderFormId) {
-        this.orderFormId = orderFormId;
+    public void setReceiveFormId(String receiveFormId) {
+        this.receiveFormId = receiveFormId;
     }
 
-    public String getOrderFormNumber() {
-        return orderFormNumber;
+    public String getReceiveFormNumber() {
+        return receiveFormNumber;
     }
 
-    public void setOrderFormNumber(String orderFormNumber) {
-        this.orderFormNumber = orderFormNumber;
+    public void setReceiveFormNumber(String receiveFormNumber) {
+        this.receiveFormNumber = receiveFormNumber;
     }
 
-    public String getOrderItemId() {
-        return orderItemId;
+    public String getReceiveItemId() {
+        return receiveItemId;
     }
 
-    public void setOrderItemId(String orderItemId) {
-        this.orderItemId = orderItemId;
+    public void setReceiveItemId(String receiveItemId) {
+        this.receiveItemId = receiveItemId;
     }
 
     public String getQuantity() {
@@ -171,9 +170,9 @@ public class InventoryDTO {
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", serialNumber='" + serialNumber + '\'' +
-                ", orderFormId='" + orderFormId + '\'' +
-                ", orderFormNumber='" + orderFormNumber + '\'' +
-                ", orderItemId='" + orderItemId + '\'' +
+                ", receiveFormId='" + receiveFormId + '\'' +
+                ", receiveFormNumber='" + receiveFormNumber + '\'' +
+                ", receiveItemId='" + receiveItemId + '\'' +
                 ", quantity='" + quantity + '\'' +
                 ", usedDate='" + usedDate + '\'' +
                 ", storeDate='" + storeDate + '\'' +

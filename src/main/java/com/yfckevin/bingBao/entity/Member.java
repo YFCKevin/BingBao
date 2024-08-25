@@ -1,16 +1,23 @@
-package com.yfckevin.bingBao.dto;
+package com.yfckevin.bingBao.entity;
 
-import com.yfckevin.bingBao.entity.Product;
+import jakarta.persistence.Id;
+import jakarta.persistence.Version;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-public class OrderItemDTO {
+@Document(collection = "member")
+public class Member {
+    @Id
     private String id;
-    private String productId;
-    private int amount;
+    private String name;
+    private String account;
+    private String password;
     private String creationDate;
     private String modificationDate;
     private String deletionDate;
     private String creator;
     private String modifier;
+    @Version
+    private long version;
 
     public String getId() {
         return id;
@@ -20,20 +27,28 @@ public class OrderItemDTO {
         this.id = id;
     }
 
-    public String getProductId() {
-        return productId;
+    public String getName() {
+        return name;
     }
 
-    public void setProductId(String productId) {
-        this.productId = productId;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public int getAmount() {
-        return amount;
+    public String getAccount() {
+        return account;
     }
 
-    public void setAmount(int amount) {
-        this.amount = amount;
+    public void setAccount(String account) {
+        this.account = account;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getCreationDate() {
@@ -76,17 +91,11 @@ public class OrderItemDTO {
         this.modifier = modifier;
     }
 
-    @Override
-    public String toString() {
-        return "OrderItemDTO{" +
-                "id='" + id + '\'' +
-                ", productId='" + productId + '\'' +
-                ", amount=" + amount +
-                ", creationDate='" + creationDate + '\'' +
-                ", modificationDate='" + modificationDate + '\'' +
-                ", deletionDate='" + deletionDate + '\'' +
-                ", creator='" + creator + '\'' +
-                ", modifier='" + modifier + '\'' +
-                '}';
+    public long getVersion() {
+        return version;
+    }
+
+    public void setVersion(long version) {
+        this.version = version;
     }
 }

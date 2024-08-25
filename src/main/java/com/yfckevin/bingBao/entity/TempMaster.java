@@ -7,16 +7,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document(collection = "order_form")
-public class OrderForm {
+@Document(collection = "tempMaster")
+public class TempMaster {
     @Id
     private String id;
-    private String orderNumber; //訂單編號
-    private String orderDate;   //訂貨日期
-    private String storeNumber; //入庫批號
-    private String storeDate;   //入庫日期
-    private Supplier supplier;  //產品供應商
-    private List<OrderItem> orderItemList = new ArrayList<>();
+    private List<TempDetail> tempDetails = new ArrayList<>();
     private String creationDate;
     private String modificationDate;
     private String deletionDate;
@@ -33,52 +28,12 @@ public class OrderForm {
         this.id = id;
     }
 
-    public String getOrderNumber() {
-        return orderNumber;
+    public List<TempDetail> getTempDetails() {
+        return tempDetails;
     }
 
-    public void setOrderNumber(String orderNumber) {
-        this.orderNumber = orderNumber;
-    }
-
-    public String getOrderDate() {
-        return orderDate;
-    }
-
-    public void setOrderDate(String orderDate) {
-        this.orderDate = orderDate;
-    }
-
-    public String getStoreNumber() {
-        return storeNumber;
-    }
-
-    public void setStoreNumber(String storeNumber) {
-        this.storeNumber = storeNumber;
-    }
-
-    public String getStoreDate() {
-        return storeDate;
-    }
-
-    public void setStoreDate(String storeDate) {
-        this.storeDate = storeDate;
-    }
-
-    public Supplier getSupplier() {
-        return supplier;
-    }
-
-    public void setSupplier(Supplier supplier) {
-        this.supplier = supplier;
-    }
-
-    public List<OrderItem> getOrderItemList() {
-        return orderItemList;
-    }
-
-    public void setOrderItemList(List<OrderItem> orderItemList) {
-        this.orderItemList = orderItemList;
+    public void setTempDetails(List<TempDetail> tempDetails) {
+        this.tempDetails = tempDetails;
     }
 
     public String getCreationDate() {

@@ -1,24 +1,29 @@
-package com.yfckevin.bingBao.dto;
+package com.yfckevin.bingBao.entity;
 
-import com.yfckevin.bingBao.entity.OrderItem;
-import com.yfckevin.bingBao.entity.Supplier;
+import jakarta.persistence.Id;
+import jakarta.persistence.Version;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrderFormDTO {
+@Document(collection = "receive_form")
+public class ReceiveForm {
+    @Id
     private String id;
-    private String orderNumber; //訂單編號
-    private String orderDate;   //訂貨日期
-    private String storeNumber; //入庫編號
+    private String receiveNumber; //訂單編號
+    private String receiveDate;   //收貨日期
+    private String storeNumber; //入庫批號
     private String storeDate;   //入庫日期
     private Supplier supplier;  //產品供應商
-    private List<OrderItem> orderItemList = new ArrayList<>();
+    private List<ReceiveItem> receiveItems = new ArrayList<>();
     private String creationDate;
     private String modificationDate;
     private String deletionDate;
     private String creator;
     private String modifier;
+    @Version
+    private long version;
 
     public String getId() {
         return id;
@@ -28,20 +33,20 @@ public class OrderFormDTO {
         this.id = id;
     }
 
-    public String getOrderNumber() {
-        return orderNumber;
+    public String getReceiveNumber() {
+        return receiveNumber;
     }
 
-    public void setOrderNumber(String orderNumber) {
-        this.orderNumber = orderNumber;
+    public void setReceiveNumber(String receiveNumber) {
+        this.receiveNumber = receiveNumber;
     }
 
-    public String getOrderDate() {
-        return orderDate;
+    public String getReceiveDate() {
+        return receiveDate;
     }
 
-    public void setOrderDate(String orderDate) {
-        this.orderDate = orderDate;
+    public void setReceiveDate(String receiveDate) {
+        this.receiveDate = receiveDate;
     }
 
     public String getStoreNumber() {
@@ -68,12 +73,12 @@ public class OrderFormDTO {
         this.supplier = supplier;
     }
 
-    public List<OrderItem> getOrderItemList() {
-        return orderItemList;
+    public List<ReceiveItem> getReceiveItems() {
+        return receiveItems;
     }
 
-    public void setOrderItemList(List<OrderItem> orderItemList) {
-        this.orderItemList = orderItemList;
+    public void setReceiveItems(List<ReceiveItem> receiveItems) {
+        this.receiveItems = receiveItems;
     }
 
     public String getCreationDate() {
@@ -116,21 +121,11 @@ public class OrderFormDTO {
         this.modifier = modifier;
     }
 
-    @Override
-    public String toString() {
-        return "OrderFormDTO{" +
-                "id='" + id + '\'' +
-                ", orderNumber='" + orderNumber + '\'' +
-                ", orderDate='" + orderDate + '\'' +
-                ", storeNumber='" + storeNumber + '\'' +
-                ", storeDate='" + storeDate + '\'' +
-                ", supplier=" + supplier +
-                ", orderItemList=" + orderItemList +
-                ", creationDate='" + creationDate + '\'' +
-                ", modificationDate='" + modificationDate + '\'' +
-                ", deletionDate='" + deletionDate + '\'' +
-                ", creator='" + creator + '\'' +
-                ", modifier='" + modifier + '\'' +
-                '}';
+    public long getVersion() {
+        return version;
+    }
+
+    public void setVersion(long version) {
+        this.version = version;
     }
 }

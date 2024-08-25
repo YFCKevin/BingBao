@@ -5,19 +5,25 @@ import com.yfckevin.bingBao.enums.PackageForm;
 import com.yfckevin.bingBao.enums.PackageUnit;
 import com.yfckevin.bingBao.enums.StorePlace;
 import jakarta.persistence.Version;
+import org.springframework.web.multipart.MultipartFile;
 
 public class ProductDTO {
     private String id;
     private String serialNumber; //序號
     private String name;    //名稱
     private String description; //商品描述
-    private String coverPath;   //圖片路徑
+    private MultipartFile multipartFile;    //圖片檔案
+    private String coverPath;    //圖路徑(前端呈現用)
     private int price;
     private MainCategory mainCategory;  //商品種類 (水果、青菜、海鮮、藥品等等)
+    private String mainCategoryLabel;
     private PackageForm packageForm;    //包裝形式 (完整包裝、散裝)
+    private String packageFormLabel;
     private PackageUnit packageUnit;    //包裝單位 (包、瓶、個等等)
+    private String packageUnitLabel;
     private String packageQuantity;     //包裝數量
     private StorePlace storePlace;  //存放位置
+    private String storePlaceLabel;
     private String expiryDay;  //效期 (天數)
     private String overdueNotice;   //通知過期天數
     private String creationDate;
@@ -25,8 +31,6 @@ public class ProductDTO {
     private String deletionDate;
     private String creator;
     private String modifier;
-    @Version
-    private long version;
 
     public String getId() {
         return id;
@@ -172,12 +176,44 @@ public class ProductDTO {
         this.modifier = modifier;
     }
 
-    public long getVersion() {
-        return version;
+    public String getMainCategoryLabel() {
+        return mainCategoryLabel;
     }
 
-    public void setVersion(long version) {
-        this.version = version;
+    public void setMainCategoryLabel(String mainCategoryLabel) {
+        this.mainCategoryLabel = mainCategoryLabel;
+    }
+
+    public String getPackageFormLabel() {
+        return packageFormLabel;
+    }
+
+    public void setPackageFormLabel(String packageFormLabel) {
+        this.packageFormLabel = packageFormLabel;
+    }
+
+    public String getPackageUnitLabel() {
+        return packageUnitLabel;
+    }
+
+    public void setPackageUnitLabel(String packageUnitLabel) {
+        this.packageUnitLabel = packageUnitLabel;
+    }
+
+    public String getStorePlaceLabel() {
+        return storePlaceLabel;
+    }
+
+    public void setStorePlaceLabel(String storePlaceLabel) {
+        this.storePlaceLabel = storePlaceLabel;
+    }
+
+    public MultipartFile getMultipartFile() {
+        return multipartFile;
+    }
+
+    public void setMultipartFile(MultipartFile multipartFile) {
+        this.multipartFile = multipartFile;
     }
 
     @Override
@@ -187,13 +223,18 @@ public class ProductDTO {
                 ", serialNumber='" + serialNumber + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
+                ", multipartFile=" + multipartFile +
                 ", coverPath='" + coverPath + '\'' +
                 ", price=" + price +
                 ", mainCategory=" + mainCategory +
+                ", mainCategoryLabel='" + mainCategoryLabel + '\'' +
                 ", packageForm=" + packageForm +
+                ", packageFormLabel='" + packageFormLabel + '\'' +
                 ", packageUnit=" + packageUnit +
+                ", packageUnitLabel='" + packageUnitLabel + '\'' +
                 ", packageQuantity='" + packageQuantity + '\'' +
                 ", storePlace=" + storePlace +
+                ", storePlaceLabel='" + storePlaceLabel + '\'' +
                 ", expiryDay='" + expiryDay + '\'' +
                 ", overdueNotice='" + overdueNotice + '\'' +
                 ", creationDate='" + creationDate + '\'' +
@@ -201,7 +242,6 @@ public class ProductDTO {
                 ", deletionDate='" + deletionDate + '\'' +
                 ", creator='" + creator + '\'' +
                 ", modifier='" + modifier + '\'' +
-                ", version=" + version +
                 '}';
     }
 }

@@ -1,7 +1,7 @@
 package com.yfckevin.bingBao.enums;
 
 public enum PackageForm {
-    complete(1,"完整包裝"),bulk(2,"散裝");
+    COMPLETE(1,"完整包裝"),BULK(2,"散裝");
 
     private PackageForm(){
     }

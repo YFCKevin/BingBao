@@ -26,9 +26,9 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
     @Override
     public MongoClient mongoClient() {
         // vm上的mongo
-//        return MongoClients.create(configProperties.getMongodbUri());
+        return MongoClients.create(configProperties.getMongodbUri());
         // 本地測試用
-        return MongoClients.create("mongodb://localhost:27017");
+//        return MongoClients.create("mongodb://localhost:27017");
     }
 
     @Bean
