@@ -1,5 +1,8 @@
 package com.yfckevin.bingBao.entity;
 
+import com.yfckevin.bingBao.enums.PackageForm;
+import com.yfckevin.bingBao.enums.PackageUnit;
+import com.yfckevin.bingBao.enums.StorePlace;
 import jakarta.persistence.Id;
 import jakarta.persistence.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -13,13 +16,17 @@ public class Inventory {
     private String receiveFormId; //收貨唯一編號
     private String receiveFormNumber; //收貨編號
     private String receiveItemId; //收貨明細唯一編號
-    private int quantity;    //庫存數量
     private String usedDate;    //用產品日期
     private String storeDate;   //入庫日期
-    private String storeNumber; //入庫編號
+    private String storeNumber; //入庫批號
     private String expiryDate;   //有效日期
-    private String expiryDay;  //效期 (天數)
+    private StorePlace storePlace;
+    private PackageForm packageForm;
+    private PackageUnit packageUnit;
+    private String packageQuantity;
+    private String packageNumber;
     private String overdueNotice;   //通知過期天數
+    private String productId;
     private String creationDate;
     private String modificationDate;
     private String deletionDate;
@@ -58,14 +65,6 @@ public class Inventory {
 
     public void setReceiveItemId(String receiveItemId) {
         this.receiveItemId = receiveItemId;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
     }
 
     public String getCreationDate() {
@@ -164,12 +163,12 @@ public class Inventory {
         this.expiryDate = expiryDate;
     }
 
-    public String getExpiryDay() {
-        return expiryDay;
+    public String getProductId() {
+        return productId;
     }
 
-    public void setExpiryDay(String expiryDay) {
-        this.expiryDay = expiryDay;
+    public void setProductId(String productId) {
+        this.productId = productId;
     }
 
     public String getOverdueNotice() {
@@ -178,5 +177,45 @@ public class Inventory {
 
     public void setOverdueNotice(String overdueNotice) {
         this.overdueNotice = overdueNotice;
+    }
+
+    public PackageForm getPackageForm() {
+        return packageForm;
+    }
+
+    public void setPackageForm(PackageForm packageForm) {
+        this.packageForm = packageForm;
+    }
+
+    public PackageUnit getPackageUnit() {
+        return packageUnit;
+    }
+
+    public void setPackageUnit(PackageUnit packageUnit) {
+        this.packageUnit = packageUnit;
+    }
+
+    public String getPackageQuantity() {
+        return packageQuantity;
+    }
+
+    public void setPackageQuantity(String packageQuantity) {
+        this.packageQuantity = packageQuantity;
+    }
+
+    public String getPackageNumber() {
+        return packageNumber;
+    }
+
+    public void setPackageNumber(String packageNumber) {
+        this.packageNumber = packageNumber;
+    }
+
+    public StorePlace getStorePlace() {
+        return storePlace;
+    }
+
+    public void setStorePlace(StorePlace storePlace) {
+        this.storePlace = storePlace;
     }
 }

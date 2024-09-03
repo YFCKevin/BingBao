@@ -3,6 +3,7 @@ package com.yfckevin.bingBao.config;
 import com.yfckevin.bingBao.ConfigProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -12,6 +13,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
@@ -32,7 +36,8 @@ public class SecurityConfig {
                                 .requestMatchers("/bingBao_files/**").permitAll()
                                 .requestMatchers("/bingBao/**").permitAll()
                                 .requestMatchers("/bingBao/api/**").authenticated() // 需要身份驗證的API
-                ).httpBasic(); // 使用HTTP Basic認證
+                ).httpBasic(withDefaults()).exceptionHandling()
+                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));  // 沒有提供身份認證資訊則回傳401
 
         return http.build();
     }

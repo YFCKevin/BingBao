@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:x-on="http://www.w3.org/1999/xhtml" xmlns:x-bind="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<title>Avatars - Kaiadmin Bootstrap 5 Admin Dashboard</title>
+	<meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
+	<link rel="icon" href="images/favicon.ico" type="image/x-icon"/>
+
+	<!-- Fonts and icons -->
+	<script src="js/webfont.min.js"></script>
+	<script>
+		WebFont.load({
+			google: {"families":["Public Sans:300,400,500,600,700"]},
+			custom: {"families":["Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands", "simple-line-icons"], urls: ['css/fonts.min.css']},
+			active: function() {
+				sessionStorage.fonts = true;
+			}
+		});
+	</script>
+
+	<!-- CSS Files -->
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/plugins.min.css">
+	<link rel="stylesheet" href="css/kaiadmin.min.css">
+
+	<!-- CSS Just for demo purpose, don't include it in your project -->
+<!--	<link rel="stylesheet" href="css/demo.css">-->
+</head>
+<body x-data="loadData()" x-init="init()">
+	<div class="wrapper">
+		<!-- Sidebar -->
+		<div class="sidebar" data-background-color="dark">
+			<div class="sidebar-logo">
+				<!-- Logo Header -->
+				<div class="logo-header" data-background-color="dark">
+
+					<a href="dashboard.html" class="logo">
+						<img src="images/fridge001.jpg" alt="navbar brand" class="navbar-brand" height="20">
+					</a>
+					<div class="nav-toggle">
+						<button class="btn btn-toggle toggle-sidebar">
+							<i class="gg-menu-right"></i>
+						</button>
+						<button class="btn btn-toggle sidenav-toggler">
+							<i class="gg-menu-left"></i>
+						</button>
+					</div>
+					<button class="topbar-toggler more">
+						<i class="gg-more-vertical-alt"></i>
+					</button>
+				</div>
+				<!-- End Logo Header -->
+			</div>
+			<div class="sidebar-wrapper scrollbar scrollbar-inner">
+				<div class="sidebar-content">
+					<ul class="nav nav-secondary">
+						<li class="nav-section">
+							<span class="sidebar-mini-icon">
+								<i class="fa fa-ellipsis-h"></i>
+							</span>
+							<h4 class="text-section">清單</h4>
+						</li>
+						<li class="nav-item">
+							<a href="dashboard.html">
+								<i class="fas fa-desktop"></i>
+								<p>冰箱清單</p>
+								<span class="badge badge-success" x-text="todayListLabel"></span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="product.html">
+								<i class="fas fa-fish"></i>
+								<p>商品模板</p>
+							</a>
+						</li>
+						<li class="nav-section">
+							<span class="sidebar-mini-icon">
+								<i class="fa fa-ellipsis-h"></i>
+							</span>
+							<h4 class="text-section">動作</h4>
+						</li>
+						<li class="nav-item submenu">
+							<a data-bs-toggle="collapse" href="#submenu" class="" aria-expanded="true">
+								<i class="fas fa-bars"></i>
+								<p>產品建檔</p>
+								<span class="caret"></span>
+							</a>
+							<div class="collapse" id="submenu" style="">
+								<ul class="nav nav-collapse">
+									<li class="submenu">
+										<a href="import.html">
+											<span class="sub-item">AI建檔</span>
+										</a>
+										<!--										<a href="add.html">-->
+										<!--											<span class="sub-item">手動輸入</span>-->
+										<!--										</a>-->
+									</li>
+								</ul>
+							</div>
+						</li>
+						<li class="nav-item">
+							<a href="receive.html">
+								<i class="fas fa-box-open"></i>
+								<p>收貨放進冰箱</p>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<!-- End Sidebar -->
+
+		<div class="main-panel">
+			<div class="main-header">
+				<div class="main-header-logo">
+					<!-- Logo Header -->
+					<div class="logo-header" data-background-color="dark">
+
+						<a href="dashboard.html" class="logo">
+							<img src="images/fridge001.jpg" alt="navbar brand" class="navbar-brand" height="20">
+						</a>
+						<div class="nav-toggle">
+							<button class="btn btn-toggle toggle-sidebar">
+								<i class="gg-menu-right"></i>
+							</button>
+							<button class="btn btn-toggle sidenav-toggler">
+								<i class="gg-menu-left"></i>
+							</button>
+						</div>
+						<button class="topbar-toggler more">
+							<i class="gg-more-vertical-alt"></i>
+						</button>
+
+					</div>
+					<!-- End Logo Header -->
+				</div>
+				<!-- Navbar Header -->
+				<nav hidden="hidden" class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom"></nav>
+				<!-- End Navbar -->
+			</div>
+
+			<div class="container">
+				<div class="page-inner">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card">
+								<div class="card-header d-flex justify-content-between align-items-center">
+									<h4 class="card-title">收貨放入冰箱</h4>
+									<div class="d-flex ms-auto">
+										<button class="btn btn-primary me-2" x-on:click="showSelectedProductsModal()">查看收貨明細</button>
+									</div>
+								</div>
+								<div class="card-body">
+									<ul class="nav nav-pills nav-secondary nav-pills-no-bd" id="pills-tab-without-border" role="tablist">
+										<li class="nav-item" role="presentation">
+											<a class="nav-link active" id="pills-form-tab-nobd" data-bs-toggle="pill" href="#pills-form-nobd" role="tab" aria-controls="pills-home-nobd" aria-selected="true">主表單</a>
+										</li>
+										<li class="nav-item" role="presentation">
+											<a class="nav-link" id="pills-supplier-tab-nobd" data-bs-toggle="pill" href="#pills-supplier-nobd" role="tab" aria-controls="pills-contact-nobd" aria-selected="false" tabindex="-1">選擇供應商</a>
+										</li>
+										<li class="nav-item" role="presentation">
+											<a class="nav-link" id="pills-detail-tab-nobd" data-bs-toggle="pill" href="#pills-detail-nobd" role="tab" aria-controls="pills-profile-nobd" aria-selected="false" tabindex="-1">選擇商品</a>
+										</li>
+									</ul>
+									<div class="tab-content mt-2 mb-3" id="pills-without-border-tabContent">
+										<div class="tab-pane fade show active" id="pills-form-nobd" role="tabpanel" aria-labelledby="pills-home-tab-nobd">
+											<div class="col-md-6">
+												<div class="form-group">
+													<label for="receiveDate">收貨日期</label>
+													<div class="d-flex justify-content-center align-items-center">
+														<input type="date" class="form-control" id="receiveDate" x-model="receiveDate" placeholder="選擇日期">
+													</div>
+												</div>
+												<div class="form-group">
+													<div class="input-icon">
+														<span class="input-icon-addon">
+														  <i class="fa fa-user"></i>
+														</span>
+														<input id="supplierName_readOnly" type="text" class="form-control" placeholder="供應商名" readonly>
+													</div>
+												</div>
+												<div class="form-group">
+													<label for="receiveNumber">收貨編號</label>
+													<input type="text" class="form-control" id="receiveNumber" placeholder="自動產生收貨編號，無須填寫" readonly>
+												</div>
+												<div class="form-group">
+													<label for="storeDate">入庫日期</label>
+													<div class="d-flex justify-content-center align-items-center">
+														<input type="text" class="form-control" id="storeDate" placeholder="自動帶入日期，無須填寫" readonly>
+													</div>
+												</div>
+												<div class="form-group">
+													<label for="storeNumber">入庫編號</label>
+													<input type="text" class="form-control" id="storeNumber" placeholder="自動產生入庫編號，無須填寫" readonly>
+												</div>
+											</div>
+										</div>
+										<div class="tab-pane fade" id="pills-supplier-nobd" role="tabpanel" aria-labelledby="pills-contact-tab-nobd">
+<!--											供應商表格列表-->
+											<div class="col-md-12">
+<!--												<div class="card">-->
+													<div class="card-header">
+														<div class="d-flex align-items-center">
+															<h4 class="card-title"></h4>
+															<button class="btn btn-primary btn-round ms-auto" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
+																<i class="fa fa-plus"></i>
+																新增
+															</button>
+														</div>
+													</div>
+													<div class="card-body">
+														<div class="table-responsive">
+															<div id="add-row_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
+																<div class="row">
+																	<div class="col-sm-12 col-md-6">
+																		<div id="add-row_filter" class="">
+																			<input x-on:keydown.enter="searchSupplier()" id="keyword" type="search" class="form-control" placeholder="可搜尋名稱、地址、電話、網站" aria-controls="add-row">
+																		</div>
+																	</div>
+																</div>
+																<div class="row">
+																	<div class="col-sm-12">
+																		<table id="add-row" class="display table table-striped table-hover dataTable" role="grid" aria-describedby="add-row_info">
+																			<thead>
+																				<tr role="row">
+																					<th>選擇</th>
+																					<th>名稱</th>
+																					<th>電話</th>
+																					<th>網站</th>
+																					<th>地址</th>
+																				</tr>
+																			</thead>
+																			<tbody>
+																			<template x-for="(item,index) in getSupplierData()" :key="index">
+																					<tr role="row" class="odd">
+																						<td>
+																							<div class="form-button-action">
+																								<input type="radio" :id="item.id" :value="item.id" x-model="selectedSupplierId" x-on:change="updateSelectedName(item.name)">
+																							</div>
+																						</td>
+																						<td x-text="item.name"></td>
+																						<td x-text="item.phone"></td>
+																						<td x-text="item.website"></td>
+																						<td x-text="item.address"></td>
+																					</tr>
+																				</template>
+																			</tbody>
+																		</table>
+																		<nav class="mt-5 mb-4" x-show="pageCount() > 1">
+																			<ul class="pagination justify-content-center card-page">
+																				<li class="page-item" :class="{ 'disabled' : pageNumber==0 }">
+																					<a
+																							class="page-link page-prev"
+																							type="button"
+																							x-on:click="prevPage();"
+																							:disabled="pageNumber==0"
+																					>
+																						<i class="fa fas fa-chevron-left"></i>
+																					</a>
+																				</li>
+																				<li
+																						class="page-item disabled"
+																						:class="{ 'd-none' : pageCount() <= 4 || pageNumber == 0 || ( pageCount() > 4 && pageNumber == pageCount() ) }"
+																				>
+																					<a class="page-link">···</a>
+																				</li>
+																				<template x-for="(page,index) in pages()" :key="index">
+																					<li
+																							class="page-item"
+																							:class="{ 'active' : index === pageNumber , 'd-none' : pageCount() > 4 && ( (index < pageNumber && pageNumber < pageCount() -4) || (index < pageCount() -4 && pageNumber >= pageCount() -4) || index >= pageNumber+4 ) }"
+																					>
+																						<a
+																								class="page-link"
+																								type="button"
+																								x-on:click="viewPage(index);"
+																								x-text="index+1"
+																						></a>
+																					</li>
+																				</template>
+																				<li
+																						class="page-item disabled"
+																						:class="{ 'd-none' : pageCount() <= 4 || pageNumber >= pageCount() -4}"
+																				>
+																					<a class="page-link">···</a>
+																				</li>
+																				<li
+																						class="page-item"
+																						:class="{ 'disabled' : pageNumber >= pageCount() -1 }"
+																				>
+																					<a
+																							class="page-link page-next"
+																							type="button"
+																							x-on:click="nextPage();"
+																							:disabled="pageNumber >= pageCount() -1"
+																					>
+																						<i class="fa fas fa-chevron-right"></i>
+																					</a>
+																				</li>
+																			</ul>
+																		</nav>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+<!--												</div>-->
+											</div>
+
+										</div>
+										<div class="tab-pane fade" id="pills-detail-nobd" role="tabpanel" aria-labelledby="pills-profile-tab-nobd">
+<!--											選擇商品-->
+											<div class="col-md-12">
+<!--												<div class="card">-->
+												<div class="card-header">
+													<div class="d-flex align-items-center">
+														<h4 class="card-title"></h4>
+													</div>
+												</div>
+												<div class="card-body">
+													<div class="table-responsive">
+														<div id="select-product_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
+															<div class="row">
+																<div class="col-sm-12 col-md-6">
+																	<div id="select-product_filter" class="mb-3">
+																		<input x-on:keydown.enter="productSearch()" id="productKeyword" type="search" class="form-control" placeholder="可搜尋商品名稱" aria-controls="add-row">
+																	</div>
+																	<div class="d-flex flex-column flex-md-row align-items-start">
+																		<select class="form-select form-control me-2 mb-2 mb-md-0" x-model="selectedCategory" x-on:change="categoryChange()">
+																			<option value="">請選擇主類型</option>
+																			<option value="MEAT">肉品</option>
+																			<option value="SEAFOOD">海鮮</option>
+																			<option value="VEGETABLES">青菜</option>
+																			<option value="FRUITS">水果</option>
+																			<option value="GRAINS">穀物</option>
+																			<option value="BEVERAGES">飲料</option>
+																			<option value="CONDIMENTS">醬料</option>
+																			<option value="SNACKS">零食</option>
+																			<option value="BAKERY">烘焙食品</option>
+																			<option value="MEDICINE">藥品</option>
+																			<option value="CANNED_FOOD">罐頭食品</option>
+																			<option value="SPICES">香料</option>
+																			<option value="OILS">食用油</option>
+																			<option value="SWEETS">甜品</option>
+																			<option value="DRIED_FOOD">乾貨</option>
+																			<option value="HEALTH_FOOD">保健食品</option>
+																		</select>
+																		<template x-if="selectedCategory !== 'MEAT' && selectedCategory !== 'SEAFOOD'">
+																			<select class="form-select form-control" x-model="selectedSubCategory" disabled x-on:change="productSearch()">
+																				<option value="x">-</option>
+																			</select>
+																		</template>
+																		<template x-if="selectedCategory === 'MEAT'">
+																			<select class="form-select form-control" x-model="selectedSubCategory" x-on:change="productSearch()">
+																					<option value="">請選擇副類型</option>
+																					<option value="BEEF">牛肉</option>
+																					<option value="PORK">豬肉</option>
+																					<option value="CHICKEN">雞肉</option>
+																					<option value="EGG">雞蛋</option>
+																			</select>
+																		</template>
+																		<template x-if="selectedCategory === 'SEAFOOD'">
+																			<select class="form-select form-control" x-model="selectedSubCategory" x-on:change="productSearch()">
+																				<option value="">請選擇副類型</option>
+																				<option value="FISH">魚</option>
+																				<option value="SHRIMP">蝦</option>
+																			</select>
+																		</template>
+																	</div>
+																</div>
+															</div>
+															<div class="row">
+																<div class="col-sm-12">
+																	<table id="select-product" class="display table table-striped table-hover dataTable" role="grid" aria-describedby="add-row_info">
+																		<thead>
+																			<tr role="row">
+																				<th>動作</th>
+																				<th>商品名稱</th>
+																				<th>商品數量</th>
+																				<th>新增時間</th>
+																			</tr>
+																		</thead>
+																		<template x-for="(item, index) in getProductData()" :key="index">
+																			<tbody>
+																			<tr role="row" class="odd">
+																				<td>
+																					<div class="d-flex align-items-center">
+																						<div class="form-check form-switch">
+																							<input class="form-check-input" type="checkbox" id="toggleAll" x-model="item.allSelected" x-on:change="toggleSelectAll($event, index)">
+																						</div>
+																						<button @click="toggleCollapse(index)" type="button" data-bs-toggle="tooltip" title="查看細節" class="btn btn-link btn-primary">
+																							<i class="fas fa-angle-double-down"></i>
+																						</button>
+																					</div>
+																				</td>
+																				<td x-html="item.groupName"></td>
+																				<td x-text="item.products.length"></td>
+																				<td x-text="item.products[0].creationDate"></td>
+																			</tr>
+																			<template x-if="isCollapseOpen(index)">
+																				<tr role="row">
+																					<td colspan="4" style="background-color: #e0f7fa;">
+																						<div class="collapse-content" style="padding-left: 10px;">
+																							<table class="table table-bordered">
+																								<thead>
+																								<tr role="row">
+																									<th class="bg-primary text-white">選擇</th>
+																									<th class="bg-primary text-white">名稱</th>
+																									<th class="bg-primary text-white">包裝類型</th>
+																									<th class="bg-primary text-white">包裝方式</th>
+																								</tr>
+																								</thead>
+																								<tbody>
+																								<template x-for="product in item.products" :key="product.id">
+																									<tr role="row" class="odd">
+																										<td class="text-center">
+																											<div class="form-check form-switch d-inline-block">
+																												<input class="form-check-input" :value="product.id" type="checkbox" x-model="product.selected" x-on:change="update($event, index)">
+																											</div>
+																										</td>
+																										<td x-html="product.name"></td>
+																										<td x-html="product.packageFormLabel"></td>
+																										<td>
+																											<span x-html="product.packageQuantity"></span>
+																											<span>份</span>
+																											<span x-show="product.packageUnit != null"> / </span>
+																											<span x-html="product.packageUnitLabel"></span>
+																										</td>
+																									</tr>
+																								</template>
+																								</tbody>
+																							</table>
+																						</div>
+																					</td>
+																				</tr>
+																			</template>
+																			</tbody>
+																		</template>
+
+																	</table>
+																	<nav class="mt-5 mb-4" x-show="pageCount_product() > 1">
+																		<ul class="pagination justify-content-center card-page">
+																			<li class="page-item" :class="{ 'disabled' : pageNumber_product==0 }">
+																				<a
+																						class="page-link page-prev"
+																						type="button"
+																						x-on:click="prevPage_product();"
+																						:disabled="pageNumber_product==0"
+																				>
+																					<i class="fa fas fa-chevron-left"></i>
+																				</a>
+																			</li>
+																			<li
+																					class="page-item disabled"
+																					:class="{ 'd-none' : pageCount_product() <= 4 || pageNumber_product == 0 || ( pageCount_product() > 4 && pageNumber_product == pageCount_product() ) }"
+																			>
+																				<a class="page-link">···</a>
+																			</li>
+																			<template x-for="(page,index) in pages_product()" :key="index">
+																				<li
+																						class="page-item"
+																						:class="{ 'active' : index === pageNumber_product , 'd-none' : pageCount_product() > 4 && ( (index < pageNumber_product && pageNumber_product < pageCount_product() -4) || (index < pageCount_product() -4 && pageNumber_product >= pageCount_product() -4) || index >= pageNumber_product+4 ) }"
+																				>
+																					<a
+																							class="page-link"
+																							type="button"
+																							x-on:click="viewPage_product(index);"
+																							x-text="index+1"
+																					></a>
+																				</li>
+																			</template>
+																			<li
+																					class="page-item disabled"
+																					:class="{ 'd-none' : pageCount_product() <= 4 || pageNumber_product >= pageCount_product() -4}"
+																			>
+																				<a class="page-link">···</a>
+																			</li>
+																			<li
+																					class="page-item"
+																					:class="{ 'disabled' : pageNumber_product >= pageCount_product() -1 }"
+																			>
+																				<a
+																						class="page-link page-next"
+																						type="button"
+																						x-on:click="nextPage_product();"
+																						:disabled="pageNumber_product >= pageCount_product() -1"
+																				>
+																					<i class="fa fas fa-chevron-right"></i>
+																				</a>
+																			</li>
+																		</ul>
+																	</nav>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+<!--												</div>-->
+											</div>
+
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<footer class="footer">
+				<div class="container-fluid d-flex justify-content-between">
+					<nav class="pull-left">
+						<ul class="nav">
+							<li class="nav-item">
+								<a class="nav-link" href="http://www.themekita.com">
+									ThemeKita
+								</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="#"> Help </a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="#"> Licenses </a>
+							</li>
+						</ul>
+					</nav>
+					<div class="copyright">
+						2024, made with <i class="fa fa-heart heart text-danger"></i> by
+						<a href="http://www.themekita.com">ThemeKita</a>
+					</div>
+					<div>
+						Distributed by
+						<a target="_blank" href="https://themewagon.com/">ThemeWagon</a>.
+					</div>
+				</div>
+			</footer>
+		</div>
+
+	</div>
+
+
+	<!-- addSupplierModal -->
+	<div class="modal fade" id="addSupplierModal" tabindex="-1" aria-hidden="true" style="display: none;">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header border-0">
+					<h5 class="modal-title">
+						<span class="fw-mediumbold">新增供應商</span>
+					</h5>
+					<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" x-on:click="clearSupplier()">
+						<span aria-hidden="true">×</span>
+					</button>
+				</div>
+				<div class="modal-body">
+						<div class="row">
+							<div class="col-sm-12">
+								<div class="form-group form-group-default">
+									<label>名稱</label>
+									<input id="supplierName" type="text" class="form-control" placeholder="公司名">
+								</div>
+							</div>
+							<div class="col-md-6 pe-0">
+								<div class="form-group form-group-default">
+									<label>電話</label>
+									<input id="supplierPhone" type="text" class="form-control" placeholder="公司電話">
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group form-group-default">
+									<label>網址</label>
+									<input id="supplierWebsite" type="text" class="form-control" placeholder="公司網址">
+								</div>
+							</div>
+							<div class="col-sm-12">
+								<div class="form-group form-group-default">
+									<label>地址</label>
+									<input id="supplierAddress" type="text" class="form-control" placeholder="公司地址">
+								</div>
+							</div>
+						</div>
+				</div>
+				<div class="modal-footer border-0">
+					<button type="button" x-on:click="addSupplier()" class="btn btn-primary">
+						新增
+					</button>
+					<button type="button" class="btn btn-danger" data-bs-dismiss="modal" x-on:click="clearSupplier()">
+						關閉
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- addSupplierModal -->
+	<div class="modal fade" id="selectedProductModal" tabindex="-1" aria-hidden="true" style="display: none; --bs-modal-width: 80%">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header border-0">
+					<h5 class="modal-title">
+						<span class="fw-mediumbold">收貨明細</span>
+					</h5>
+					<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">×</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="table-responsive">
+						<div class="dataTables_wrapper container-fluid dt-bootstrap4">
+							<div class="row">
+								<div>
+									<span>選定的供應商：</span>
+									<span x-text="selectedSupplierName"></span>
+								</div>
+								<table id="add-product" class="display table table-striped table-hover dataTable" role="grid" aria-describedby="add-row_info">
+									<thead>
+									<tr role="row">
+										<th>名稱</th>
+										<th>放進冰箱數量</th>
+										<th>總份數</th>
+										<th>有效期限</th>
+										<th>存放位置</th>
+									</tr>
+									</thead>
+									<template x-for="(item, index) in getSelectedProductData()" :key="index">
+										<tbody>
+										<tr role="row" class="odd">
+											<td x-html="item.name"></td>
+											<td>
+												<input type="number" min="0" x-model="item.quantity" x-on:input="updateTotal(index, $event.target.value)">
+											</td>
+											<td>
+												<input type="number" disabled x-model="item.total">
+											</td>
+											<td>
+												<input type="date" x-model="item.expiryDate" x-on:input="updateExpiryDate(index, $event.target.value)">
+											</td>
+											<td>
+												<select class="form-select" x-on:input="updateStorePlace(index, $event.target.value)">
+													<option value="">請選擇</option>
+													<option value="HUALIEN_REF_2F_LEFT">花蓮2樓左側冰箱</option>
+													<option value="HUALIEN_REF_2F_RIGHT">花蓮2樓右側冰箱</option>
+													<option value="HUALIEN_REF_1F_RIGHT">花蓮1樓冰箱</option>
+													<option value="TAIPEI_REF">台北冰箱</option>
+												</select>
+											</td>
+										</tr>
+										</tbody>
+									</template>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer border-0">
+					<button type="button" x-on:click="refrigerate()" class="btn btn-primary">
+						放進冰箱
+					</button>
+					<button type="button" class="btn btn-danger" data-bs-dismiss="modal" x-on:click="clearSupplier()">
+						關閉
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+<!--	成功modal-->
+	<div class="swal-modal" role="dialog" aria-modal="true"><div class="swal-icon swal-icon--success">
+		<span class="swal-icon--success__line swal-icon--success__line--long"></span>
+		<span class="swal-icon--success__line swal-icon--success__line--tip"></span>
+
+		<div class="swal-icon--success__ring"></div>
+		<div class="swal-icon--success__hide-corners"></div>
+	</div><div class="swal-title" style="">Good job!</div><div class="swal-text" style="">You clicked the button!</div><div class="swal-footer"><div class="swal-button-container">
+
+		<button class="swal-button swal-button--confirm btn btn-success">OK</button>
+
+		<div class="swal-button__loader">
+			<div></div>
+			<div></div>
+			<div></div>
+		</div>
+
+	</div></div></div>
+
+	<!--   Core JS Files   -->
+	<script src="js/jquery-3.7.1.min.js"></script>
+	<script src="js/popper.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<!-- jQuery Scrollbar -->
+	<script src="js/jquery.scrollbar.min.js"></script>
+	<!-- Moment JS -->
+	<script src="js/moment.min.js"></script>
+	<!-- Chart JS -->
+	<script src="js/chart.min.js"></script>
+	<!-- jQuery Sparkline -->
+	<script src="js/jquery.sparkline.min.js"></script>
+	<!-- Chart Circle -->
+	<script src="js/circles.min.js"></script>
+	<!-- Datatables -->
+	<script src="js/datatables.min.js"></script>
+	<!-- Bootstrap Notify -->
+	<script src="js/bootstrap-notify.min.js"></script>
+	<!-- jQuery Vector Maps -->
+	<script src="js/jsvectormap.min.js"></script>
+	<script src="js/world.js"></script>
+	<!-- Sweet Alert -->
+	<script src="js/sweetalert.min.js"></script>
+	<!-- Kaiadmin JS -->
+	<script src="js/kaiadmin.min.js"></script>
+	<script src="js/alpine.2.8.2.min.js"></script>
+	<script>
+
+		function loadData() {
+			return {
+				pageNumber: 0,
+				size: 10,
+				total: "",
+				pageNumber_product: 0,
+				size_product: 100,
+				total_product: "",
+				receiveDate: "",
+				supplierList: [],
+				selectedSupplierId: "",
+				selectedSupplierName: '',
+				productList: [],
+				openCollapseIndex: 0, // 追蹤是哪個 collapse 被打開
+				selectedProductIds: [],
+				selectedProductList: [],	//用來裝選定要放入冰箱的商品
+				selectedCategory: "",	//動態增減次種類選單
+				selectedSubCategory: "",	//搜尋商品用
+				todayListLabel: [],
+
+				init(){
+					let _this = this;
+				    $.ajax({
+						url: "allSuppliers",
+						type: "get",
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.supplierList = response.data;
+							}
+						},
+				  	});
+				    $.ajax({
+						url: "getGroupProducts",
+						type: "get",
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.productList = Object.entries(response.data).map(([key, value]) => ({
+									groupName: key,
+									products: value,
+									allSelected: false
+								}));
+							}
+						},
+				  	});
+				    $.ajax({
+						url: "getTodaySize",
+						type: "get",
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.todayListLabel = response.data;
+							}
+						},
+				  	});
+				},
+				getSupplierData(){
+					const start = this.pageNumber * this.size,
+						  end = start + this.size;
+					this.total = this.supplierList.length;
+					return this.supplierList.slice(start, end);
+				},
+				getSelectedProductData(){
+					return this.selectedProductList.map(item => ({
+						...item,
+						quantity: item.quantity || 0,
+						total: item.total || 0,
+						expiryDate: item.expiryDate || '',
+						storePlace: item.storePlace || ''
+					}));
+				},
+				getProductData(){
+					const start = this.pageNumber_product * this.size_product,
+						  end = start + this.size_product;
+					this.total_product = this.productList.length;
+					return this.productList.slice(start, end);
+				},
+				toggleCollapse(index) {
+					this.openCollapseIndex = this.openCollapseIndex === index ? null : index;
+				},
+				isCollapseOpen(index) {
+					return this.openCollapseIndex === index;
+				},
+                toggleSelectAll(event, index) {
+					const isChecked = event.target.checked;
+					const productListItem = this.productList[index];
+
+					productListItem.products.forEach(product => {
+						product.selected = isChecked;
+						if (isChecked) {
+							if (!this.selectedProductIds.includes(product.id)) {
+								this.selectedProductIds.push(product.id);
+							}
+						} else {
+							this.selectedProductIds = this.selectedProductIds.filter(id => id !== product.id);
+						}
+					});
+                    this.checkAllSelected(index);
+                    console.log(this.selectedProductIds)
+                },
+                update(event, index) {
+                    const isChecked = $(event.target).is(':checked');
+                    const productId = $(event.target).val();
+                    const productListItem = this.productList[index];
+
+					if (isChecked) {
+						if (!this.selectedProductIds.includes(productId)) {
+							this.selectedProductIds.push(productId);
+						}
+					} else {
+						this.selectedProductIds = this.selectedProductIds.filter(id => id !== productId);
+					}
+                    this.checkAllSelected(index);
+                    console.log(this.selectedProductIds)
+                },
+                checkAllSelected(index) {
+					const item = this.productList[index];
+					if (!item) return;
+					const allSelected = item.products.every(product => product.selected);
+					item.allSelected = allSelected;
+                },
+                showSelectedProductsModal(){
+                	let _this = this;
+				    $.ajax({
+						url: "getSelectedProduct",
+						type: "post",
+						data: JSON.stringify(this.selectedProductIds),
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.selectedProductList = response.data;
+								$("#selectedProductModal").modal('show');
+							}
+						},
+				  	});
+                },
+				updateTotal(index, quantity) {
+					let item = this.selectedProductList[index];
+					if (item && item.packageQuantity) {
+						item.total = item.packageQuantity * quantity;
+						item.quantity = quantity;
+					}
+				},
+				updateExpiryDate(index, expiryDate) {
+					let item = this.selectedProductList[index];
+					if (item) {
+						item.expiryDate = expiryDate;
+					}
+				},
+				updateStorePlace(index, storePlace) {
+					let item = this.selectedProductList[index];
+					if (item) {
+						item.storePlace = storePlace;
+					}
+				},
+				categoryChange() {
+					this.selectedSubCategory = '';
+					this.productSearch();
+				},
+				productSearch(){
+					let _this = this;
+					let data = {};
+					data.keyword = $("#productKeyword").val();
+					data.mainCategory = this.selectedCategory;
+					data.subCategory = this.selectedSubCategory;
+
+					let selectedProducts = _this.selectedProductIds;
+
+				    $.ajax({
+						url: "productSearch",
+						type: "post",
+						data: JSON.stringify(data),
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								let newProductList = Object.entries(response.data).map(([key, value]) => ({
+									groupName: key,
+									products: value.map(p => ({
+										...p,
+										selected: selectedProducts.includes(p.id)  // 設定勾選狀態
+									})),
+									allSelected: false,
+								}));
+								_this.productList = newProductList;
+							}
+						},
+				  	});
+				},
+                refrigerate(){
+                	let _this = this;
+					let data = {};
+					let selectedProducts = this.selectedProductList.map(item => ({
+						productId: item.id,
+						quantity: item.quantity,
+						totalQuantity: item.total,
+						storePlace: item.storePlace,
+						expiryDate: item.expiryDate
+					}));
+					data.receiveDate = this.receiveDate;
+					data.supplierId = this.selectedSupplierId;
+					data.selectedProducts = selectedProducts;
+
+					if (validate(selectedProducts, this.receiveDate, this.selectedSupplierId)){
+						$.ajax({
+							url: "receive",
+							type: "post",
+							contentType: "application/json; charset=utf-8",
+							data: JSON.stringify(data),
+							success: function(response) {
+								if (response.code === "C000") {
+									$('#selectedProductModal').modal('hide');
+									const data = response.data;
+									$("#receiveNumber").val(data.receiveNumber);
+									$("#storeDate").val(data.storeDate);
+									$("#storeNumber").val(data.storeNumber);
+									$("#supplierName_readOnly").val(_this.selectedSupplierName);
+
+									_this.selectedProductList = [];
+									_this.selectedSupplierName = '';
+									_this.selectedSupplierId = '';
+									_this.selectedProductIds = [];
+									_this.init();
+
+									Swal.fire({
+										title: '成功放進冰箱!',
+										text: '',
+										icon: 'success',
+										confirmButtonText: '完成',
+										customClass: {
+											confirmButton: 'btn btn-success'
+										}
+									}).then((result) => {
+										if (result.isConfirmed) {
+											let tabTrigger = new bootstrap.Tab(document.getElementById('pills-form-tab-nobd'));
+											tabTrigger.show();
+										}
+									});
+
+								} else {
+									Swal.fire({
+										title: '錯誤發生，請稍後再試！',
+										text: '',
+										icon: 'error',
+										confirmButtonText: '關閉',
+										customClass: {
+											confirmButton: 'btn btn-danger'
+										}
+									})
+								}
+							},
+							error: function(xhr, status, error) {
+								Swal.fire({
+									title: '錯誤發生，請稍後再試！',
+									text: '',
+									icon: 'error',
+									confirmButtonText: '關閉',
+									customClass: {
+										confirmButton: 'btn btn-danger'
+									}
+								})
+							}
+						});
+					}
+
+                },
+				searchSupplier(){
+					let _this = this;
+					let data = {};
+					let keyword = $("#keyword").val();
+					data.keyword = keyword;
+				    $.ajax({
+						url: "supplierSearch",
+						type: "post",
+						data: JSON.stringify(data),
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.supplierList = response.data;
+								_this.clearSupplierCheckboxes();
+							}
+						},
+				  	});
+				},
+				clearSupplierCheckboxes() {
+					this.selectedSupplierId = "";
+					this.selectedSupplierName = "";
+					this.$nextTick(() => {
+						this.supplierList.forEach(item => {
+							let radio = document.getElementById(item.id);
+							if (radio) {
+								radio.checked = false;
+							}
+						});
+					});
+				},
+				updateSelectedName(name){
+					this.selectedSupplierName = name;
+				},
+				clearSupplier(){
+					$("#supplierName").val('');
+					$("#supplierPhone").val('');
+					$("#supplierAddress").val('');
+					$("#supplierWebsite").val('');
+				},
+				addSupplier(){
+					let _this = this;
+					let name = $("#supplierName").val();
+					let address = $("#supplierAddress").val();
+					let phone = $("#supplierPhone").val();
+					let website = $("#supplierWebsite").val();
+
+					if (name == ''){
+						alert('公司名必須填寫！');
+						return;
+					}
+
+					let data = {};
+					data.name = name;
+					data.address = address;
+					data.phone = phone;
+					data.website = website;
+				    $.ajax({
+						url: "saveSupplier",
+						type: "post",
+						data: JSON.stringify(data),
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.init();
+								$("#addSupplierModal").modal('hide');
+							}
+						},
+				  	});
+				},
+				pages() {
+					return Array.from({
+						length: Math.ceil(this.total / this.size),
+					});
+				},
+				nextPage() { this.pageNumber++;},
+				prevPage() { this.pageNumber--;},
+				pageCount() { return Math.ceil(this.total / this.size);},
+				viewPage(index) { this.pageNumber = index;},
+				pages_product() {
+					return Array.from({
+						length: Math.ceil(this.total_product / this.size_product),
+					});
+				},
+				nextPage_product() { this.pageNumber_product++;},
+				prevPage_product() { this.pageNumber_product--;},
+				pageCount_product() { return Math.ceil(this.total_product / this.size_product);},
+				viewPage_product(index) { this.pageNumber_product = index;},
+			};
+		}
+
+
+		function validate(selectedProducts, receiveDate, supplierId) {
+			if (selectedProducts.length === 0) {
+				alert('至少選擇一種商品！');
+				return false;
+			}
+
+			for (let item of selectedProducts) {
+				if (!item.quantity || item.quantity <= 0) {
+					alert('所有商品的數量不能為空或小於等於0！');
+					return false;
+				}
+				if (!item.totalQuantity || item.totalQuantity <= 0) {
+					alert('所有商品的總份數不能為空或小於等於0！');
+					return false;
+				}
+				if (!item.storePlace) {
+					alert('所有商品的存放位置不能為空！');
+					return false;
+				}
+				if (!item.expiryDate) {
+					alert('所有商品的有效期限不能為空！');
+					return false;
+				}
+			}
+
+			if (!receiveDate) {
+				alert('收貨日期不能為空！');
+				return false;
+			}
+			if (!supplierId) {
+				alert('需選擇一間供應商！');
+				return false;
+			}
+
+			return true;
+		}
+	</script>
+</body>
+</html>

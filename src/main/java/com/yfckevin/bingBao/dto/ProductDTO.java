@@ -1,9 +1,6 @@
 package com.yfckevin.bingBao.dto;
 
-import com.yfckevin.bingBao.enums.MainCategory;
-import com.yfckevin.bingBao.enums.PackageForm;
-import com.yfckevin.bingBao.enums.PackageUnit;
-import com.yfckevin.bingBao.enums.StorePlace;
+import com.yfckevin.bingBao.enums.*;
 import jakarta.persistence.Version;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,11 +18,13 @@ public class ProductDTO {
     private String packageFormLabel;
     private PackageUnit packageUnit;    //包裝單位 (包、瓶、個等等)
     private String packageUnitLabel;
+    private SubCategory subCategory;
+    private String subCategoryLabel;
     private String packageQuantity;     //包裝數量
-    private StorePlace storePlace;  //存放位置
-    private String storePlaceLabel;
-    private String expiryDay;  //效期 (天數)
+    private String expiryDay;  //效期 (年月日)
+    private String shelfLife;   //保質天數
     private String overdueNotice;   //通知過期天數
+    private String packageNumber;   //批次建檔編號
     private String creationDate;
     private String modificationDate;
     private String deletionDate;
@@ -112,14 +111,6 @@ public class ProductDTO {
         this.packageQuantity = packageQuantity;
     }
 
-    public StorePlace getStorePlace() {
-        return storePlace;
-    }
-
-    public void setStorePlace(StorePlace storePlace) {
-        this.storePlace = storePlace;
-    }
-
     public String getExpiryDay() {
         return expiryDay;
     }
@@ -199,21 +190,44 @@ public class ProductDTO {
     public void setPackageUnitLabel(String packageUnitLabel) {
         this.packageUnitLabel = packageUnitLabel;
     }
-
-    public String getStorePlaceLabel() {
-        return storePlaceLabel;
-    }
-
-    public void setStorePlaceLabel(String storePlaceLabel) {
-        this.storePlaceLabel = storePlaceLabel;
-    }
-
     public MultipartFile getMultipartFile() {
         return multipartFile;
     }
 
     public void setMultipartFile(MultipartFile multipartFile) {
         this.multipartFile = multipartFile;
+    }
+
+    public String getPackageNumber() {
+        return packageNumber;
+    }
+
+    public void setPackageNumber(String packageNumber) {
+        this.packageNumber = packageNumber;
+    }
+
+    public SubCategory getSubCategory() {
+        return subCategory;
+    }
+
+    public void setSubCategory(SubCategory subCategory) {
+        this.subCategory = subCategory;
+    }
+
+    public String getSubCategoryLabel() {
+        return subCategoryLabel;
+    }
+
+    public void setSubCategoryLabel(String subCategoryLabel) {
+        this.subCategoryLabel = subCategoryLabel;
+    }
+
+    public String getShelfLife() {
+        return shelfLife;
+    }
+
+    public void setShelfLife(String shelfLife) {
+        this.shelfLife = shelfLife;
     }
 
     @Override
@@ -232,11 +246,13 @@ public class ProductDTO {
                 ", packageFormLabel='" + packageFormLabel + '\'' +
                 ", packageUnit=" + packageUnit +
                 ", packageUnitLabel='" + packageUnitLabel + '\'' +
+                ", subCategory=" + subCategory +
+                ", subCategoryLabel='" + subCategoryLabel + '\'' +
                 ", packageQuantity='" + packageQuantity + '\'' +
-                ", storePlace=" + storePlace +
-                ", storePlaceLabel='" + storePlaceLabel + '\'' +
                 ", expiryDay='" + expiryDay + '\'' +
+                ", shelfLife='" + shelfLife + '\'' +
                 ", overdueNotice='" + overdueNotice + '\'' +
+                ", packageNumber='" + packageNumber + '\'' +
                 ", creationDate='" + creationDate + '\'' +
                 ", modificationDate='" + modificationDate + '\'' +
                 ", deletionDate='" + deletionDate + '\'' +

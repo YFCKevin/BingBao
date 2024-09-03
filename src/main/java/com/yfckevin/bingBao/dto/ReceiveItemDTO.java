@@ -1,12 +1,15 @@
 package com.yfckevin.bingBao.dto;
 
 import com.yfckevin.bingBao.entity.Product;
+import com.yfckevin.bingBao.enums.StorePlace;
 
 public class ReceiveItemDTO {
     private String id;
     private String productId;
     private int amount;
     private String expiryDate;  //產品有效期限日期
+    private StorePlace storePlace;  //存放位置
+    private String storePlaceLabel;
     private String creationDate;
     private String modificationDate;
     private String deletionDate;
@@ -85,6 +88,22 @@ public class ReceiveItemDTO {
         this.expiryDate = expiryDate;
     }
 
+    public StorePlace getStorePlace() {
+        return storePlace;
+    }
+
+    public void setStorePlace(StorePlace storePlace) {
+        this.storePlace = storePlace;
+    }
+
+    public String getStorePlaceLabel() {
+        return storePlaceLabel;
+    }
+
+    public void setStorePlaceLabel(String storePlaceLabel) {
+        this.storePlaceLabel = storePlaceLabel;
+    }
+
     @Override
     public String toString() {
         return "ReceiveItemDTO{" +
@@ -92,6 +111,8 @@ public class ReceiveItemDTO {
                 ", productId='" + productId + '\'' +
                 ", amount=" + amount +
                 ", expiryDate='" + expiryDate + '\'' +
+                ", storePlace=" + storePlace +
+                ", storePlaceLabel='" + storePlaceLabel + '\'' +
                 ", creationDate='" + creationDate + '\'' +
                 ", modificationDate='" + modificationDate + '\'' +
                 ", deletionDate='" + deletionDate + '\'' +

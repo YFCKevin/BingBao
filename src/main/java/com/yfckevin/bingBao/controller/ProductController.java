@@ -5,17 +5,18 @@ import com.google.cloud.vision.v1.Feature;
 import com.google.cloud.vision.v1.Image;
 import com.google.protobuf.ByteString;
 import com.yfckevin.bingBao.ConfigProperties;
-import com.yfckevin.bingBao.dto.ImageRequestDTO;
-import com.yfckevin.bingBao.dto.MemberDTO;
-import com.yfckevin.bingBao.dto.ProductDTO;
-import com.yfckevin.bingBao.dto.SearchDTO;
+import com.yfckevin.bingBao.dto.*;
 import com.yfckevin.bingBao.entity.Product;
+import com.yfckevin.bingBao.entity.TempDetail;
 import com.yfckevin.bingBao.entity.TempMaster;
+import com.yfckevin.bingBao.enums.PackageForm;
 import com.yfckevin.bingBao.exception.ResultStatus;
 import com.yfckevin.bingBao.service.GoogleVisionService;
 import com.yfckevin.bingBao.service.OpenAiService;
 import com.yfckevin.bingBao.service.ProductService;
+import com.yfckevin.bingBao.service.TempMasterService;
 import com.yfckevin.bingBao.utils.FileUtils;
+import com.yfckevin.bingBao.utils.PNUtil;
 import com.yfckevin.bingBao.utils.SNUtil;
 import jakarta.servlet.http.HttpSession;
 import org.apache.commons.io.FilenameUtils;
@@ -30,7 +31,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RestController
@@ -40,14 +44,16 @@ public class ProductController {
     private final SimpleDateFormat picSuffix;
     private final ProductService productService;
     private final GoogleVisionService googleVisionService;
+    private final TempMasterService tempMasterService;
     private final OpenAiService openAiService;
     private final ConfigProperties configProperties;
 
-    public ProductController(@Qualifier("sdf") SimpleDateFormat sdf, @Qualifier("picSuffix") SimpleDateFormat picSuffix, ProductService productService, GoogleVisionService googleVisionService, OpenAiService openAiService, ConfigProperties configProperties) {
+    public ProductController(@Qualifier("sdf") SimpleDateFormat sdf, @Qualifier("picSuffix") SimpleDateFormat picSuffix, ProductService productService, GoogleVisionService googleVisionService, TempMasterService tempMasterService, OpenAiService openAiService, ConfigProperties configProperties) {
         this.sdf = sdf;
         this.picSuffix = picSuffix;
         this.productService = productService;
         this.googleVisionService = googleVisionService;
+        this.tempMasterService = tempMasterService;
         this.openAiService = openAiService;
         this.configProperties = configProperties;
     }
@@ -55,12 +61,13 @@ public class ProductController {
 
     /**
      * 手寫輸入產品資訊
+     *
      * @param dto
      * @param session
      * @return
      */
     @PostMapping("/saveProduct")
-    public ResponseEntity<?> saveProduct (@ModelAttribute ProductDTO dto, HttpSession session) {
+    public ResponseEntity<?> saveProduct(@ModelAttribute ProductDTO dto, HttpSession session) {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
@@ -91,18 +98,19 @@ public class ProductController {
                 product.setCoverName(fileName);
             }
 
-            product.setCreator(member.getName());
+//            product.setCreator(member.getName());
+            product.setName(dto.getName());
             product.setCreationDate(sdf.format(new Date()));
             product.setPackageForm(dto.getPackageForm());
             product.setDescription(dto.getDescription());
-            product.setExpiryDay(dto.getExpiryDay());
             product.setOverdueNotice(dto.getOverdueNotice());
             product.setMainCategory(dto.getMainCategory());
-            product.setPackageQuantity(dto.getPackageQuantity());
+            if (PackageForm.COMPLETE.equals(dto.getPackageForm())) {
+                product.setPackageQuantity(dto.getPackageQuantity());
+            }
             product.setPackageUnit(dto.getPackageUnit());
             product.setPrice(dto.getPrice());
             product.setSerialNumber(SNUtil.generateSerialNumber());
-            product.setStorePlace(dto.getStorePlace());
             Product savedProduct = productService.save(product);
 
             resultStatus.setCode("C000");
@@ -125,7 +133,6 @@ public class ProductController {
                 product.setPackageQuantity(dto.getPackageQuantity());
                 product.setOverdueNotice(dto.getOverdueNotice());
                 product.setMainCategory(dto.getMainCategory());
-                product.setExpiryDay(dto.getExpiryDay());
                 product.setModificationDate(sdf.format(new Date()));
                 product.setModifier(member.getName());
                 product.setDescription(dto.getDescription());
@@ -167,16 +174,17 @@ public class ProductController {
 
     /**
      * 拍照匯入產品資訊
+     *
      * @param imageDTO
      * @param session
      * @return
      */
-    @PostMapping("/importDataByPhoto")
-    public ResponseEntity<?> importDataByPhoto (@RequestBody ImageRequestDTO imageDTO, HttpSession session){
+    @PostMapping("/convertDataByPhoto")
+    public ResponseEntity<?> importDataByPhoto(@RequestBody ImageRequestDTO imageDTO, HttpSession session) {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[importDataByPhoto]");
+            logger.info("[convertDataByPhoto]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -200,9 +208,12 @@ public class ProductController {
 
             final TempMaster tempMaster = openAiService.completion(rawText);
             if (tempMaster != null) {
+                tempMaster.setCreationDate(sdf.format(new Date()));
+//                tempMaster.setCreator(member.getName());
+                final TempMaster savedTempMaster = tempMasterService.save(tempMaster);
                 resultStatus.setCode("C000");
                 resultStatus.setMessage("成功");
-                resultStatus.setData(tempMaster);
+                resultStatus.setData(savedTempMaster);
             } else {
                 resultStatus.setCode("C010");
                 resultStatus.setMessage("轉換失敗");
@@ -217,8 +228,117 @@ public class ProductController {
     }
 
 
+    @PostMapping("/importIntoDB")
+    public ResponseEntity<?> importIntoDB(@ModelAttribute ProductDTOListWrapperDTO productDTOListWrapperDTO, HttpSession session) {
+        final MemberDTO member = (MemberDTO) session.getAttribute("member");
+        if (member != null) {
+            logger.info("[importIntoDB]");
+        }
+        ResultStatus resultStatus = new ResultStatus();
+
+        System.out.println(productDTOListWrapperDTO);
+
+        List<Product> productList = new ArrayList<>();
+        final String packageNumber = PNUtil.generatePackageNumber();
+
+        for (ProductDTO dto : productDTOListWrapperDTO.getProductDTOList()) {
+
+            Product product = new Product();
+
+            final MultipartFile nameFile = dto.getMultipartFile();
+
+            if (nameFile != null && !nameFile.isEmpty() && nameFile.getSize() != 0) {
+                final String extension = FilenameUtils.getExtension(nameFile.getOriginalFilename());
+                String fileName = String.format("%d", System.currentTimeMillis()) + "." + extension;
+                System.out.println("fileName: " + fileName);
+
+                try {
+                    System.out.println("上傳圖片");
+                    FileUtils.saveUploadedFile(nameFile, configProperties.getPicSavePath() + fileName);
+                } catch (IOException e) {
+                    System.out.println("圖片上傳失敗");
+                    logger.error(e.getMessage(), e);
+                    resultStatus.setCode("C009");
+                    resultStatus.setMessage("圖片上傳失敗");
+                    return ResponseEntity.ok(resultStatus);
+                }
+                product.setCoverName(fileName);
+            }
+
+//            product.setCreator(member.getName());
+            product.setName(dto.getName());
+            product.setCreationDate(sdf.format(new Date()));
+            product.setPackageForm(dto.getPackageForm());
+            product.setDescription(dto.getDescription());
+//            product.setExpiryDay(dto.getExpiryDay());
+            product.setOverdueNotice(dto.getOverdueNotice());
+            product.setMainCategory(dto.getMainCategory());
+            product.setSubCategory(dto.getSubCategory());
+            if (PackageForm.COMPLETE.equals(dto.getPackageForm())) {
+                product.setPackageQuantity(dto.getPackageQuantity());
+                product.setPackageUnit(dto.getPackageUnit());
+            }
+            product.setPrice(dto.getPrice());
+            product.setSerialNumber(SNUtil.generateSerialNumber());
+            product.setPackageNumber(packageNumber);
+            productList.add(product);
+        }
+        List<Product> savedProductList = productService.saveAll(productList);
+        List<ProductDTO> productDTOS = savedProductList.stream().map(this::constructProductDTO).toList();
+
+        resultStatus.setCode("C000");
+        resultStatus.setMessage("成功");
+        resultStatus.setData(productDTOS);
+        return ResponseEntity.ok(resultStatus);
+    }
+
+
+    @GetMapping("/allTempMasters")
+    public ResponseEntity<?> allTempMasters(HttpSession session) {
+        final MemberDTO member = (MemberDTO) session.getAttribute("member");
+        if (member != null) {
+            logger.info("[allTempMasters]");
+        }
+        ResultStatus resultStatus = new ResultStatus();
+
+        List<TempMaster> tempMasterList = tempMasterService.findAllByOrderByCreationDateDesc();
+
+        resultStatus.setCode("C000");
+        resultStatus.setMessage("成功");
+        resultStatus.setData(tempMasterList);
+        return ResponseEntity.ok(resultStatus);
+    }
+
+
+    @GetMapping("/getTempMasterInfo/{id}")
+    public ResponseEntity<?> getTempMasterInfo(@PathVariable String id, HttpSession session) {
+        final MemberDTO member = (MemberDTO) session.getAttribute("member");
+        if (member != null) {
+            logger.info("[getTempMasterInfo]");
+        }
+        ResultStatus resultStatus = new ResultStatus();
+
+        return tempMasterService.findById(id)
+                .map(t -> {
+                    final List<TempDetailDTO> detailDTOList = t.getTempDetails().stream()
+                            .map(ProductController::constructTempDetailDTO).toList();
+                    resultStatus.setCode("C000");
+                    resultStatus.setMessage("成功");
+                    resultStatus.setData(detailDTOList);
+                    return ResponseEntity.ok(resultStatus);
+                })
+                .orElseGet(() -> {
+                    resultStatus.setCode("C005");
+                    resultStatus.setMessage("查無匯入資料");
+                    return ResponseEntity.ok(resultStatus);
+                });
+    }
+
+
+
     /**
      * 我的產品清單
+     *
      * @param session
      * @return
      */
@@ -231,7 +351,7 @@ public class ProductController {
         }
         ResultStatus resultStatus = new ResultStatus();
 
-        List<Product> productList = productService.findAllByOrderByCreationDateDesc();
+        List<Product> productList = productService.findAllByDeletionDateIsNullOrderByCreationDateDesc();
         List<ProductDTO> productDTOList = new ArrayList<>();
         for (Product product : productList) {
             ProductDTO dto = constructProductDTO(product);
@@ -247,12 +367,13 @@ public class ProductController {
 
     /**
      * 刪除產品
+     *
      * @param id
      * @param session
      * @return
      */
     @DeleteMapping("/deleteProduct/{id}")
-    public ResponseEntity<?> deleteProduct (@PathVariable String id, HttpSession session){
+    public ResponseEntity<?> deleteProduct(@PathVariable String id, HttpSession session) {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
@@ -277,12 +398,13 @@ public class ProductController {
 
     /**
      * 查詢單一產品資訊
+     *
      * @param id
      * @param session
      * @return
      */
     @GetMapping("/productInfo/{id}")
-    public ResponseEntity<?> productInfo (@PathVariable String id, HttpSession session){
+    public ResponseEntity<?> productInfo(@PathVariable String id, HttpSession session) {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
@@ -307,12 +429,13 @@ public class ProductController {
 
     /**
      * 模糊查詢產品資訊
+     *
      * @param searchDTO
      * @param session
      * @return
      */
     @PostMapping("productSearch")
-    public ResponseEntity<?> productSearch (@RequestBody SearchDTO searchDTO, HttpSession session){
+    public ResponseEntity<?> productSearch(@RequestBody SearchDTO searchDTO, HttpSession session) {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
@@ -320,11 +443,47 @@ public class ProductController {
         }
         ResultStatus resultStatus = new ResultStatus();
 
-        List<Product> productList = productService.searchProduct(searchDTO.getKeyword().trim());
+        final String keyword = searchDTO.getKeyword().trim();
+        final String mainCategory = searchDTO.getMainCategory();
+        final String subCategory = searchDTO.getSubCategory();
+        System.out.println(keyword + " / " + mainCategory + " / " + subCategory);
+        List<Product> productList = new ArrayList<>();
+        if (StringUtils.isNotBlank(keyword) && StringUtils.isBlank(mainCategory) && StringUtils.isBlank(subCategory)) {
+            // 只有輸入名稱
+            productList = productService.searchProductByName(keyword);
+        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isBlank(subCategory)) {
+            // 有輸入名稱 + 只有主種類
+            productList = productService.searchProductByNameAndMainCategory(keyword, mainCategory);
+        } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isBlank(subCategory)) {
+            // 只有主種類
+            productList = productService.searchProductByMainCategory(mainCategory);
+        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory)) {
+            // 有輸入名稱 + 有主種類 + 有副種類
+            productList = productService.searchProductByNameAndMainCategoryAndSubCategory(keyword, mainCategory, subCategory);
+        } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory)) {
+            // 有主種類 + 有副種類
+            productList = productService.searchProductByMainCategoryAndSubCategory(mainCategory, subCategory);
+        }  else {
+            // 全空白搜尋全部
+            productList = productService.searchProductByName("");
+        }
+
+        final List<ProductDTO> productDTOList = productList.stream().map(this::constructProductDTO).toList();
+
+        final Map<String, List<ProductDTO>> tempMap = productDTOList.stream()
+                .collect(Collectors.groupingBy(ProductDTO::getPackageNumber));
+        final Map<String, List<ProductDTO>> groupedProductMap = tempMap.entrySet().stream()
+                .collect(Collectors.toMap(
+                        entry -> entry.getValue().stream()
+                                .map(ProductDTO::getName)
+                                .collect(Collectors.joining("<br>")) +
+                                " (" + entry.getValue().get(0).getPackageNumber() + ")",  // 加入CreationDate到key中
+                        Map.Entry::getValue
+                ));
 
         resultStatus.setCode("C000");
         resultStatus.setMessage("成功");
-        resultStatus.setData(productList);
+        resultStatus.setData(groupedProductMap);
         return ResponseEntity.ok(resultStatus);
     }
 
@@ -333,19 +492,47 @@ public class ProductController {
         ProductDTO dto = new ProductDTO();
         dto.setName(product.getName());
         dto.setPrice(product.getPrice());
-        dto.setPackageUnitLabel(product.getPackageUnit().getLabel());
+        if (PackageForm.COMPLETE.equals(product.getPackageForm())) {
+            dto.setPackageQuantity(product.getPackageQuantity());
+            dto.setPackageUnit(product.getPackageUnit());
+            dto.setPackageUnitLabel(product.getPackageUnit().getLabel());
+        }
         dto.setSerialNumber(product.getSerialNumber());
-        dto.setPackageQuantity(product.getPackageQuantity());
         dto.setOverdueNotice(product.getOverdueNotice());
         dto.setMainCategoryLabel(product.getMainCategory().getLabel());
-        dto.setExpiryDay(product.getExpiryDay());
         dto.setModificationDate(product.getModificationDate());
         dto.setModifier(product.getModifier());
         dto.setDescription(product.getDescription());
+        dto.setPackageForm(product.getPackageForm());
         dto.setPackageFormLabel(product.getPackageForm().getLabel());
         dto.setCreationDate(product.getCreationDate());
         dto.setCreator(product.getCreator());
+        dto.setId(product.getId());
         dto.setCoverPath(configProperties.picShowPath + product.getCoverName());
+        dto.setPackageNumber(product.getPackageNumber());
+        return dto;
+    }
+
+
+    private static TempDetailDTO constructTempDetailDTO(TempDetail d) {
+        TempDetailDTO dto = new TempDetailDTO();
+        dto.setId(d.getId());
+        dto.setName(d.getName());
+        dto.setDescription(d.getDescription());
+//        dto.setExpiryDay(d.getExpiryDay());
+        dto.setMainCategoryLabel(d.getMainCategory().getLabel());
+        dto.setPackageUnitLabel(d.getPackageUnit().getLabel());
+        dto.setPrice(d.getPrice());
+        dto.setOverdueNotice(d.getOverdueNotice());
+        dto.setPackageQuantity(d.getPackageQuantity());
+        dto.setPackageUnit(d.getPackageUnit());
+        dto.setMainCategory(d.getMainCategory());
+        dto.setTitle(d.getName());
+        dto.setSubCategory(d.getSubCategory());
+        if (d.getSubCategory() != null) {
+            dto.setSubCategoryLabel(d.getSubCategory().getLabel());
+        }
+        dto.setPackageForm(PackageForm.COMPLETE);
         return dto;
     }
 }

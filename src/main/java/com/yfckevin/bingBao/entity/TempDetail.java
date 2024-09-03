@@ -3,6 +3,7 @@ package com.yfckevin.bingBao.entity;
 import com.yfckevin.bingBao.enums.MainCategory;
 import com.yfckevin.bingBao.enums.PackageForm;
 import com.yfckevin.bingBao.enums.PackageUnit;
+import com.yfckevin.bingBao.enums.SubCategory;
 import jakarta.persistence.Id;
 import jakarta.persistence.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -15,10 +16,10 @@ public class TempDetail {
     private String description; //商品描述
     private int price;
     private MainCategory mainCategory;  //商品種類 (水果、青菜、海鮮、藥品等等)
-    private PackageForm packageForm;    //包裝形式 (完整包裝、散裝)
+    private SubCategory subCategory;    //商品次種類
     private PackageUnit packageUnit;    //包裝單位 (包、瓶、個等等)
     private String packageQuantity;     //包裝數量
-    private String expiryDay;  //效期 (天數)
+    private String overdueNotice;   //通知過期天數
     @Version
     private long version;
 
@@ -62,14 +63,6 @@ public class TempDetail {
         this.mainCategory = mainCategory;
     }
 
-    public PackageForm getPackageForm() {
-        return packageForm;
-    }
-
-    public void setPackageForm(PackageForm packageForm) {
-        this.packageForm = packageForm;
-    }
-
     public PackageUnit getPackageUnit() {
         return packageUnit;
     }
@@ -86,19 +79,27 @@ public class TempDetail {
         this.packageQuantity = packageQuantity;
     }
 
-    public String getExpiryDay() {
-        return expiryDay;
-    }
-
-    public void setExpiryDay(String expiryDay) {
-        this.expiryDay = expiryDay;
-    }
-
     public long getVersion() {
         return version;
     }
 
     public void setVersion(long version) {
         this.version = version;
+    }
+
+    public String getOverdueNotice() {
+        return overdueNotice;
+    }
+
+    public void setOverdueNotice(String overdueNotice) {
+        this.overdueNotice = overdueNotice;
+    }
+
+    public SubCategory getSubCategory() {
+        return subCategory;
+    }
+
+    public void setSubCategory(SubCategory subCategory) {
+        this.subCategory = subCategory;
     }
 }

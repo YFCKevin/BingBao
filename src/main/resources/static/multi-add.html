@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:x-on="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<title>Avatars - Kaiadmin Bootstrap 5 Admin Dashboard</title>
+	<meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
+	<link rel="icon" href="images/favicon.ico" type="image/x-icon"/>
+
+	<!-- Fonts and icons -->
+	<script src="js/webfont.min.js"></script>
+	<script>
+		WebFont.load({
+			google: {"families":["Public Sans:300,400,500,600,700"]},
+			custom: {"families":["Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands", "simple-line-icons"], urls: ['css/fonts.min.css']},
+			active: function() {
+				sessionStorage.fonts = true;
+			}
+		});
+	</script>
+
+	<!-- CSS Files -->
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/plugins.min.css">
+	<link rel="stylesheet" href="css/kaiadmin.min.css">
+	<style>
+        .selected {
+            background-color: #007bff;  /* Bootstrap primary color */
+            color: white;
+        }
+	    .nav-link.error-style {
+			border: 2px solid red; /* 红色邊框 */
+			background-color: white; /* 白色背景 */
+			color: black; /* 黑色文字 */
+		}
+    </style>
+
+	<!-- CSS Just for demo purpose, don't include it in your project -->
+<!--	<link rel="stylesheet" href="css/demo.css">-->
+</head>
+<body x-data="loadData()" x-init="init()">
+	<div class="wrapper">
+		<!-- Sidebar -->
+		<div class="sidebar" data-background-color="dark">
+			<div class="sidebar-logo">
+				<!-- Logo Header -->
+				<div class="logo-header" data-background-color="dark">
+
+					<a href="dashboard.html" class="logo">
+						<img src="images/fridge001.jpg" alt="navbar brand" class="navbar-brand" height="20">
+					</a>
+					<div class="nav-toggle">
+						<button class="btn btn-toggle toggle-sidebar">
+							<i class="gg-menu-right"></i>
+						</button>
+						<button class="btn btn-toggle sidenav-toggler">
+							<i class="gg-menu-left"></i>
+						</button>
+					</div>
+					<button class="topbar-toggler more">
+						<i class="gg-more-vertical-alt"></i>
+					</button>
+				</div>
+				<!-- End Logo Header -->
+			</div>
+			<div class="sidebar-wrapper scrollbar scrollbar-inner">
+				<div class="sidebar-content">
+					<ul class="nav nav-secondary">
+						<li class="nav-section">
+							<span class="sidebar-mini-icon">
+								<i class="fa fa-ellipsis-h"></i>
+							</span>
+							<h4 class="text-section">清單</h4>
+						</li>
+						<li class="nav-item">
+							<a href="dashboard.html">
+								<i class="fas fa-desktop"></i>
+								<p>冰箱清單</p>
+								<span class="badge badge-success" x-text="todayListLabel"></span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="product.html">
+								<i class="fas fa-fish"></i>
+								<p>商品模板</p>
+							</a>
+						</li>
+						<li class="nav-section">
+							<span class="sidebar-mini-icon">
+								<i class="fa fa-ellipsis-h"></i>
+							</span>
+							<h4 class="text-section">動作</h4>
+						</li>
+						<li class="nav-item submenu">
+							<a data-bs-toggle="collapse" href="#submenu" class="" aria-expanded="true">
+								<i class="fas fa-bars"></i>
+								<p>產品建檔</p>
+								<span class="caret"></span>
+							</a>
+							<div class="collapse" id="submenu" style="">
+								<ul class="nav nav-collapse">
+									<li class="submenu">
+										<a href="import.html">
+											<span class="sub-item">AI建檔</span>
+										</a>
+										<!--										<a href="add.html">-->
+										<!--											<span class="sub-item">手動輸入</span>-->
+										<!--										</a>-->
+									</li>
+								</ul>
+							</div>
+						</li>
+						<li class="nav-item">
+							<a href="receive.html">
+								<i class="fas fa-box-open"></i>
+								<p>收貨放進冰箱</p>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<!-- End Sidebar -->
+
+		<div class="main-panel">
+			<div class="main-header">
+				<div class="main-header-logo">
+					<!-- Logo Header -->
+					<div class="logo-header" data-background-color="dark">
+
+						<a href="dashboard.html" class="logo">
+							<img src="images/fridge001.jpg" alt="navbar brand" class="navbar-brand" height="20">
+						</a>
+						<div class="nav-toggle">
+							<button class="btn btn-toggle toggle-sidebar">
+								<i class="gg-menu-right"></i>
+							</button>
+							<button class="btn btn-toggle sidenav-toggler">
+								<i class="gg-menu-left"></i>
+							</button>
+						</div>
+						<button class="topbar-toggler more">
+							<i class="gg-more-vertical-alt"></i>
+						</button>
+
+					</div>
+					<!-- End Logo Header -->
+				</div>
+				<!-- Navbar Header -->
+				<nav hidden="hidden" class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom"></nav>
+				<!-- End Navbar -->
+			</div>
+
+			<div class="container">
+				<form id="fm" @submit.prevent="saveProduct">
+				<div class="page-inner">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card">
+								<div class="card-header d-flex justify-content-between align-items-center">
+									<div class="card-title">產品建檔</div>
+									<div class="d-flex ms-auto">
+										<button type="submit" class="btn btn-success" id="saveProductBtn">建檔</button> <!--x-on:click="saveMultiProduct()"-->
+									</div>
+								</div>
+								<div class="card-body" style="display:flex;flex-direction:column;align-items:center">
+									<ul class="nav nav-pills nav-secondary nav-pills-no-bd" id="pills-tab-without-border" role="tablist">
+										<template x-for="(item, index) in getData()" :key="index">
+											<li class="nav-item submenu" role="presentation">
+												<a :class="{'nav-link': true, 'active': selectedTab === index}"
+												   :id="'pills-home-tab-nobd-' + index"
+												   data-bs-toggle="pill"
+												   :href="'#pills-home-nobd-' + index"
+												   role="tab"
+												   :aria-controls="'pills-home-nobd-' + index"
+												   :aria-selected="selectedTab === index ? 'true' : 'false'"
+												   @click="setSelectedTab(index)"
+												   x-text="item.title"></a>
+											</li>
+										</template>
+									</ul>
+
+									<div class="row tab-content mt-3" style="width:100%;display:flex;justify-content:center">
+										<template x-for="(item, index) in getData()" :key="index">
+											<div class="tab-pane fade" :class="{'show active': selectedTab === index, 'col-12 col-lg-6': true}"
+												 :id="'pills-home-nobd-' + index"
+												 role="tabpanel"
+												 :aria-labelledby="'pills-home-tab-nobd-' + index">
+												<div class="form-group">
+													<label :for="'name-' + index">物品名稱 *</label>
+													<div class="d-flex justify-content-center align-items-center">
+														<input x-model="item.name" type="text" :id="'name-' + index" :name="'productDTOList[' + index + '].name'" placeholder="物品名稱" class="form-control">
+													</div>
+												</div>
+<!--												<div class="form-group">-->
+<!--													<label :for="'serialNumber-' + index">商品序號</label>-->
+<!--													<input type="text" class="form-control" :id="'serialNumber-' + index" :name="'productDTOList[' + index + '].serialNumber'" placeholder="自動產生序號，無須填入" readonly>-->
+<!--												</div>-->
+												<div class="form-group">
+													<label :for="'image-' + index">照片</label>
+													<div class="selectgroup selectgroup-secondary selectgroup-pills">
+														<label class="selectgroup-item">
+															<input
+																	type="file"
+																	:id="'image-' + index"
+																	class="selectgroup-input d-none"
+																	accept="image/*"
+																	:name="'productDTOList[' + index + '].multipartFile'"
+																	x-on:change="selectImage($event, index)">
+															<span :class="{'selectgroup-button selectgroup-button-icon': true, 'selected': getHasImage(index)}">
+															  <i class="fas fa-image"></i>
+															</span>
+														</label>
+													</div>
+													<div class="image-container mt-2">
+														<img x-show="getHasImage(index)" :src="getImageSrc(index)" alt="照片呈現" style="width: 100px; height: 100px; object-fit: cover;">
+													</div>
+												</div>
+												<div class="form-group">
+													<label :for="'mainCategory-' + index">產品分類 *</label>
+													<div class="d-flex">
+														<select class="form-select form-control me-2"
+																:id="'mainCategory-' + index"
+																:name="'productDTOList[' + index + '].mainCategory'"
+																x-model="item.mainCategory">
+															<option value="">請選擇</option>
+															<option value="MEAT">肉品</option>
+															<option value="SEAFOOD">海鮮</option>
+															<option value="VEGETABLES">青菜</option>
+															<option value="FRUITS">水果</option>
+															<option value="GRAINS">穀物</option>
+															<option value="BEVERAGES">飲料</option>
+															<option value="CONDIMENTS">醬料</option>
+															<option value="SNACKS">零食</option>
+															<option value="BAKERY">烘焙食品</option>
+															<option value="MEDICINE">藥品</option>
+															<option value="CANNED_FOOD">罐頭食品</option>
+															<option value="SPICES">香料</option>
+															<option value="OILS">食用油</option>
+															<option value="SWEETS">甜品</option>
+															<option value="DRIED_FOOD">乾貨</option>
+															<option value="HEALTH_FOOD">保健食品</option>
+														</select>
+														<select class="form-select form-control"
+																:id="'subCategory-' + index"
+																:name="'productDTOList[' + index + '].subCategory'"
+																x-model="item.subCategory">
+															<option value="">請選擇</option>
+															<option value="BEEF" x-show="item.mainCategory === 'MEAT'">牛肉</option>
+															<option value="PORK" x-show="item.mainCategory === 'MEAT'">豬肉</option>
+															<option value="CHICKEN" x-show="item.mainCategory === 'MEAT'">雞肉</option>
+															<option value="EGG" x-show="item.mainCategory === 'MEAT'">雞蛋</option>
+															<option value="FISH" x-show="item.mainCategory === 'SEAFOOD'">魚</option>
+															<option value="SHRIMP" x-show="item.mainCategory === 'SEAFOOD'">蝦</option>
+														</select>
+													</div>
+												</div>
+												<div class="form-group">
+													<label :for="'packageForm-' + index" for="packageForm">包裝類型 *</label>
+													<div :id="'packageForm-' + index" id="packageForm" class="d-flex">
+														<div class="form-check me-2">
+															<input x-model="item.packageForm" class="form-check-input" type="radio" :id="'completePackage-' + index" :name="'productDTOList[' + index + '].packageForm'" value="COMPLETE" id="completePackage">
+															<label class="form-check-label" :for="'completePackage-' + index" for="completePackage">
+																完整包裝
+															</label>
+														</div>
+														<div class="form-check">
+															<input x-model="item.packageForm" class="form-check-input" type="radio" :id="'bulkPackage-' + index" :name="'productDTOList[' + index + '].packageForm'" value="BULK" id="bulkPackage">
+															<label class="form-check-label" :for="'bulkPackage-' + index" for="bulkPackage">
+																散裝
+															</label>
+														</div>
+													</div>
+												</div>
+												<div class="form-group" x-show="item.packageForm === 'COMPLETE'">
+													<label :for="'packageUnit-' + index" class="col-form-label">包裝方式 *</label>
+													<div class="row" style="--bs-gutter-x: 0;">
+														<div class="col-8">
+															<input x-model="item.packageQuantity" type="text" class="form-control" :id="'packageQuantity-' + index" :name="'productDTOList[' + index + '].packageQuantity'" placeholder="填入數量">
+														</div>
+														<div class="col-4">
+															<select class="form-select form-control"
+																	:id="'packageUnit-' + index"
+																	:name="'productDTOList[' + index + '].packageUnit'"
+																	x-model="item.packageUnit">
+																<option value="">請選擇</option>
+																<option value="EACH">個</option>
+																<option value="BOX">箱</option>
+																<option value="PACK">包</option>
+																<option value="BOTTLE">瓶</option>
+																<option value="BAG">袋</option>
+																<option value="BARREL">桶</option>
+																<option value="CASE">盒</option>
+																<option value="CAN">罐</option>
+																<option value="BUNDLE">捆</option>
+																<option value="STRIP">條</option>
+																<option value="PORTION">份</option>
+															</select>
+														</div>
+													</div>
+												</div>
+												<div class="form-group">
+													<label :for="'comment-' + index">商品描述備註</label>
+													<textarea x-model="item.description" :name="'productDTOList[' + index + '].description'" class="form-control" :id="'comment-' + index" rows="5"></textarea>
+												</div>
+<!--&lt;!&ndash;											<div class="form-group">&ndash;&gt;-->
+<!--&lt;!&ndash;												<label for="mainCategory">存放位置</label>&ndash;&gt;-->
+<!--&lt;!&ndash;												<select class="form-select form-control" id="storePlace">&ndash;&gt;-->
+<!--&lt;!&ndash;													<option value="">請選擇</option>&ndash;&gt;-->
+<!--&lt;!&ndash;													<option value="HUALIEN_REF_2F_LEFT">花蓮2樓左側冰箱</option>&ndash;&gt;-->
+<!--&lt;!&ndash;													<option value="HUALIEN_REF_2F_RIGHT">花蓮2樓右側冰箱</option>&ndash;&gt;-->
+<!--&lt;!&ndash;													<option value="HUALIEN_REF_1F_RIGHT">花蓮1樓冰箱</option>&ndash;&gt;-->
+<!--&lt;!&ndash;													<option value="TAIPEI_REF">台北冰箱</option>&ndash;&gt;-->
+<!--&lt;!&ndash;												</select>&ndash;&gt;-->
+<!--&lt;!&ndash;											</div>&ndash;&gt;-->
+												<div class="form-group">
+													<label class="form-label d-block">快過期了</label>
+													<div class="d-flex align-items-center">
+														<label class="form-label">臨近有效日期幾天，提醒您即將過期？</label>
+														<label class="mx-2" x-text="item.rangeValue">0</label>
+														<label>天</label>
+													</div>
+													<input
+															x-model="item.rangeValue"
+															:id="'overdueNotice-' + index"
+															:name="'productDTOList[' + index + '].overdueNotice'"
+															class="form-range"
+															type="range"
+															min="0"
+															max="365"
+															step="1">
+												</div>
+											</div>
+										</template>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				</form>
+			</div>
+
+			<footer class="footer">
+				<div class="container-fluid d-flex justify-content-between">
+					<nav class="pull-left">
+						<ul class="nav">
+							<li class="nav-item">
+								<a class="nav-link" href="http://www.themekita.com">
+									ThemeKita
+								</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="#"> Help </a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="#"> Licenses </a>
+							</li>
+						</ul>
+					</nav>
+					<div class="copyright">
+						2024, made with <i class="fa fa-heart heart text-danger"></i> by
+						<a href="http://www.themekita.com">ThemeKita</a>
+					</div>
+					<div>
+						Distributed by
+						<a target="_blank" href="https://themewagon.com/">ThemeWagon</a>.
+					</div>
+				</div>
+			</footer>
+		</div>
+
+	</div>
+
+<!--	錯誤提示modal-->
+	<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModal" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">錯誤</h5>
+					<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body" id="errorWord">
+					相關資訊尚未填寫，請再次確認！
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-danger" data-bs-dismiss="modal">關閉</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+<!--	成功提示modal-->
+	<div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModal" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="successWord">成功</h5>
+					<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					您已完成商品建檔步驟，可前往管理頁面觀看商品資料！
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-bs-dismiss="modal">關閉</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--   Core JS Files   -->
+	<script src="js/jquery-3.7.1.min.js"></script>
+	<script src="js/popper.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<!-- jQuery Scrollbar -->
+	<script src="js/jquery.scrollbar.min.js"></script>
+	<!-- Moment JS -->
+	<script src="js/moment.min.js"></script>
+	<!-- Chart JS -->
+	<script src="js/chart.min.js"></script>
+	<!-- jQuery Sparkline -->
+	<script src="js/jquery.sparkline.min.js"></script>
+	<!-- Chart Circle -->
+	<script src="js/circles.min.js"></script>
+	<!-- Datatables -->
+	<script src="js/datatables.min.js"></script>
+	<!-- Bootstrap Notify -->
+	<script src="js/bootstrap-notify.min.js"></script>
+	<!-- jQuery Vector Maps -->
+	<script src="js/jsvectormap.min.js"></script>
+	<script src="js/world.js"></script>
+	<!-- Sweet Alert -->
+	<script src="js/sweetalert.min.js"></script>
+	<!-- Kaiadmin JS -->
+	<script src="js/kaiadmin.min.js"></script>
+	<script src="js/alpine.2.8.2.min.js"></script>
+	<script>
+		function loadData() {
+			return {
+				pageNumber: 0,
+				size: 10,
+				total: "",
+				tempDetailList: [],
+				imageSrc: [],
+				hasImage: [],	//跟蹤是否選擇了照片
+				selectedTab: 0,
+				products: [],
+				todayListLabel: [],
+
+				init(){
+					const params = new URLSearchParams(window.location.search);
+					const id = params.get('id');
+					let _this = this;
+				    $.ajax({
+						url: "getTempMasterInfo/" + id,
+						type: "get",
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.tempDetailList = response.data.map(item => ({
+									...item,
+									rangeValue: 0 // 初始值為 0
+								}));
+							}
+						},
+				  	});
+				    $.ajax({
+						url: "getTodaySize",
+						type: "get",
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.todayListLabel = response.data;
+							}
+						},
+				  	});
+				},
+
+				getData(){
+					const start = this.pageNumber * this.size,
+						  end = start + this.size;
+					this.total = this.tempDetailList.length;
+					return this.tempDetailList.slice(start, end);
+				},
+				selectImage(event, index) {
+				    const file = event.target.files[0];
+				    if (file) {
+					    this.imageSrc[index] = URL.createObjectURL(file); // 儲存圖片的 URL
+					    this.hasImage[index] = true;
+				    } else {
+					    this.imageSrc[index] = '';
+					    this.hasImage[index] = false;
+				    }
+				},
+				getHasImage(index) {
+				    return this.hasImage[index] || false;
+				},
+				getImageSrc(index) {
+				    return this.imageSrc[index] || '';
+				},
+				saveMultiProduct(){
+				    importIntoDB
+				},
+				setSelectedTab(index) {
+				    this.selectedTab = index;
+				},
+				loadProducts() {
+					this.products = [];
+
+					$('#fm .tab-pane').each((index, tabPane) => {
+						const product = {};
+						const pane = $(tabPane);
+
+						product.name = pane.find(`[name='productDTOList[${index}].name']`).val();
+						product.mainCategory = pane.find(`[name='productDTOList[${index}].mainCategory']`).val();
+						product.subCategory = pane.find(`[name='productDTOList[${index}].subCategory']`).val();
+						product.packageForm = pane.find(`[name='productDTOList[${index}].packageForm']:checked`).val();
+						product.packageQuantity = pane.find(`[name='productDTOList[${index}].packageQuantity']`).val();
+						product.packageUnit = pane.find(`[name='productDTOList[${index}].packageUnit']`).val();
+						product.description = pane.find(`[name='productDTOList[${index}].description']`).val();
+						product.overdueNotice = pane.find(`[name='productDTOList[${index}].overdueNotice']`).val();
+						const fileInput = pane.find(`[name='productDTOList[${index}].multipartFile']`)[0];
+						if (fileInput.files.length > 0) {
+							product.multipartFile = fileInput.files[0];
+						}
+						this.products.push(product);
+					});
+				},
+				saveProduct(){
+					this.loadProducts();	//把form表單的商品資訊帶入Alpine內
+					let hasError = false;
+					$('.has-error').removeClass('has-error');
+					$('.nav-link').removeClass('bg-danger text-white');
+
+					this.products.forEach((product, index) => {
+						// 商品名稱
+						if (product.name.trim() === '') {
+							$(`[name='productDTOList[${index}].name']`).closest('.form-group').addClass('has-error');
+							hasError = true;
+							changeNavLinkCss(index);
+						}
+
+						// 商品主種類
+						if (product.mainCategory.trim() === '') {
+							$(`[name='productDTOList[${index}].mainCategory']`).closest('.form-group').addClass('has-error');
+							hasError = true;
+							changeNavLinkCss(index);
+						}
+
+						// 包裝方式
+						if (product.packageForm === 'COMPLETE') {
+							if (product.packageQuantity.trim() === '' || product.packageQuantity.trim() == 0) {
+								$(`[name='productDTOList[${index}].packageQuantity']`).closest('.col-8').addClass('has-error');
+								hasError = true;
+								changeNavLinkCss(index);
+							}
+
+							if (product.packageUnit.trim() === '') {
+								$(`[name='productDTOList[${index}].packageUnit']`).closest('.col-4').addClass('has-error');
+								hasError = true;
+								changeNavLinkCss(index);
+							}
+						}
+					});
+
+					if (hasError) {
+						$('#errorModal').modal('show');
+						return;
+					}
+
+					const formData = new FormData();
+					this.products.forEach((product, index) => {
+						formData.append(`productDTOList[${index}].name`, product.name);
+						formData.append(`productDTOList[${index}].mainCategory`, product.mainCategory);
+						formData.append(`productDTOList[${index}].subCategory`, product.subCategory);
+						formData.append(`productDTOList[${index}].packageForm`, product.packageForm);
+						if (product.packageForm == 'COMPLETE'){
+							formData.append(`productDTOList[${index}].packageQuantity`, product.packageQuantity);
+							formData.append(`productDTOList[${index}].packageUnit`, product.packageUnit);
+						}
+						formData.append(`productDTOList[${index}].description`, product.description);
+						formData.append(`productDTOList[${index}].overdueNotice`, product.overdueNotice);
+
+						if (product.multipartFile) {
+							formData.append(`productDTOList[${index}].multipartFile`, product.multipartFile);
+						}
+					});
+
+					$.ajax({
+						url: 'importIntoDB',
+						type: 'POST',
+						data: formData,
+						processData: false,
+						contentType: false,
+						success: function(response) {
+							if (response.code === "C000") {
+								$('#successModal').modal('show');
+								$('#saveProductBtn').prop('disabled', true);
+							} else {
+								$('#errorWord').text('例外發生，請稍後再試！');
+								$('#errorModal').modal('show');
+							}
+						},
+						error: function(error) {
+							console.error('Error:', error);
+						}
+					});
+				},
+				pages() {
+					return Array.from({
+						length: Math.ceil(this.total / this.size),
+					});
+				},
+				nextPage() { this.pageNumber++;},
+				prevPage() { this.pageNumber--;},
+				pageCount() { return Math.ceil(this.total / this.size);},
+				viewPage(index) { this.pageNumber = index;},
+			};
+		}
+
+		// 查找對應的nav按鈕，變更樣式
+		function changeNavLinkCss(index){
+			const navLink = $('#pills-home-tab-nobd-' + index);
+			if (navLink.length) {
+				navLink.addClass('bg-danger text-white');
+			}
+		}
+	</script>
+</body>
+</html>

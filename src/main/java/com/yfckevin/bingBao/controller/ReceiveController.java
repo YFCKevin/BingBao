@@ -1,10 +1,10 @@
 package com.yfckevin.bingBao.controller;
 
 import com.yfckevin.bingBao.ConfigProperties;
-import com.yfckevin.bingBao.dto.MemberDTO;
-import com.yfckevin.bingBao.dto.ReceiveFormDTO;
-import com.yfckevin.bingBao.dto.SearchDTO;
+import com.yfckevin.bingBao.dto.*;
 import com.yfckevin.bingBao.entity.*;
+import com.yfckevin.bingBao.enums.PackageForm;
+import com.yfckevin.bingBao.enums.StorePlace;
 import com.yfckevin.bingBao.exception.ResultStatus;
 import com.yfckevin.bingBao.service.*;
 import com.yfckevin.bingBao.utils.INUtil;
@@ -19,8 +19,12 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.swing.text.html.Option;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @RestController
 public class ReceiveController {
@@ -43,6 +47,8 @@ public class ReceiveController {
         this.sdf = sdf;
     }
 
+
+
     /**
      * 新增或更新收貨、收貨明細和入庫
      * @param dto
@@ -50,7 +56,7 @@ public class ReceiveController {
      * @return
      */
     @PostMapping("/receive")
-    public ResponseEntity<?> receive(@RequestBody ReceiveFormDTO dto, HttpSession session) {
+    public ResponseEntity<?> receive(@RequestBody ReceiveRequestDTO dto, HttpSession session) {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
@@ -58,97 +64,96 @@ public class ReceiveController {
         }
         ResultStatus resultStatus = new ResultStatus();
 
-        if (StringUtils.isBlank(dto.getId())) { //新增
-            ReceiveForm receiveForm = new ReceiveForm();
-            receiveForm.setCreationDate(sdf.format(new Date()));
-            receiveForm.setCreator(member.getName());
-            receiveForm.setReceiveDate(sdf.format(new Date()));
-            receiveForm.setReceiveNumber(RNUtil.generateReceiveNumber());
-            receiveForm.setStoreDate(sdf.format(new Date()));
-            Optional<Supplier> supplierOpt = supplierService.findById(dto.getSupplierId());
-            if (supplierOpt.isEmpty()) {
-                resultStatus.setCode("C002");
-                resultStatus.setMessage("查無供應商");
-                return ResponseEntity.ok(receiveForm);
-            } else {
-                receiveForm.setSupplier(supplierOpt.get());
-            }
-            //組收貨明細
-            List<ReceiveItem> receiveItemList = dto.getItemRequestDTOS()
-                    .stream().map(item -> {
-                        ReceiveItem receiveItem = new ReceiveItem();
-                        receiveItem.setCreator(member.getName());
-                        receiveItem.setCreationDate(sdf.format(new Date()));
-                        receiveItem.setAmount(item.getQuantity());
-                        receiveItem.setProductId(item.getProductId());
-                        receiveItem.setExpiryDate(item.getExpiryDate());
-                        return receiveItemService.save(receiveItem);
-                    }).toList();
-            receiveForm.setReceiveItems(receiveItemList);
-            ReceiveForm savedReceiveForm = receiveFormService.save(receiveForm);
-            //產品入庫
-            final Map<String, Map<String, Integer>> itemIdExpiryDateAmountMap =
-                    savedReceiveForm.getReceiveItems().stream()
-                            .collect(Collectors.toMap(
-                                    ReceiveItem::getId,
-                                    receiveItem -> {
-                                        Map<String, Integer> expiryDateAmountMap = new HashMap<>();
-                                        expiryDateAmountMap.put(receiveItem.getExpiryDate(), receiveItem.getAmount());
-                                        return expiryDateAmountMap;
-                                    },
-                                    (existingMap, newMap) -> {
-                                        existingMap.putAll(newMap);
-                                        return existingMap;
-                                    }
-                            ));
-            final List<Inventory> inventoryList = savedReceiveForm.getReceiveItems()
-                    .stream().map(item -> {
+        System.out.println("放進冰箱的內容物：" + dto);
+
+        final String storeNumber = INUtil.generateStoreNumber();
+        ReceiveForm receiveForm = new ReceiveForm();
+        receiveForm.setCreationDate(sdf.format(new Date()));
+//            receiveForm.setCreator(member.getName());
+        receiveForm.setReceiveDate(sdf.format(new Date()));
+        receiveForm.setReceiveNumber(RNUtil.generateReceiveNumber());
+        receiveForm.setStoreDate(sdf.format(new Date()));
+        receiveForm.setStoreNumber(storeNumber);
+        Optional<Supplier> supplierOpt = supplierService.findById(dto.getSupplierId());
+        if (supplierOpt.isEmpty()) {
+            resultStatus.setCode("C002");
+            resultStatus.setMessage("查無供應商");
+            return ResponseEntity.ok(receiveForm);
+        } else {
+            receiveForm.setSupplier(supplierOpt.get());
+        }
+
+        //組收貨明細
+        final List<ReceiveItem> receiveItemList = dto.getSelectedProducts().stream()
+                .map(product -> {
+                    ReceiveItem receiveItem = new ReceiveItem();
+                    receiveItem.setCreationDate(sdf.format(new Date()));
+                    receiveItem.setAmount(product.getQuantity());
+                    receiveItem.setTotalAmount(product.getTotalQuantity());
+                    receiveItem.setProductId(product.getProductId());
+                    receiveItem.setExpiryDate(product.getExpiryDate());
+                    receiveItem.setStorePlace(StorePlace.valueOf(product.getStorePlace())); //前端要加這個
+                    return receiveItemService.save(receiveItem);
+                }).toList();
+        receiveForm.setReceiveItems(receiveItemList);
+        ReceiveForm savedReceiveForm = receiveFormService.save(receiveForm);
+
+        //商品放進冰箱(入庫)
+        final Map<String, Map<String, Integer>> receiveItemIdExpiryDateAmountMap =
+                savedReceiveForm.getReceiveItems().stream()
+                        .collect(Collectors.toMap(
+                                ReceiveItem::getId,
+                                receiveItem -> {
+                                    Map<String, Integer> expiryDateAmountMap = new HashMap<>();
+                                    expiryDateAmountMap.put(receiveItem.getExpiryDate(), receiveItem.getTotalAmount());
+                                    return expiryDateAmountMap;
+                                },
+                                (existingMap, newMap) -> {
+                                    existingMap.putAll(newMap);
+                                    return existingMap;
+                                }
+                        ));
+
+        final List<Inventory> inventoryList = new ArrayList<>();
+        for (ReceiveItem receiveItem : savedReceiveForm.getReceiveItems()) {
+            Map<String, Integer> expiryDateAmountMap = receiveItemIdExpiryDateAmountMap.getOrDefault(receiveItem.getId(), null);
+            if (expiryDateAmountMap != null) {
+                for (Map.Entry<String, Integer> entry : expiryDateAmountMap.entrySet()) {
+                    String expiryDate = entry.getKey();
+                    int amount = entry.getValue();
+
+                    for (int i = 0; i < amount; i++) {
                         Inventory inventory = new Inventory();
                         inventory.setCreationDate(sdf.format(new Date()));
-                        inventory.setCreator(member.getName());
                         inventory.setReceiveFormId(savedReceiveForm.getId());
-                        inventory.setReceiveItemId(item.getId());
+                        inventory.setReceiveItemId(receiveItem.getId());
                         inventory.setStoreDate(sdf.format(new Date()));
                         inventory.setReceiveFormNumber(savedReceiveForm.getReceiveNumber());
-                        inventory.setStoreNumber(INUtil.generateStoreNumber());
-                        productService.findById(item.getProductId())
+                        inventory.setStoreNumber(storeNumber);
+                        inventory.setExpiryDate(expiryDate);
+                        //計算今日到有效期限的天數差 => 保鮮期
+//                        LocalDate now = LocalDate.now();
+//                        LocalDate parsedExpiryDate = LocalDate.parse(expiryDate);
+//                        inventory.setExpiryDay(String.valueOf(ChronoUnit.DAYS.between(now, parsedExpiryDate)));
+                        inventory.setStorePlace(receiveItem.getStorePlace());
+                        productService.findById(receiveItem.getProductId())
                                 .ifPresent(product -> {
-                                    inventory.setExpiryDay(product.getExpiryDay());
+                                    inventory.setProductId(product.getId());
                                     inventory.setOverdueNotice(product.getOverdueNotice());
-                                    final Map<String, Integer> expiryDateAmountMap = itemIdExpiryDateAmountMap.getOrDefault(item.getId(), null);
-                                    if (expiryDateAmountMap != null) {
-                                        for (Map.Entry<String, Integer> entry : expiryDateAmountMap.entrySet()) {
-                                            inventory.setExpiryDate(entry.getKey());
-                                            inventory.setQuantity(entry.getValue());
-                                        }
-                                    }
+                                    inventory.setPackageForm(product.getPackageForm());
+                                    inventory.setPackageUnit(product.getPackageUnit());
+                                    inventory.setPackageNumber(product.getPackageNumber());
+                                    inventory.setPackageQuantity(product.getPackageQuantity());
                                 });
-                        return inventory;
-                    }).toList();
-            inventoryService.saveAll(inventoryList);
-            resultStatus.setCode("C000");
-            resultStatus.setMessage("成功");
-            resultStatus.setData(savedReceiveForm);
-        } else {    //更新
-            receiveFormService.findById(dto.getId())
-                    .map(r -> {
-                        r.setReceiveNumber(dto.getReceiveNumber());
-                        r.setSupplier(supplierService.findById(dto.getSupplierId()).get());
-                        r.setReceiveDate(dto.getReceiveDate());
-                        r.setModificationDate(sdf.format(new Date()));
-                        r.setModifier(member.getName());
-                        final ReceiveForm savedReceiveForm = receiveFormService.save(r);
-                        resultStatus.setCode("C000");
-                        resultStatus.setMessage("成功");
-                        resultStatus.setData(savedReceiveForm);
-                        return resultStatus;
-                    })
-                    .orElseGet(() -> {
-                        resultStatus.setCode("C003");
-                        resultStatus.setMessage("查無收貨清單");
-                        return resultStatus;
-                    });
+                        inventoryList.add(inventory);
+                    }
+                }
+            }
         }
+        inventoryService.saveAll(inventoryList);
+        resultStatus.setCode("C000");
+        resultStatus.setMessage("成功");
+        resultStatus.setData(savedReceiveForm);
         return ResponseEntity.ok(resultStatus);
     }
 
@@ -226,6 +231,82 @@ public class ReceiveController {
         resultStatus.setMessage("成功");
         resultStatus.setData(receiveFormList);
         return ResponseEntity.ok(resultStatus);
+    }
+
+
+
+    @GetMapping("/getGroupProducts")
+    public ResponseEntity<?> getGroupProducts (HttpSession session){
+
+        final MemberDTO member = (MemberDTO) session.getAttribute("member");
+        if (member != null) {
+            logger.info("[getGroupProducts]");
+        }
+        ResultStatus resultStatus = new ResultStatus();
+
+        final List<ProductDTO> productDTOList = productService.findAllByDeletionDateIsNullOrderByCreationDateDesc()
+                .stream().map(this::constructProductDTO).toList();
+
+        final Map<String, List<ProductDTO>> tempMap = productDTOList.stream()
+                .collect(Collectors.groupingBy(ProductDTO::getPackageNumber));
+        final Map<String, List<ProductDTO>> groupedProductMap = tempMap.entrySet().stream()
+                .collect(Collectors.toMap(
+                        entry -> entry.getValue().stream()
+                                .map(ProductDTO::getName)
+                                .collect(Collectors.joining("<br>")) +
+                                " (" + entry.getValue().get(0).getPackageNumber() + ")",  // 加入CreationDate到key中
+                        Map.Entry::getValue
+                ));
+        resultStatus.setCode("C000");
+        resultStatus.setMessage("成功");
+        resultStatus.setData(groupedProductMap);
+        return ResponseEntity.ok(resultStatus);
+    }
+
+
+
+    @PostMapping("/getSelectedProduct")
+    public ResponseEntity<?> getSelectedProduct (@RequestBody List<String> productIds, HttpSession session){
+
+        final MemberDTO member = (MemberDTO) session.getAttribute("member");
+        if (member != null) {
+            logger.info("[getSelectedProduct]");
+        }
+        ResultStatus resultStatus = new ResultStatus();
+
+        final List<ProductDTO> productDTOList = productService.findByIdIn(productIds).stream().map(this::constructProductDTO).toList();
+
+        resultStatus.setCode("C000");
+        resultStatus.setMessage("成功");
+        resultStatus.setData(productDTOList);
+        return ResponseEntity.ok(resultStatus);
+    }
+
+    public ProductDTO constructProductDTO(Product product) {
+        ProductDTO dto = new ProductDTO();
+        dto.setName(product.getName());
+        dto.setPrice(product.getPrice());
+        dto.setSerialNumber(product.getSerialNumber());
+        if (PackageForm.BULK.equals(product.getPackageForm())) {
+            dto.setPackageQuantity("1");
+        } else {
+            dto.setPackageUnit(product.getPackageUnit());
+            dto.setPackageUnitLabel(product.getPackageUnit().getLabel());
+            dto.setPackageQuantity(product.getPackageQuantity());
+        }
+        dto.setOverdueNotice(product.getOverdueNotice());
+        dto.setMainCategoryLabel(product.getMainCategory().getLabel());
+        dto.setModificationDate(product.getModificationDate());
+        dto.setModifier(product.getModifier());
+        dto.setDescription(product.getDescription());
+        dto.setPackageForm(product.getPackageForm());
+        dto.setPackageFormLabel(product.getPackageForm().getLabel());
+        dto.setCreationDate(product.getCreationDate());
+        dto.setCreator(product.getCreator());
+        dto.setId(product.getId());
+        dto.setCoverPath(configProperties.picShowPath + product.getCoverName());
+        dto.setPackageNumber(product.getPackageNumber());
+        return dto;
     }
 
 }

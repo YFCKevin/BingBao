@@ -1,5 +1,7 @@
 package com.yfckevin.bingBao.dto;
 
+import com.yfckevin.bingBao.enums.*;
+
 public class InventoryDTO {
     private String id;
     private String name;    //產品名稱
@@ -7,13 +9,28 @@ public class InventoryDTO {
     private String receiveFormId; //收貨唯一編號
     private String receiveFormNumber; //收貨編號
     private String receiveItemId; //收貨明細唯一編號
-    private String quantity;    //庫存數量
     private String usedDate;    //用產品日期
     private String storeDate;   //入庫日期
-    private String storeNumber; //入庫編號
+    private String storeNumber; //入庫批號
     private String expiryDate;   //有效日期
-    private String expiryDay;  //效期 (天數)
+    private StorePlace storePlace;
+    private String storePlaceLabel;
+    private PackageForm packageForm;
+    private String packageFormLabel;
+    private PackageUnit packageUnit;
+    private String packageUnitLabel;
+    private String packageQuantity;
+    private String packageNumber;
+    private MainCategory mainCategory;
+    private String mainCategoryLabel;
+    private SubCategory subCategory;
+    private String subCategoryLabel;
     private String overdueNotice;   //通知過期天數
+    private String expiryTime;  //再過多久過期(天數or月數or年數)
+    private String existedTime; //已存放多久(天數or月數or年數)
+    private String noticeDate;  //預計何時通知(包含實際通知的年月日)
+    private String totalAmount; //商品庫存總數
+    private String coverPath;    //商品圖路徑(前端呈現用)
     private String creationDate;
     private String modificationDate;
     private String deletionDate;
@@ -68,14 +85,6 @@ public class InventoryDTO {
         this.receiveItemId = receiveItemId;
     }
 
-    public String getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(String quantity) {
-        this.quantity = quantity;
-    }
-
     public String getUsedDate() {
         return usedDate;
     }
@@ -106,14 +115,6 @@ public class InventoryDTO {
 
     public void setExpiryDate(String expiryDate) {
         this.expiryDate = expiryDate;
-    }
-
-    public String getExpiryDay() {
-        return expiryDay;
-    }
-
-    public void setExpiryDay(String expiryDay) {
-        this.expiryDay = expiryDay;
     }
 
     public String getOverdueNotice() {
@@ -164,6 +165,142 @@ public class InventoryDTO {
         this.modifier = modifier;
     }
 
+    public StorePlace getStorePlace() {
+        return storePlace;
+    }
+
+    public void setStorePlace(StorePlace storePlace) {
+        this.storePlace = storePlace;
+    }
+
+    public String getStorePlaceLabel() {
+        return storePlaceLabel;
+    }
+
+    public void setStorePlaceLabel(String storePlaceLabel) {
+        this.storePlaceLabel = storePlaceLabel;
+    }
+
+    public PackageForm getPackageForm() {
+        return packageForm;
+    }
+
+    public void setPackageForm(PackageForm packageForm) {
+        this.packageForm = packageForm;
+    }
+
+    public String getPackageFormLabel() {
+        return packageFormLabel;
+    }
+
+    public void setPackageFormLabel(String packageFormLabel) {
+        this.packageFormLabel = packageFormLabel;
+    }
+
+    public PackageUnit getPackageUnit() {
+        return packageUnit;
+    }
+
+    public void setPackageUnit(PackageUnit packageUnit) {
+        this.packageUnit = packageUnit;
+    }
+
+    public String getPackageUnitLabel() {
+        return packageUnitLabel;
+    }
+
+    public void setPackageUnitLabel(String packageUnitLabel) {
+        this.packageUnitLabel = packageUnitLabel;
+    }
+
+    public String getPackageQuantity() {
+        return packageQuantity;
+    }
+
+    public void setPackageQuantity(String packageQuantity) {
+        this.packageQuantity = packageQuantity;
+    }
+
+    public String getPackageNumber() {
+        return packageNumber;
+    }
+
+    public void setPackageNumber(String packageNumber) {
+        this.packageNumber = packageNumber;
+    }
+
+    public String getExpiryTime() {
+        return expiryTime;
+    }
+
+    public void setExpiryTime(String expiryTime) {
+        this.expiryTime = expiryTime;
+    }
+
+    public String getExistedTime() {
+        return existedTime;
+    }
+
+    public void setExistedTime(String existedTime) {
+        this.existedTime = existedTime;
+    }
+
+    public String getNoticeDate() {
+        return noticeDate;
+    }
+
+    public void setNoticeDate(String noticeDate) {
+        this.noticeDate = noticeDate;
+    }
+
+    public String getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(String totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public String getCoverPath() {
+        return coverPath;
+    }
+
+    public void setCoverPath(String coverPath) {
+        this.coverPath = coverPath;
+    }
+
+    public MainCategory getMainCategory() {
+        return mainCategory;
+    }
+
+    public void setMainCategory(MainCategory mainCategory) {
+        this.mainCategory = mainCategory;
+    }
+
+    public String getMainCategoryLabel() {
+        return mainCategoryLabel;
+    }
+
+    public void setMainCategoryLabel(String mainCategoryLabel) {
+        this.mainCategoryLabel = mainCategoryLabel;
+    }
+
+    public SubCategory getSubCategory() {
+        return subCategory;
+    }
+
+    public void setSubCategory(SubCategory subCategory) {
+        this.subCategory = subCategory;
+    }
+
+    public String getSubCategoryLabel() {
+        return subCategoryLabel;
+    }
+
+    public void setSubCategoryLabel(String subCategoryLabel) {
+        this.subCategoryLabel = subCategoryLabel;
+    }
+
     @Override
     public String toString() {
         return "InventoryDTO{" +
@@ -173,13 +310,28 @@ public class InventoryDTO {
                 ", receiveFormId='" + receiveFormId + '\'' +
                 ", receiveFormNumber='" + receiveFormNumber + '\'' +
                 ", receiveItemId='" + receiveItemId + '\'' +
-                ", quantity='" + quantity + '\'' +
                 ", usedDate='" + usedDate + '\'' +
                 ", storeDate='" + storeDate + '\'' +
                 ", storeNumber='" + storeNumber + '\'' +
                 ", expiryDate='" + expiryDate + '\'' +
-                ", expiryDay='" + expiryDay + '\'' +
+                ", storePlace=" + storePlace +
+                ", storePlaceLabel='" + storePlaceLabel + '\'' +
+                ", packageForm=" + packageForm +
+                ", packageFormLabel='" + packageFormLabel + '\'' +
+                ", packageUnit=" + packageUnit +
+                ", packageUnitLabel='" + packageUnitLabel + '\'' +
+                ", packageQuantity='" + packageQuantity + '\'' +
+                ", packageNumber='" + packageNumber + '\'' +
+                ", mainCategory=" + mainCategory +
+                ", mainCategoryLabel='" + mainCategoryLabel + '\'' +
+                ", subCategory=" + subCategory +
+                ", subCategoryLabel='" + subCategoryLabel + '\'' +
                 ", overdueNotice='" + overdueNotice + '\'' +
+                ", expiryTime='" + expiryTime + '\'' +
+                ", existedTime='" + existedTime + '\'' +
+                ", noticeDate='" + noticeDate + '\'' +
+                ", totalAmount='" + totalAmount + '\'' +
+                ", coverPath='" + coverPath + '\'' +
                 ", creationDate='" + creationDate + '\'' +
                 ", modificationDate='" + modificationDate + '\'' +
                 ", deletionDate='" + deletionDate + '\'' +

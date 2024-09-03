@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:x-on="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<title>Avatars - Kaiadmin Bootstrap 5 Admin Dashboard</title>
+	<meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
+	<link rel="icon" href="images/favicon.ico" type="image/x-icon"/>
+
+	<!-- Fonts and icons -->
+	<script src="js/webfont.min.js"></script>
+	<script>
+		WebFont.load({
+			google: {"families":["Public Sans:300,400,500,600,700"]},
+			custom: {"families":["Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands", "simple-line-icons"], urls: ['css/fonts.min.css']},
+			active: function() {
+				sessionStorage.fonts = true;
+			}
+		});
+	</script>
+
+	<!-- CSS Files -->
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/plugins.min.css">
+	<link rel="stylesheet" href="css/kaiadmin.min.css">
+
+	<!-- CSS Just for demo purpose, don't include it in your project -->
+<!--	<link rel="stylesheet" href="css/demo.css">-->
+</head>
+<body x-data="loadData()" x-init="init()">
+	<div class="wrapper">
+		<!-- Sidebar -->
+		<div class="sidebar" data-background-color="dark">
+			<div class="sidebar-logo">
+				<!-- Logo Header -->
+				<div class="logo-header" data-background-color="dark">
+
+					<a href="dashboard.html" class="logo">
+						<img src="images/fridge001.jpg" alt="navbar brand" class="navbar-brand" height="20">
+					</a>
+					<div class="nav-toggle">
+						<button class="btn btn-toggle toggle-sidebar">
+							<i class="gg-menu-right"></i>
+						</button>
+						<button class="btn btn-toggle sidenav-toggler">
+							<i class="gg-menu-left"></i>
+						</button>
+					</div>
+					<button class="topbar-toggler more">
+						<i class="gg-more-vertical-alt"></i>
+					</button>
+				</div>
+				<!-- End Logo Header -->
+			</div>
+			<div class="sidebar-wrapper scrollbar scrollbar-inner">
+				<div class="sidebar-content">
+					<ul class="nav nav-secondary">
+						<li class="nav-section">
+							<span class="sidebar-mini-icon">
+								<i class="fa fa-ellipsis-h"></i>
+							</span>
+							<h4 class="text-section">清單</h4>
+						</li>
+						<li class="nav-item">
+							<a href="dashboard.html">
+								<i class="fas fa-desktop"></i>
+								<p>冰箱清單</p>
+								<span class="badge badge-success" x-text="todayListLabel"></span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="product.html">
+								<i class="fas fa-fish"></i>
+								<p>商品模板</p>
+							</a>
+						</li>
+						<li class="nav-section">
+							<span class="sidebar-mini-icon">
+								<i class="fa fa-ellipsis-h"></i>
+							</span>
+							<h4 class="text-section">動作</h4>
+						</li>
+						<li class="nav-item submenu">
+							<a data-bs-toggle="collapse" href="#submenu" class="" aria-expanded="true">
+								<i class="fas fa-bars"></i>
+								<p>產品建檔</p>
+								<span class="caret"></span>
+							</a>
+							<div class="collapse" id="submenu" style="">
+								<ul class="nav nav-collapse">
+									<li class="submenu">
+										<a href="import.html">
+											<span class="sub-item">AI建檔</span>
+										</a>
+										<!--										<a href="add.html">-->
+										<!--											<span class="sub-item">手動輸入</span>-->
+										<!--										</a>-->
+									</li>
+								</ul>
+							</div>
+						</li>
+						<li class="nav-item">
+							<a href="receive.html">
+								<i class="fas fa-box-open"></i>
+								<p>收貨放進冰箱</p>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<!-- End Sidebar -->
+
+		<div class="main-panel">
+			<div class="main-header">
+				<div class="main-header-logo">
+					<!-- Logo Header -->
+					<div class="logo-header" data-background-color="dark">
+
+						<a href="dashboard.html" class="logo">
+							<img src="images/fridge001.jpg" alt="navbar brand" class="navbar-brand" height="20">
+						</a>
+						<div class="nav-toggle">
+							<button class="btn btn-toggle toggle-sidebar">
+								<i class="gg-menu-right"></i>
+							</button>
+							<button class="btn btn-toggle sidenav-toggler">
+								<i class="gg-menu-left"></i>
+							</button>
+						</div>
+						<button class="topbar-toggler more">
+							<i class="gg-more-vertical-alt"></i>
+						</button>
+
+					</div>
+					<!-- End Logo Header -->
+				</div>
+				<!-- Navbar Header -->
+				<nav hidden="hidden" class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom"></nav>
+				<!-- End Navbar -->
+			</div>
+
+			<div class="container">
+				<div class="page-inner">
+					<div class="row">
+						<div class="card">
+							<div class="card-header">
+								<div class="d-flex align-items-center">
+									<h4 class="card-title">歷史匯入資料</h4>
+									<div class="ms-auto">
+										<input type="file" accept="image/*" id="fileInput" style="display: none;">
+										<button class="btn btn-primary btn-round me-2" x-on:click="takePhoto()" id="takePhotoBtn">
+											<i class="fa fa-plus"></i>
+											拍照
+										</button>
+										<button class="btn btn-primary btn-round" id="aiUploadBtn" x-on:click="aiImport()">
+											<i class="fas fa-star"></i>
+											AI匯入
+										</button>
+									</div>
+								</div>
+							</div>
+							<div class="card-body">
+								<div class="table-responsive">
+									<div id="add-row_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
+										<div class="row">
+											<div class="col-sm-12">
+												<table id="add-row" class="display table table-striped table-hover dataTable" role="grid" aria-describedby="add-row_info">
+													<thead>
+														<tr role="row">
+															<th>新增日期</th>
+															<th>筆數</th>
+															<th>動作</th>
+														</tr>
+													</thead>
+													<tbody>
+														<template x-for="(item,index) in getData()" :key="index">
+															<tr role="row" class="odd">
+																<td x-text="item.creationDate"></td>
+																<td x-text="item.tempDetails.length"></td>
+																<td>
+																	<div class="form-button-action d-flex flex-column flex-md-row">
+																		<button x-on:click="openUploadModal(item.id)" type="button" data-bs-toggle="tooltip" title="" class="btn btn-primary me-2">
+																			查看資料
+																		</button>
+																		<a :href="'multi-add.html?id=' + item.id" type="button" data-bs-toggle="tooltip" title="" class="btn btn-primary">
+																			填寫產品資料
+																		</a>
+																	</div>
+																</td>
+															</tr>
+														</template>
+													</tbody>
+												</table>
+												<nav class="mt-5 mb-4" x-show="pageCount() > 1">
+													<ul class="pagination justify-content-center card-page">
+														<li class="page-item" :class="{ 'disabled' : pageNumber==0 }">
+															<a
+																	class="page-link page-prev"
+																	type="button"
+																	x-on:click="prevPage();"
+																	:disabled="pageNumber==0"
+															>
+																<i class="fa fas fa-chevron-left"></i>
+															</a>
+														</li>
+														<li
+																class="page-item disabled"
+																:class="{ 'd-none' : pageCount() <= 4 || pageNumber == 0 || ( pageCount() > 4 && pageNumber == pageCount() ) }"
+														>
+															<a class="page-link">···</a>
+														</li>
+														<template x-for="(page,index) in pages()" :key="index">
+															<li
+																	class="page-item"
+																	:class="{ 'active' : index === pageNumber , 'd-none' : pageCount() > 4 && ( (index < pageNumber && pageNumber < pageCount() -4) || (index < pageCount() -4 && pageNumber >= pageCount() -4) || index >= pageNumber+4 ) }"
+															>
+																<a
+																		class="page-link"
+																		type="button"
+																		x-on:click="viewPage(index);"
+																		x-text="index+1"
+																></a>
+															</li>
+														</template>
+														<li
+																class="page-item disabled"
+																:class="{ 'd-none' : pageCount() <= 4 || pageNumber >= pageCount() -4}"
+														>
+															<a class="page-link">···</a>
+														</li>
+														<li
+																class="page-item"
+																:class="{ 'disabled' : pageNumber >= pageCount() -1 }"
+														>
+															<a
+																	class="page-link page-next"
+																	type="button"
+																	x-on:click="nextPage();"
+																	:disabled="pageNumber >= pageCount() -1"
+															>
+																<i class="fa fas fa-chevron-right"></i>
+															</a>
+														</li>
+													</ul>
+												</nav>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<footer class="footer">
+				<div class="container-fluid d-flex justify-content-between">
+					<nav class="pull-left">
+						<ul class="nav">
+							<li class="nav-item">
+								<a class="nav-link" href="http://www.themekita.com">
+									ThemeKita
+								</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="#"> Help </a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="#"> Licenses </a>
+							</li>
+						</ul>
+					</nav>
+					<div class="copyright">
+						2024, made with <i class="fa fa-heart heart text-danger"></i> by
+						<a href="http://www.themekita.com">ThemeKita</a>
+					</div>
+					<div>
+						Distributed by
+						<a target="_blank" href="https://themewagon.com/">ThemeWagon</a>.
+					</div>
+				</div>
+			</footer>
+		</div>
+
+	</div>
+
+
+	<!-- addSupplierModal -->
+	<div class="modal fade" id="addSupplierModal" tabindex="-1" aria-hidden="true" style="display: none;">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header border-0">
+					<h5 class="modal-title">
+						<span class="fw-mediumbold"> New</span>
+						<span class="fw-light"> Row </span>
+					</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">×</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<p class="small">
+						Create a new row using this form, make sure you
+						fill them all
+					</p>
+					<form>
+						<div class="row">
+							<div class="col-sm-12">
+								<div class="form-group form-group-default">
+									<label>Name</label>
+									<input id="addName" type="text" class="form-control" placeholder="fill name">
+								</div>
+							</div>
+							<div class="col-md-6 pe-0">
+								<div class="form-group form-group-default">
+									<label>Position</label>
+									<input id="addPosition" type="text" class="form-control" placeholder="fill position">
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group form-group-default">
+									<label>Office</label>
+									<input id="addOffice" type="text" class="form-control" placeholder="fill office">
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer border-0">
+					<button type="button" id="addRowButton" class="btn btn-primary">
+						Add
+					</button>
+					<button type="button" class="btn btn-danger" data-dismiss="modal">
+						Close
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+<!--	uploadDetailModal-->
+	<div class="modal fade" id="uploadDetailModal" tabindex="-1" data-bs-backdrop="static" aria-labelledby="uploadDetailModal" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+					<div class="modal-header">
+						<div class="model-title">明細</div>
+					</div>
+					<div class="modal-body pb-0">
+						<template x-for="(item,index) in getDetailData()" :key="index">
+							<div class="d-flex">
+								<div class="flex-1 pt-1 ms-2">
+									<div class="d-flex align-items-center mb-1">
+										<span>商品名稱：</span>
+										<p class="fw-bold mb-0 ms-2" x-text="item.name"></p>
+									</div>
+									<div class="d-flex align-items-center mb-1">
+										<span>種類：</span>
+										<p class="fw-bold mb-0 ms-2" x-text="item.mainCategoryLabel"></p>
+										(<p class="fw-bold mb-0 ms-2" x-text="item.subCategoryLabel"></p>)
+									</div>
+									<div class="d-flex align-items-center mb-1">
+										<span>包裝方式：</span>
+										<p class="fw-bold mb-1" x-text="item.packageQuantity"></p>
+										<span>/</span>
+										<p class="fw-bold mb-1" x-text="item.packageUnitLabel"></p>
+									</div>
+<!--									<div class="d-flex align-items-center mb-1">-->
+<!--										<span>有效期限：</span>-->
+<!--										<p class="fw-bold mb-0 ms-2" x-text="item.expiryDay"></p>-->
+<!--									</div>-->
+<!--									<div class="d-flex align-items-center mb-1">-->
+<!--										<span>通知過期天數：</span>-->
+<!--										<p class="fw-bold mb-0 ms-2" x-text="item.overdueNotice"></p>-->
+<!--										<span>天</span>-->
+<!--									</div>-->
+									<div class="d-flex align-items-center mb-1">
+										<span>商品描述：</span>
+										<p class="fw-bold mb-0 ms-2" x-text="item.description"></p>
+									</div>
+								</div>
+							</div>
+							<div class="separator-dashed"></div>
+						</template>
+					</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+<!--	處理中modal-->
+	<div class="swal-modal" role="dialog" aria-modal="true"><div class="swal-text" style="">AI處理中，請稍候......</div></div>
+
+<!--	錯誤提示-->
+	<div class="swal-modal" role="dialog" aria-modal="true"><div class="swal-icon swal-icon--error">
+		<div class="swal-icon--error__x-mark">
+			<span class="swal-icon--error__line swal-icon--error__line--left"></span>
+			<span class="swal-icon--error__line swal-icon--error__line--right"></span>
+		</div>
+	</div><div class="swal-title" style="">Good job!</div><div class="swal-text" style="">You clicked the button!</div><div class="swal-footer"><div class="swal-button-container">
+
+		<button class="swal-button swal-button--confirm btn btn-danger">OK</button>
+
+		<div class="swal-button__loader">
+			<div></div>
+			<div></div>
+			<div></div>
+		</div>
+
+	</div></div></div>
+
+<!--	成功提示-->
+	<div class="swal-modal" role="dialog" aria-modal="true"><div class="swal-icon swal-icon--success">
+		<span class="swal-icon--success__line swal-icon--success__line--long"></span>
+		<span class="swal-icon--success__line swal-icon--success__line--tip"></span>
+
+		<div class="swal-icon--success__ring"></div>
+		<div class="swal-icon--success__hide-corners"></div>
+	</div><div class="swal-title" style="">Good job!</div><div class="swal-text" style="">You clicked the button!</div><div class="swal-footer"><div class="swal-button-container">
+
+		<button class="swal-button swal-button--confirm btn btn-success">Confirm Me</button>
+
+		<div class="swal-button__loader">
+			<div></div>
+			<div></div>
+			<div></div>
+		</div>
+
+	</div></div></div>
+
+	<!--   Core JS Files   -->
+	<script src="js/jquery-3.7.1.min.js"></script>
+	<script src="js/popper.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<!-- jQuery Scrollbar -->
+	<script src="js/jquery.scrollbar.min.js"></script>
+	<!-- Moment JS -->
+	<script src="js/moment.min.js"></script>
+	<!-- Chart JS -->
+	<script src="js/chart.min.js"></script>
+	<!-- jQuery Sparkline -->
+	<script src="js/jquery.sparkline.min.js"></script>
+	<!-- Chart Circle -->
+	<script src="js/circles.min.js"></script>
+	<!-- Datatables -->
+	<script src="js/datatables.min.js"></script>
+	<!-- Bootstrap Notify -->
+	<script src="js/bootstrap-notify.min.js"></script>
+	<!-- jQuery Vector Maps -->
+	<script src="js/jsvectormap.min.js"></script>
+	<script src="js/world.js"></script>
+	<!-- Sweet Alert -->
+	<script src="js/sweetalert.min.js"></script>
+	<!-- Kaiadmin JS -->
+	<script src="js/kaiadmin.min.js"></script>
+	<script src="js/alpine.2.8.2.min.js"></script>
+	<script>
+
+		function loadData() {
+			return {
+				pageNumber: 0,
+				size: 10,
+				total: "",
+				tempMasterList: [],
+				tempDetailList: [],
+				todayListLabel: [],
+
+				init(){
+					let _this = this;
+				    $.ajax({
+						url: "allTempMasters",
+						type: "get",
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.tempMasterList = response.data;
+							}
+						},
+				  	});
+				    $.ajax({
+						url: "getTodaySize",
+						type: "get",
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.todayListLabel = response.data;
+							}
+						},
+				  	});
+				},
+
+				takePhoto(){
+					const fileInput = $('#fileInput');
+					const takePhotoBtn = $('#takePhotoBtn');
+                    fileInput.click();
+					fileInput.on('change', function() {
+						if (fileInput[0].files.length > 0) {
+							takePhotoBtn.removeClass('btn-primary').addClass('btn-success');
+						} else {
+							takePhotoBtn.removeClass('btn-success').addClass('btn-primary');
+						}
+					});
+				},
+				aiImport (){
+					const _this = this;
+					const fileInput = $('#fileInput');
+					const file = fileInput[0].files[0];
+					if (!file) {
+						alert("至少選擇一張圖片");
+						return;
+					}
+
+					const reader = new FileReader();
+					reader.onloadend = function() {
+						const base64Img = reader.result.split(',')[1];
+
+						const swalLoading = Swal.fire({
+							title: 'AI處理中，請稍候......',
+							text: '',
+							icon: 'info',
+							allowOutsideClick: false,
+							showConfirmButton: false,
+							customClass: {
+								popup: 'swal-modal'
+							}
+						});
+
+						$.ajax({
+							url: 'convertDataByPhoto',
+							method: 'POST',
+							contentType: 'application/json',
+							data: JSON.stringify({ image: base64Img }),
+							success: function(response) {
+								Swal.close();
+								if (response.code == 'C000') {
+									Swal.fire({
+										title: '產品資訊匯入成功！',
+										text: '',
+										icon: 'success',
+										confirmButtonText: '關閉',
+										customClass: {
+											confirmButton: 'btn btn-success'
+										}
+									})
+									_this.tempMasterList = response.data;
+									_this.init()
+								} else {
+									Swal.fire({
+										title: '錯誤發生，請聯繫管理員！',
+										text: '',
+										icon: 'error',
+										confirmButtonText: '關閉',
+										customClass: {
+											confirmButton: 'btn btn-danger'
+										}
+									})
+								}
+							},
+							error: function(error) {
+								Swal.close();
+
+								Swal.fire({
+									title: '錯誤發生，請稍後再試！',
+									text: '',
+									icon: 'error',
+									confirmButtonText: '關閉',
+									customClass: {
+										confirmButton: 'btn btn-danger'
+									}
+								});
+								console.error('Error:', error);
+							}
+						});
+					};
+					reader.readAsDataURL(file);
+				},
+				openUploadModal(id){
+					let _this = this;
+				    $.ajax({
+						url: "getTempMasterInfo/" + id,
+						type: "get",
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.tempDetailList = response.data;
+								console.log(_this.tempDetailList)
+								$("#uploadDetailModal").modal("show");
+							}
+						},
+				  	});
+				},
+
+				getData(){
+					const start = this.pageNumber * this.size,
+						  end = start + this.size;
+					this.total = this.tempMasterList.length;
+					return this.tempMasterList.slice(start, end);
+				},
+				getDetailData(){
+					return this.tempDetailList;
+				},
+				pages() {
+					return Array.from({
+						length: Math.ceil(this.total / this.size),
+					});
+				},
+				nextPage() { this.pageNumber++;},
+				prevPage() { this.pageNumber--;},
+				pageCount() { return Math.ceil(this.total / this.size);},
+				viewPage(index) { this.pageNumber = index;},
+			};
+		}
+	</script>
+</body>
+</html>

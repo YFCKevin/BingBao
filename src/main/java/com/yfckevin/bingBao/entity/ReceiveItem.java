@@ -1,5 +1,6 @@
 package com.yfckevin.bingBao.entity;
 
+import com.yfckevin.bingBao.enums.StorePlace;
 import jakarta.persistence.Id;
 import jakarta.persistence.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -10,7 +11,9 @@ public class ReceiveItem {
     private String id;
     private String productId;
     private int amount; //收貨產品數量
+    private int totalAmount;    //收貨產品總數量(數量 * 包裝單位)
     private String expiryDate;  //產品有效期限日期
+    private StorePlace storePlace;  //存放位置
     private String creationDate;
     private String modificationDate;
     private String deletionDate;
@@ -97,5 +100,21 @@ public class ReceiveItem {
 
     public void setExpiryDate(String expiryDate) {
         this.expiryDate = expiryDate;
+    }
+
+    public StorePlace getStorePlace() {
+        return storePlace;
+    }
+
+    public void setStorePlace(StorePlace storePlace) {
+        this.storePlace = storePlace;
+    }
+
+    public int getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(int totalAmount) {
+        this.totalAmount = totalAmount;
     }
 }

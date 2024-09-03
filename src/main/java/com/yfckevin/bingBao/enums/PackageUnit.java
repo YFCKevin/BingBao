@@ -10,7 +10,8 @@ public enum PackageUnit {
     CASE(7, "盒"),
     CAN(8, "罐"),
     BUNDLE(9, "捆"),
-    STRIP(10, "條");
+    STRIP(10, "條"),
+    PORTION(11, "份");
 
     private int value;
     private String label;

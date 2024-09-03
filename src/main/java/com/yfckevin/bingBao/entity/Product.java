@@ -15,12 +15,12 @@ public class Product {
     private String coverName;   //圖片檔名
     private int price;
     private MainCategory mainCategory;  //商品種類 (水果、青菜、海鮮、藥品等等)
+    private SubCategory subCategory;    //商品副總類
     private PackageForm packageForm;    //包裝形式 (完整包裝、散裝)
     private PackageUnit packageUnit;    //包裝單位 (包、瓶、個等等)
     private String packageQuantity;     //包裝數量
-    private StorePlace storePlace;  //存放位置
-    private String expiryDay;  //效期 (天數)
     private String overdueNotice;   //通知過期天數
+    private String packageNumber;   //批次建檔編號
     private String creationDate;
     private String modificationDate;
     private String deletionDate;
@@ -109,22 +109,6 @@ public class Product {
         this.packageQuantity = packageQuantity;
     }
 
-    public StorePlace getStorePlace() {
-        return storePlace;
-    }
-
-    public void setStorePlace(StorePlace storePlace) {
-        this.storePlace = storePlace;
-    }
-
-    public String getExpiryDay() {
-        return expiryDay;
-    }
-
-    public void setExpiryDay(String expiryDay) {
-        this.expiryDay = expiryDay;
-    }
-
     public String getOverdueNotice() {
         return overdueNotice;
     }
@@ -179,5 +163,21 @@ public class Product {
 
     public void setVersion(long version) {
         this.version = version;
+    }
+
+    public String getPackageNumber() {
+        return packageNumber;
+    }
+
+    public void setPackageNumber(String packageNumber) {
+        this.packageNumber = packageNumber;
+    }
+
+    public SubCategory getSubCategory() {
+        return subCategory;
+    }
+
+    public void setSubCategory(SubCategory subCategory) {
+        this.subCategory = subCategory;
     }
 }

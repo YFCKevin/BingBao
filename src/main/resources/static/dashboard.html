@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:x-on="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<title>Avatars - Kaiadmin Bootstrap 5 Admin Dashboard</title>
+	<meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
+	<link rel="icon" href="images/favicon.ico" type="image/x-icon"/>
+
+	<!-- Fonts and icons -->
+	<script src="js/webfont.min.js"></script>
+	<script>
+		WebFont.load({
+			google: {"families":["Public Sans:300,400,500,600,700"]},
+			custom: {"families":["Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands", "simple-line-icons"], urls: ['css/fonts.min.css']},
+			active: function() {
+				sessionStorage.fonts = true;
+			}
+		});
+	</script>
+
+	<!-- CSS Files -->
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/plugins.min.css">
+	<link rel="stylesheet" href="css/kaiadmin.min.css">
+
+	<!-- CSS Just for demo purpose, don't include it in your project -->
+<!--	<link rel="stylesheet" href="css/demo.css">-->
+</head>
+<body x-data="loadData()" x-init="init()">
+	<div class="wrapper">
+		<!-- Sidebar -->
+		<div class="sidebar" data-background-color="dark">
+			<div class="sidebar-logo">
+				<!-- Logo Header -->
+				<div class="logo-header" data-background-color="dark">
+
+					<a href="dashboard.html" class="logo">
+						<img src="images/fridge001.jpg" alt="navbar brand" class="navbar-brand" height="20">
+					</a>
+					<div class="nav-toggle">
+						<button class="btn btn-toggle toggle-sidebar">
+							<i class="gg-menu-right"></i>
+						</button>
+						<button class="btn btn-toggle sidenav-toggler">
+							<i class="gg-menu-left"></i>
+						</button>
+					</div>
+					<button class="topbar-toggler more">
+						<i class="gg-more-vertical-alt"></i>
+					</button>
+				</div>
+				<!-- End Logo Header -->
+			</div>
+			<div class="sidebar-wrapper scrollbar scrollbar-inner">
+				<div class="sidebar-content">
+					<ul class="nav nav-secondary">
+						<li class="nav-section">
+							<span class="sidebar-mini-icon">
+								<i class="fa fa-ellipsis-h"></i>
+							</span>
+							<h4 class="text-section">清單</h4>
+						</li>
+						<li class="nav-item">
+							<a href="dashboard.html">
+								<i class="fas fa-desktop"></i>
+								<p>冰箱清單</p>
+								<span class="badge badge-success" x-text="todayListLabel"></span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="product.html">
+							  <i class="fas fa-fish"></i>
+							  <p>商品模板</p>
+							</a>
+						</li>
+						<li class="nav-section">
+							<span class="sidebar-mini-icon">
+								<i class="fa fa-ellipsis-h"></i>
+							</span>
+							<h4 class="text-section">動作</h4>
+						</li>
+						<li class="nav-item submenu">
+							<a data-bs-toggle="collapse" href="#submenu" class="" aria-expanded="true">
+								<i class="fas fa-bars"></i>
+								<p>產品建檔</p>
+								<span class="caret"></span>
+							</a>
+							<div class="collapse" id="submenu" style="">
+								<ul class="nav nav-collapse">
+									<li class="submenu">
+										<a href="import.html">
+											<span class="sub-item">AI建檔</span>
+										</a>
+<!--										<a href="add.html">-->
+<!--											<span class="sub-item">手動輸入</span>-->
+<!--										</a>-->
+									</li>
+								</ul>
+							</div>
+						</li>
+						<li class="nav-item">
+							<a href="receive.html">
+								<i class="fas fa-box-open"></i>
+								<p>收貨放進冰箱</p>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<!-- End Sidebar -->
+
+		<div class="main-panel">
+			<div class="main-header">
+				<div class="main-header-logo">
+					<!-- Logo Header -->
+					<div class="logo-header" data-background-color="dark">
+
+						<a href="dashboard.html" class="logo">
+							<img src="images/fridge001.jpg" alt="navbar brand" class="navbar-brand" height="20">
+						</a>
+						<div class="nav-toggle">
+							<button class="btn btn-toggle toggle-sidebar">
+								<i class="gg-menu-right"></i>
+							</button>
+							<button class="btn btn-toggle sidenav-toggler">
+								<i class="gg-menu-left"></i>
+							</button>
+						</div>
+						<button class="topbar-toggler more">
+							<i class="gg-more-vertical-alt"></i>
+						</button>
+
+					</div>
+					<!-- End Logo Header -->
+				</div>
+				<!-- Navbar Header -->
+				<nav hidden="hidden" class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom"></nav>
+				<!-- End Navbar -->
+			</div>
+
+			<div class="container">
+				<div class="page-inner">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card">
+								<div class="card-header d-flex justify-content-between align-items-center">
+									<h4 class="card-title">管理</h4>
+								</div>
+								<div class="card-body">
+									<ul class="nav nav-pills nav-secondary nav-pills-no-bd" id="pills-tab-without-border" role="tablist">
+										<li class="nav-item" role="presentation">
+											<a class="nav-link active" id="pills-today-tab-nobd" data-bs-toggle="pill" href="#pills-today-nobd" role="tab" aria-controls="pills-today-nobd" aria-selected="true">今日放進冰箱</a>
+										</li>
+										<li class="nav-item" role="presentation">
+											<a class="nav-link" id="pills-soon-tab-nobd" data-bs-toggle="pill" href="#pills-soon-nobd" role="tab" aria-controls="pills-soon-nobd" aria-selected="false" tabindex="-1">快過期</a>
+										</li>
+										<li class="nav-item" role="presentation">
+											<a class="nav-link" id="pills-valid-tab-nobd" data-bs-toggle="pill" href="#pills-valid-nobd" role="tab" aria-controls="pills-valid-nobd" aria-selected="false" tabindex="-1">在有效期限內</a>
+										</li>
+									</ul>
+									<div class="tab-content mt-2 mb-3" id="pills-without-border-tabContent">
+<!--										今日放進冰箱的-->
+										<div class="tab-pane active" id="pills-today-nobd" role="tabpanel" aria-labelledby="pills-today-tab-nobd">
+											<div class="col-md-12">
+<!--												<div class="card">-->
+												<div class="card-header">
+													<div class="d-flex align-items-center">
+														<h4 class="card-title"></h4>
+													</div>
+												</div>
+												<div class="card-body">
+													<div class="table-responsive">
+														<div id="add-row_wrapper_1" class="dataTables_wrapper container-fluid dt-bootstrap4">
+															<div class="row">
+																<div class="col-sm-12 col-md-6">
+																	<div id="select-product_filter_today" class="mb-3">
+																		<input x-on:keydown.enter="todayProductSearch()" id="todayProductKeyword" type="search" class="form-control" placeholder="可搜尋商品名稱" aria-controls="add-row">
+																	</div>
+																	<div class="d-flex flex-column flex-md-row align-items-start">
+																		<select class="form-select form-control me-2 mb-2 mb-md-0" x-model="todaySelectedCategory" x-on:change="todayCategoryChange()">
+																			<option value="">請選擇主類型</option>
+																			<option value="MEAT">肉品</option>
+																			<option value="SEAFOOD">海鮮</option>
+																			<option value="VEGETABLES">青菜</option>
+																			<option value="FRUITS">水果</option>
+																			<option value="GRAINS">穀物</option>
+																			<option value="BEVERAGES">飲料</option>
+																			<option value="CONDIMENTS">醬料</option>
+																			<option value="SNACKS">零食</option>
+																			<option value="BAKERY">烘焙食品</option>
+																			<option value="MEDICINE">藥品</option>
+																			<option value="CANNED_FOOD">罐頭食品</option>
+																			<option value="SPICES">香料</option>
+																			<option value="OILS">食用油</option>
+																			<option value="SWEETS">甜品</option>
+																			<option value="DRIED_FOOD">乾貨</option>
+																			<option value="HEALTH_FOOD">保健食品</option>
+																		</select>
+																		<template x-if="todaySelectedCategory !== 'MEAT' && todaySelectedCategory !== 'SEAFOOD'">
+																			<select class="form-select form-control" x-model="todaySelectedSubCategory" disabled x-on:change="todayProductSearch()">
+																				<option value="x">-</option>
+																			</select>
+																		</template>
+																		<template x-if="todaySelectedCategory === 'MEAT'">
+																			<select class="form-select form-control" x-model="todaySelectedSubCategory" x-on:change="todayProductSearch()">
+																				<option value="">請選擇副類型</option>
+																				<option value="BEEF">牛肉</option>
+																				<option value="PORK">豬肉</option>
+																				<option value="CHICKEN">雞肉</option>
+																				<option value="EGG">雞蛋</option>
+																			</select>
+																		</template>
+																		<template x-if="todaySelectedCategory === 'SEAFOOD'">
+																			<select class="form-select form-control" x-model="todaySelectedSubCategory" x-on:change="todayProductSearch()">
+																				<option value="">請選擇副類型</option>
+																				<option value="FISH">魚</option>
+																				<option value="SHRIMP">蝦</option>
+																			</select>
+																		</template>
+																	</div>
+																</div>
+															</div>
+															<div class="row">
+																<div class="col-sm-12">
+																	<table id="add-row_1" class="display table table-striped table-hover dataTable" role="grid" aria-describedby="add-row_info">
+																		<thead>
+																		<tr role="row">
+																			<th>商品照片</th>
+																			<th>商品名稱</th>
+																			<th>剩餘數量</th>
+																			<th>有效期限</th>
+																			<th>何時通知快過期</th>
+																			<th>動作</th>
+																		</tr>
+																		</thead>
+																		<tbody>
+																		<template x-for="(item,index) in getTodayData()" :key="index">
+																			<tr role="row" class="odd">
+																				<td>
+																					<img :src="item.coverPath" style="width: 50px; height: 50px">
+																				</td>
+																				<td x-text="item.name"></td>
+																				<td x-text="item.totalAmount"></td>
+																				<td x-text="item.expiryDate"></td>
+																				<td x-text="item.noticeDate"></td>
+																				<td>
+																					<button @click="openAmountModal(item.id)" type="button" data-bs-toggle="tooltip" title="登錄使用數量" class="btn btn-link btn-primary">
+																						<i class="fas fa-edit"></i>
+																					</button>
+																					<button @click="openPackageModal(item.id)" type="button" data-bs-toggle="tooltip" title="查看包裝資訊" class="btn btn-link btn-info">
+																						<i class="fas fa-list"></i>
+																					</button>
+																					<button @click="openDeleteModal(item.id)" type="button" data-bs-toggle="tooltip" title="丟棄" class="btn btn-link btn-danger">
+																						<i class="fas fa-trash-alt"></i>
+																					</button>
+																				</td>
+																			</tr>
+																		</template>
+																		</tbody>
+																	</table>
+																	<nav class="mt-5 mb-4" x-show="pageCount() > 1">
+																		<ul class="pagination justify-content-center card-page">
+																			<li class="page-item" :class="{ 'disabled' : pageNumber==0 }">
+																				<a
+																						class="page-link page-prev"
+																						type="button"
+																						x-on:click="prevPage();"
+																						:disabled="pageNumber==0"
+																				>
+																					<i class="fa fas fa-chevron-left"></i>
+																				</a>
+																			</li>
+																			<li
+																					class="page-item disabled"
+																					:class="{ 'd-none' : pageCount() <= 4 || pageNumber == 0 || ( pageCount() > 4 && pageNumber == pageCount() ) }"
+																			>
+																				<a class="page-link">···</a>
+																			</li>
+																			<template x-for="(page,index) in pages()" :key="index">
+																				<li
+																						class="page-item"
+																						:class="{ 'active' : index === pageNumber , 'd-none' : pageCount() > 4 && ( (index < pageNumber && pageNumber < pageCount() -4) || (index < pageCount() -4 && pageNumber >= pageCount() -4) || index >= pageNumber+4 ) }"
+																				>
+																					<a
+																							class="page-link"
+																							type="button"
+																							x-on:click="viewPage(index);"
+																							x-text="index+1"
+																					></a>
+																				</li>
+																			</template>
+																			<li
+																					class="page-item disabled"
+																					:class="{ 'd-none' : pageCount() <= 4 || pageNumber >= pageCount() -4}"
+																			>
+																				<a class="page-link">···</a>
+																			</li>
+																			<li
+																					class="page-item"
+																					:class="{ 'disabled' : pageNumber >= pageCount() -1 }"
+																			>
+																				<a
+																						class="page-link page-next"
+																						type="button"
+																						x-on:click="nextPage();"
+																						:disabled="pageNumber >= pageCount() -1"
+																				>
+																					<i class="fa fas fa-chevron-right"></i>
+																				</a>
+																			</li>
+																		</ul>
+																	</nav>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+<!--												</div>-->
+											</div>
+
+										</div>
+<!--										快過期-->
+										<div class="tab-pane fade" id="pills-soon-nobd" role="tabpanel" aria-labelledby="pills-today-tab-nobd">
+											<div class="col-md-12">
+<!--												<div class="card">-->
+												<div class="card-header">
+													<div class="d-flex align-items-center">
+														<h4 class="card-title"></h4>
+													</div>
+												</div>
+												<div class="card-body">
+													<div class="table-responsive">
+														<div id="add-row_wrapper_2" class="dataTables_wrapper container-fluid dt-bootstrap4">
+															<div class="row">
+																<div class="col-sm-12 col-md-6">
+																	<div id="select-product_filter_soon" class="mb-3">
+																		<input x-on:keydown.enter="soonProductSearch()" id="soonProductKeyword" type="search" class="form-control" placeholder="可搜尋商品名稱" aria-controls="add-row">
+																	</div>
+																	<div class="d-flex flex-column flex-md-row align-items-start">
+																		<select class="form-select form-control me-2 mb-2 mb-md-0" x-model="soonSelectedCategory" x-on:change="soonCategoryChange()">
+																			<option value="">請選擇主類型</option>
+																			<option value="MEAT">肉品</option>
+																			<option value="SEAFOOD">海鮮</option>
+																			<option value="VEGETABLES">青菜</option>
+																			<option value="FRUITS">水果</option>
+																			<option value="GRAINS">穀物</option>
+																			<option value="BEVERAGES">飲料</option>
+																			<option value="CONDIMENTS">醬料</option>
+																			<option value="SNACKS">零食</option>
+																			<option value="BAKERY">烘焙食品</option>
+																			<option value="MEDICINE">藥品</option>
+																			<option value="CANNED_FOOD">罐頭食品</option>
+																			<option value="SPICES">香料</option>
+																			<option value="OILS">食用油</option>
+																			<option value="SWEETS">甜品</option>
+																			<option value="DRIED_FOOD">乾貨</option>
+																			<option value="HEALTH_FOOD">保健食品</option>
+																		</select>
+																		<template x-if="soonSelectedCategory !== 'MEAT' && soonSelectedCategory !== 'SEAFOOD'">
+																			<select class="form-select form-control" x-model="soonSelectedSubCategory" disabled x-on:change="soonProductSearch()">
+																				<option value="x">-</option>
+																			</select>
+																		</template>
+																		<template x-if="soonSelectedCategory === 'MEAT'">
+																			<select class="form-select form-control" x-model="soonSelectedSubCategory" x-on:change="soonProductSearch()">
+																				<option value="">請選擇副類型</option>
+																				<option value="BEEF">牛肉</option>
+																				<option value="PORK">豬肉</option>
+																				<option value="CHICKEN">雞肉</option>
+																				<option value="EGG">雞蛋</option>
+																			</select>
+																		</template>
+																		<template x-if="soonSelectedCategory === 'SEAFOOD'">
+																			<select class="form-select form-control" x-model="soonSelectedSubCategory" x-on:change="soonProductSearch()">
+																				<option value="">請選擇副類型</option>
+																				<option value="FISH">魚</option>
+																				<option value="SHRIMP">蝦</option>
+																			</select>
+																		</template>
+																	</div>
+																</div>
+															</div>
+															<div class="row">
+																<div class="col-sm-12">
+																	<table id="add-row_2" class="display table table-striped table-hover dataTable" role="grid" aria-describedby="add-row_info">
+																		<thead>
+																		<tr role="row">
+																			<th>商品照片</th>
+																			<th>商品名稱</th>
+																			<th>剩餘數量</th>
+																			<th>有效期限</th>
+																			<th>再過多久過期</th>
+																			<th>已存放多久</th>
+																			<th>動作</th>
+																		</tr>
+																		</thead>
+																		<tbody>
+																		<template x-for="(item,index) in getExpiringSoonData()" :key="index">
+																			<tr role="row" class="odd">
+																				<td>
+																					<img :src="item.coverPath" style="width: 50px; height: 50px">
+																				</td>
+																				<td x-text="item.name"></td>
+																				<td x-text="item.totalAmount"></td>
+																				<td x-text="item.expiryDate"></td>
+																				<td x-text="item.expiryTime"></td>
+																				<td x-text="item.existedTime"></td>
+																				<td>
+																					<button @click="openAmountModal(item.id)" type="button" data-bs-toggle="tooltip" title="登錄使用數量" class="btn btn-link btn-primary">
+																						<i class="fas fa-edit"></i>
+																					</button>
+																					<button @click="openDeleteModal(item.id)" type="button" data-bs-toggle="tooltip" title="丟棄" class="btn btn-link btn-danger">
+																						<i class="fas fa-trash-alt"></i>
+																					</button>
+																				</td>
+																			</tr>
+																		</template>
+																		</tbody>
+																	</table>
+																	<nav class="mt-5 mb-4" x-show="pageCount() > 1">
+																		<ul class="pagination justify-content-center card-page">
+																			<li class="page-item" :class="{ 'disabled' : pageNumber==0 }">
+																				<a
+																						class="page-link page-prev"
+																						type="button"
+																						x-on:click="prevPage();"
+																						:disabled="pageNumber==0"
+																				>
+																					<i class="fa fas fa-chevron-left"></i>
+																				</a>
+																			</li>
+																			<li
+																					class="page-item disabled"
+																					:class="{ 'd-none' : pageCount() <= 4 || pageNumber == 0 || ( pageCount() > 4 && pageNumber == pageCount() ) }"
+																			>
+																				<a class="page-link">···</a>
+																			</li>
+																			<template x-for="(page,index) in pages()" :key="index">
+																				<li
+																						class="page-item"
+																						:class="{ 'active' : index === pageNumber , 'd-none' : pageCount() > 4 && ( (index < pageNumber && pageNumber < pageCount() -4) || (index < pageCount() -4 && pageNumber >= pageCount() -4) || index >= pageNumber+4 ) }"
+																				>
+																					<a
+																							class="page-link"
+																							type="button"
+																							x-on:click="viewPage(index);"
+																							x-text="index+1"
+																					></a>
+																				</li>
+																			</template>
+																			<li
+																					class="page-item disabled"
+																					:class="{ 'd-none' : pageCount() <= 4 || pageNumber >= pageCount() -4}"
+																			>
+																				<a class="page-link">···</a>
+																			</li>
+																			<li
+																					class="page-item"
+																					:class="{ 'disabled' : pageNumber >= pageCount() -1 }"
+																			>
+																				<a
+																						class="page-link page-next"
+																						type="button"
+																						x-on:click="nextPage();"
+																						:disabled="pageNumber >= pageCount() -1"
+																				>
+																					<i class="fa fas fa-chevron-right"></i>
+																				</a>
+																			</li>
+																		</ul>
+																	</nav>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+<!--												</div>-->
+											</div>
+
+										</div>
+<!--										在有效期限內-->
+										<div class="tab-pane fade" id="pills-valid-nobd" role="tabpanel" aria-labelledby="pills-today-tab-nobd">
+											<div class="col-md-12">
+<!--												<div class="card">-->
+												<div class="card-header">
+													<div class="d-flex align-items-center">
+														<h4 class="card-title"></h4>
+													</div>
+												</div>
+												<div class="card-body">
+													<div class="table-responsive">
+														<div id="add-row_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
+															<div class="row">
+																<div class="col-sm-12 col-md-6">
+																	<div id="select-product_filter" class="mb-3">
+																		<input x-on:keydown.enter="validProductSearch()" id="validProductKeyword" type="search" class="form-control" placeholder="可搜尋商品名稱" aria-controls="add-row">
+																	</div>
+																	<div class="d-flex flex-column flex-md-row align-items-start">
+																		<select class="form-select form-control me-2 mb-2 mb-md-0" x-model="validSelectedCategory" x-on:change="validCategoryChange()">
+																			<option value="">請選擇主類型</option>
+																			<option value="MEAT">肉品</option>
+																			<option value="SEAFOOD">海鮮</option>
+																			<option value="VEGETABLES">青菜</option>
+																			<option value="FRUITS">水果</option>
+																			<option value="GRAINS">穀物</option>
+																			<option value="BEVERAGES">飲料</option>
+																			<option value="CONDIMENTS">醬料</option>
+																			<option value="SNACKS">零食</option>
+																			<option value="BAKERY">烘焙食品</option>
+																			<option value="MEDICINE">藥品</option>
+																			<option value="CANNED_FOOD">罐頭食品</option>
+																			<option value="SPICES">香料</option>
+																			<option value="OILS">食用油</option>
+																			<option value="SWEETS">甜品</option>
+																			<option value="DRIED_FOOD">乾貨</option>
+																			<option value="HEALTH_FOOD">保健食品</option>
+																		</select>
+																		<template x-if="validSelectedCategory !== 'MEAT' && validSelectedCategory !== 'SEAFOOD'">
+																			<select class="form-select form-control" x-model="validSelectedSubCategory" disabled x-on:change="validProductSearch()">
+																				<option value="x">-</option>
+																			</select>
+																		</template>
+																		<template x-if="validSelectedCategory === 'MEAT'">
+																			<select class="form-select form-control" x-model="validSelectedSubCategory" x-on:change="validProductSearch()">
+																				<option value="">請選擇副類型</option>
+																				<option value="BEEF">牛肉</option>
+																				<option value="PORK">豬肉</option>
+																				<option value="CHICKEN">雞肉</option>
+																				<option value="EGG">雞蛋</option>
+																			</select>
+																		</template>
+																		<template x-if="validSelectedCategory === 'SEAFOOD'">
+																			<select class="form-select form-control" x-model="selectedSubCategory" x-on:change="validProductSearch()">
+																				<option value="">請選擇副類型</option>
+																				<option value="FISH">魚</option>
+																				<option value="SHRIMP">蝦</option>
+																			</select>
+																		</template>
+																	</div>
+																</div>
+															</div>
+															<div class="row">
+																<div class="col-sm-12">
+																	<table id="add-row" class="display table table-striped table-hover dataTable" role="grid" aria-describedby="add-row_info">
+																		<thead>
+																		<tr role="row">
+																			<th>商品照片</th>
+																			<th>商品名稱</th>
+																			<th>剩餘數量</th>
+																			<th>有效期限</th>
+																			<th>再過多久過期</th>
+																			<th>已存放多久</th>
+																			<th>何時通知快過期</th>
+																			<th>動作</th>
+																		</tr>
+																		</thead>
+																		<tbody>
+																		<template x-for="(item,index) in getValidData()" :key="index">
+																			<tr role="row" class="odd">
+																				<td>
+																					<img :src="item.coverPath" style="width: 50px; height: 50px">
+																				</td>
+																				<td x-text="item.name"></td>
+																				<td x-text="item.totalAmount"></td>
+																				<td x-text="item.expiryDate"></td>
+																				<td x-text="item.expiryTime"></td>
+																				<td x-text="item.existedTime"></td>
+																				<td x-text="item.noticeDate"></td>
+																				<td>
+																					<button @click="openAmountModal(item.id)" type="button" data-bs-toggle="tooltip" title="登錄使用數量" class="btn btn-link btn-primary">
+																						<i class="fas fa-edit"></i>
+																					</button>
+																					<button @click="openPackageModal(item.id)" type="button" data-bs-toggle="tooltip" title="查看包裝資訊" class="btn btn-link btn-info">
+																						<i class="fas fa-list"></i>
+																					</button>
+																					<button @click="openDeleteModal(item.id)" type="button" data-bs-toggle="tooltip" title="丟棄" class="btn btn-link btn-danger">
+																						<i class="fas fa-trash-alt"></i>
+																					</button>
+																				</td>
+																			</tr>
+																		</template>
+																		</tbody>
+																	</table>
+																	<nav class="mt-5 mb-4" x-show="pageCount() > 1">
+																		<ul class="pagination justify-content-center card-page">
+																			<li class="page-item" :class="{ 'disabled' : pageNumber==0 }">
+																				<a
+																						class="page-link page-prev"
+																						type="button"
+																						x-on:click="prevPage();"
+																						:disabled="pageNumber==0"
+																				>
+																					<i class="fa fas fa-chevron-left"></i>
+																				</a>
+																			</li>
+																			<li
+																					class="page-item disabled"
+																					:class="{ 'd-none' : pageCount() <= 4 || pageNumber == 0 || ( pageCount() > 4 && pageNumber == pageCount() ) }"
+																			>
+																				<a class="page-link">···</a>
+																			</li>
+																			<template x-for="(page,index) in pages()" :key="index">
+																				<li
+																						class="page-item"
+																						:class="{ 'active' : index === pageNumber , 'd-none' : pageCount() > 4 && ( (index < pageNumber && pageNumber < pageCount() -4) || (index < pageCount() -4 && pageNumber >= pageCount() -4) || index >= pageNumber+4 ) }"
+																				>
+																					<a
+																							class="page-link"
+																							type="button"
+																							x-on:click="viewPage(index);"
+																							x-text="index+1"
+																					></a>
+																				</li>
+																			</template>
+																			<li
+																					class="page-item disabled"
+																					:class="{ 'd-none' : pageCount() <= 4 || pageNumber >= pageCount() -4}"
+																			>
+																				<a class="page-link">···</a>
+																			</li>
+																			<li
+																					class="page-item"
+																					:class="{ 'disabled' : pageNumber >= pageCount() -1 }"
+																			>
+																				<a
+																						class="page-link page-next"
+																						type="button"
+																						x-on:click="nextPage();"
+																						:disabled="pageNumber >= pageCount() -1"
+																				>
+																					<i class="fa fas fa-chevron-right"></i>
+																				</a>
+																			</li>
+																		</ul>
+																	</nav>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+<!--												</div>-->
+											</div>
+
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<footer class="footer">
+				<div class="container-fluid d-flex justify-content-between">
+					<nav class="pull-left">
+						<ul class="nav">
+							<li class="nav-item">
+								<a class="nav-link" href="http://www.themekita.com">
+									ThemeKita
+								</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="#"> Help </a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="#"> Licenses </a>
+							</li>
+						</ul>
+					</nav>
+					<div class="copyright">
+						2024, made with <i class="fa fa-heart heart text-danger"></i> by
+						<a href="http://www.themekita.com">ThemeKita</a>
+					</div>
+					<div>
+						Distributed by
+						<a target="_blank" href="https://themewagon.com/">ThemeWagon</a>.
+					</div>
+				</div>
+			</footer>
+		</div>
+
+	</div>
+	<!--   Core JS Files   -->
+	<script src="js/jquery-3.7.1.min.js"></script>
+	<script src="js/popper.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	
+	<!-- jQuery Scrollbar -->
+	<script src="js/jquery.scrollbar.min.js"></script>
+	<!-- Moment JS -->
+	<script src="js/moment.min.js"></script>
+	<!-- Chart JS -->
+	<script src="js/chart.min.js"></script>
+	<!-- jQuery Sparkline -->
+	<script src="js/jquery.sparkline.min.js"></script>
+	<!-- Chart Circle -->
+	<script src="js/circles.min.js"></script>
+	<!-- Datatables -->
+	<script src="js/datatables.min.js"></script>
+	<!-- Bootstrap Notify -->
+	<script src="js/bootstrap-notify.min.js"></script>
+	<!-- jQuery Vector Maps -->
+	<script src="js/jsvectormap.min.js"></script>
+	<script src="js/world.js"></script>
+	<!-- Sweet Alert -->
+	<script src="js/sweetalert.min.js"></script>
+	<!-- Kaiadmin JS -->
+	<script src="js/kaiadmin.min.js"></script>
+	<script src="js/alpine.2.8.2.min.js"></script>
+	<script>
+		function loadData() {
+			return {
+				pageNumber: 0,
+				size: 10,
+				total: "",
+				todayList: [],
+				todayListLabel: [],
+				expiringSoonList: [],
+				validList: [],
+				todaySelectedCategory: "",
+				todaySelectedSubCategory: "",
+				soonSelectedCategory: "",
+				soonSelectedSubCategory: "",
+				validSelectedCategory: "",
+				validSelectedSubCategory: "",
+
+				init(){
+					let _this = this;
+				    $.ajax({
+						url: "dashboard",
+						type: "get",
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								console.log(response.data)
+								const { today, expiringSoon, valid } = response.data;
+
+								_this.todayList = today.map(item => ({
+									...item,
+								}))
+								_this.expiringSoonList = expiringSoon.map(item => ({
+									...item,
+								}))
+								console.log(_this.expiringSoonList)
+								_this.validList = valid.map(item => ({
+									...item,
+								}))
+							}
+						},
+				  	});
+
+				    $.ajax({
+						url: "getTodaySize",
+						type: "get",
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.todayListLabel = response.data;
+							}
+						},
+				  	});
+				},
+				getTodayData(){
+					const start = this.pageNumber * this.size,
+						  end = start + this.size;
+					this.total = this.todayList.length;
+					return this.todayList.slice(start, end);
+				},
+				getExpiringSoonData(){
+					const start = this.pageNumber * this.size,
+						  end = start + this.size;
+					this.total = this.todayList.length;
+					return this.expiringSoonList.slice(start, end);
+				},
+				getValidData(){
+					const start = this.pageNumber * this.size,
+						  end = start + this.size;
+					this.total = this.todayList.length;
+					return this.validList.slice(start, end);
+				},
+				todayCategoryChange() {
+					this.todaySelectedSubCategory = '';
+					this.todayProductSearch();
+				},
+				soonCategoryChange() {
+					this.soonSelectedSubCategory = '';
+					this.soonProductSearch();
+				},
+				validCategoryChange() {
+					this.validSelectedSubCategory = '';
+					this.validProductSearch();
+				},
+				todayProductSearch(){
+					let _this = this;
+					let data = {};
+					data.keyword = $("#todayProductKeyword").val();
+					data.mainCategory = this.todaySelectedCategory;
+					data.subCategory = this.todaySelectedSubCategory;
+					data.type = "today";
+
+				    $.ajax({
+						url: "inventorySearch",
+						type: "post",
+						data: JSON.stringify(data),
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.todayList = response.data;
+							}
+						},
+				  	});
+				},
+				soonProductSearch(){
+					let _this = this;
+					let data = {};
+					data.keyword = $("#soonProductKeyword").val();
+					data.mainCategory = this.soonSelectedCategory;
+					data.subCategory = this.soonSelectedSubCategory;
+					data.type = "soon";
+
+				    $.ajax({
+						url: "inventorySearch",
+						type: "post",
+						data: JSON.stringify(data),
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.expiringSoonList = response.data;
+							}
+						},
+				  	});
+				},
+				validProductSearch(){
+					let _this = this;
+					let data = {};
+					data.keyword = $("#validProductKeyword").val();
+					data.mainCategory = this.validSelectedCategory;
+					data.subCategory = this.validSelectedSubCategory;
+					data.type = "valid";
+
+				    $.ajax({
+						url: "inventorySearch",
+						type: "post",
+						data: JSON.stringify(data),
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.validList = response.data;
+							}
+						},
+				  	});
+				},
+				pages() {
+					return Array.from({
+						length: Math.ceil(this.total / this.size),
+					});
+				},
+				nextPage() { this.pageNumber++;},
+				prevPage() { this.pageNumber--;},
+				pageCount() { return Math.ceil(this.total / this.size);},
+				viewPage(index) { this.pageNumber = index;},
+			};
+		}
+	</script>
+</body>
+</html>

@@ -1,5 +1,6 @@
 package com.yfckevin.bingBao.entity;
 
+import com.yfckevin.bingBao.enums.StorePlace;
 import jakarta.persistence.Id;
 import jakarta.persistence.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -11,7 +12,7 @@ import java.util.List;
 public class ReceiveForm {
     @Id
     private String id;
-    private String receiveNumber; //訂單編號
+    private String receiveNumber; //收貨編號
     private String receiveDate;   //收貨日期
     private String storeNumber; //入庫批號
     private String storeDate;   //入庫日期

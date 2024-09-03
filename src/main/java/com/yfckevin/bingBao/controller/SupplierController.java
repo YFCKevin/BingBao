@@ -53,7 +53,7 @@ public class SupplierController {
             supplier.setName(dto.getName());
             supplier.setPhone(dto.getPhone());
             supplier.setWebsite(dto.getWebsite());
-            supplier.setCreator(member.getName());
+//            supplier.setCreator(member.getName());
             supplier.setCreationDate(sdf.format(new Date()));
             Supplier savedSupplier = supplierService.save(supplier);
             resultStatus.setCode("C000");
