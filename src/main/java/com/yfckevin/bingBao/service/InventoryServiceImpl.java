@@ -33,8 +33,8 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public void saveAll(List<Inventory> inventoryList) {
-        inventoryRepository.saveAll(inventoryList);
+    public List<Inventory> saveAll(List<Inventory> inventoryList) {
+        return inventoryRepository.saveAll(inventoryList);
     }
 
     @Override
@@ -48,14 +48,13 @@ public class InventoryServiceImpl implements InventoryService {
         String startOfDay = today.atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         String endOfDay = today.plusDays(1).atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         Criteria criteria = new Criteria().andOperator(
-//                Criteria.where("usedDate").exists(false),
-//                Criteria.where("deletionDate").exists(false),
+                Criteria.where("usedDate").exists(false),
+                Criteria.where("deletionDate").exists(false),
 //                Criteria.where("expiryDate").gt(onlyDateEndOfDay),
                 Criteria.where("storeDate").gt(startOfDay).lt(endOfDay)
                 );
         Query query = new Query(criteria);
         final List<Inventory> inventoryList = mongoTemplate.find(query, Inventory.class);
-
         return inventoryList.stream().collect(Collectors.toMap(
                         Inventory::getReceiveItemId,
                         inventory -> inventory,
@@ -126,7 +125,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public List<Inventory> todaySearchByName(String keyword, String type) {
+    public List<Inventory> searchByName(String keyword, String type) {
         LocalDate today = LocalDate.now();
         String startOfDay = today.atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         String endOfDay = today.plusDays(1).atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -145,8 +144,12 @@ public class InventoryServiceImpl implements InventoryService {
 
         switch (type) {
             case "today" -> {
-                Criteria criteria_storeDate = Criteria.where("storeDate").gt(startOfDay).lt(endOfDay);
+                final Criteria criteria_deletionDate = Criteria.where("deletionDate").exists(false);
+                final Criteria criteria_storeDate = Criteria.where("storeDate").gt(startOfDay).lt(endOfDay);
+                final Criteria criteria_usedDate = Criteria.where("usedDate").exists(false);
                 andCriterias.add(criteria_storeDate);
+                andCriterias.add(criteria_deletionDate);
+                andCriterias.add(criteria_usedDate);
             }
             case "soon", "valid" -> {
                 final Criteria criteria_usedDate = Criteria.where("usedDate").exists(false);
@@ -190,7 +193,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public List<Inventory> todaySearchByNameAndMainCategory(String keyword, String mainCategory, String type) {
+    public List<Inventory> searchByNameAndMainCategory(String keyword, String mainCategory, String type) {
         LocalDate today = LocalDate.now();
         String startOfDay = today.atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         String endOfDay = today.plusDays(1).atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -209,8 +212,12 @@ public class InventoryServiceImpl implements InventoryService {
 
         switch (type) {
             case "today" -> {
-                Criteria criteria_storeDate = Criteria.where("storeDate").gt(startOfDay).lt(endOfDay);
+                final Criteria criteria_deletionDate = Criteria.where("deletionDate").exists(false);
+                final Criteria criteria_storeDate = Criteria.where("storeDate").gt(startOfDay).lt(endOfDay);
+                final Criteria criteria_usedDate = Criteria.where("usedDate").exists(false);
                 andCriterias.add(criteria_storeDate);
+                andCriterias.add(criteria_deletionDate);
+                andCriterias.add(criteria_usedDate);
             }
             case "soon", "valid" -> {
                 final Criteria criteria_usedDate = Criteria.where("usedDate").exists(false);
@@ -256,7 +263,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public List<Inventory> todaySearchByMainCategory(String mainCategory, String type) {
+    public List<Inventory> searchByMainCategory(String mainCategory, String type) {
         LocalDate today = LocalDate.now();
         String startOfDay = today.atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         String endOfDay = today.plusDays(1).atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -274,8 +281,12 @@ public class InventoryServiceImpl implements InventoryService {
 
         switch (type) {
             case "today" -> {
-                Criteria criteria_storeDate = Criteria.where("storeDate").gt(startOfDay).lt(endOfDay);
+                final Criteria criteria_deletionDate = Criteria.where("deletionDate").exists(false);
+                final Criteria criteria_storeDate = Criteria.where("storeDate").gt(startOfDay).lt(endOfDay);
+                final Criteria criteria_usedDate = Criteria.where("usedDate").exists(false);
                 andCriterias.add(criteria_storeDate);
+                andCriterias.add(criteria_deletionDate);
+                andCriterias.add(criteria_usedDate);
             }
             case "soon", "valid" -> {
                 final Criteria criteria_usedDate = Criteria.where("usedDate").exists(false);
@@ -316,7 +327,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public List<Inventory> todaySearchByNameAndMainCategoryAndSubCategory(String keyword, String mainCategory, String subCategory, String type) {
+    public List<Inventory> searchByNameAndMainCategoryAndSubCategory(String keyword, String mainCategory, String subCategory, String type) {
         LocalDate today = LocalDate.now();
         String startOfDay = today.atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         String endOfDay = today.plusDays(1).atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -335,8 +346,12 @@ public class InventoryServiceImpl implements InventoryService {
 
         switch (type) {
             case "today" -> {
-                Criteria criteria_storeDate = Criteria.where("storeDate").gt(startOfDay).lt(endOfDay);
+                final Criteria criteria_deletionDate = Criteria.where("deletionDate").exists(false);
+                final Criteria criteria_storeDate = Criteria.where("storeDate").gt(startOfDay).lt(endOfDay);
+                final Criteria criteria_usedDate = Criteria.where("usedDate").exists(false);
                 andCriterias.add(criteria_storeDate);
+                andCriterias.add(criteria_deletionDate);
+                andCriterias.add(criteria_usedDate);
             }
             case "soon", "valid" -> {
                 final Criteria criteria_usedDate = Criteria.where("usedDate").exists(false);
@@ -384,7 +399,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public List<Inventory> todaySearchByMainCategoryAndSubCategory(String mainCategory, String subCategory, String type) {
+    public List<Inventory> searchByMainCategoryAndSubCategory(String mainCategory, String subCategory, String type) {
         LocalDate today = LocalDate.now();
         String startOfDay = today.atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         String endOfDay = today.plusDays(1).atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -402,8 +417,12 @@ public class InventoryServiceImpl implements InventoryService {
 
         switch (type) {
             case "today" -> {
-                Criteria criteria_storeDate = Criteria.where("storeDate").gt(startOfDay).lt(endOfDay);
+                final Criteria criteria_deletionDate = Criteria.where("deletionDate").exists(false);
+                final Criteria criteria_storeDate = Criteria.where("storeDate").gt(startOfDay).lt(endOfDay);
+                final Criteria criteria_usedDate = Criteria.where("usedDate").exists(false);
                 andCriterias.add(criteria_storeDate);
+                andCriterias.add(criteria_deletionDate);
+                andCriterias.add(criteria_usedDate);
             }
             case "soon", "valid" -> {
                 final Criteria criteria_usedDate = Criteria.where("usedDate").exists(false);
@@ -443,5 +462,10 @@ public class InventoryServiceImpl implements InventoryService {
                 ))
                 .values()
                 .stream().toList();
+    }
+
+    @Override
+    public List<Inventory> findByReceiveItemId(String receiveItemId) {
+        return inventoryRepository.findByReceiveItemId(receiveItemId);
     }
 }

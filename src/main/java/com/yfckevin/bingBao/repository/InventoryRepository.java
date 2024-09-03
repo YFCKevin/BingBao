@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface InventoryRepository extends MongoRepository<Inventory, String> {
     List<Inventory> findByIdIn(List<String> receiveItemIds);
+
+    List<Inventory> findByReceiveItemId(String receiveItemId);
 }

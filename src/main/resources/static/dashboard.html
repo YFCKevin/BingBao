@@ -246,13 +246,13 @@
 																				<td x-text="item.expiryDate"></td>
 																				<td x-text="item.noticeDate"></td>
 																				<td>
-																					<button @click="openAmountModal(item.id)" type="button" data-bs-toggle="tooltip" title="登錄使用數量" class="btn btn-link btn-primary">
+																					<button @click="openAmountModal(item.receiveItemId, item.totalAmount)" type="button" data-bs-toggle="tooltip" title="登錄使用數量" class="btn btn-link btn-primary">
 																						<i class="fas fa-edit"></i>
 																					</button>
 																					<button @click="openPackageModal(item.id)" type="button" data-bs-toggle="tooltip" title="查看包裝資訊" class="btn btn-link btn-info">
 																						<i class="fas fa-list"></i>
 																					</button>
-																					<button @click="openDeleteModal(item.id)" type="button" data-bs-toggle="tooltip" title="丟棄" class="btn btn-link btn-danger">
+																					<button @click="openDeleteModal(item.receiveItemId)" type="button" data-bs-toggle="tooltip" title="丟棄" class="btn btn-link btn-danger">
 																						<i class="fas fa-trash-alt"></i>
 																					</button>
 																				</td>
@@ -408,10 +408,10 @@
 																				<td x-text="item.expiryTime"></td>
 																				<td x-text="item.existedTime"></td>
 																				<td>
-																					<button @click="openAmountModal(item.id)" type="button" data-bs-toggle="tooltip" title="登錄使用數量" class="btn btn-link btn-primary">
+																					<button @click="openAmountModal(item.receiveItemId, item.totalAmount)" type="button" data-bs-toggle="tooltip" title="登錄使用數量" class="btn btn-link btn-primary">
 																						<i class="fas fa-edit"></i>
 																					</button>
-																					<button @click="openDeleteModal(item.id)" type="button" data-bs-toggle="tooltip" title="丟棄" class="btn btn-link btn-danger">
+																					<button @click="openDeleteModal(item.receiveItemId)" type="button" data-bs-toggle="tooltip" title="丟棄" class="btn btn-link btn-danger">
 																						<i class="fas fa-trash-alt"></i>
 																					</button>
 																				</td>
@@ -569,13 +569,13 @@
 																				<td x-text="item.existedTime"></td>
 																				<td x-text="item.noticeDate"></td>
 																				<td>
-																					<button @click="openAmountModal(item.id)" type="button" data-bs-toggle="tooltip" title="登錄使用數量" class="btn btn-link btn-primary">
+																					<button @click="openAmountModal(item.receiveItemId, item.totalAmount)" type="button" data-bs-toggle="tooltip" title="登錄使用數量" class="btn btn-link btn-primary">
 																						<i class="fas fa-edit"></i>
 																					</button>
 																					<button @click="openPackageModal(item.id)" type="button" data-bs-toggle="tooltip" title="查看包裝資訊" class="btn btn-link btn-info">
 																						<i class="fas fa-list"></i>
 																					</button>
-																					<button @click="openDeleteModal(item.id)" type="button" data-bs-toggle="tooltip" title="丟棄" class="btn btn-link btn-danger">
+																					<button @click="openDeleteModal(item.receiveItemId)" type="button" data-bs-toggle="tooltip" title="丟棄" class="btn btn-link btn-danger">
 																						<i class="fas fa-trash-alt"></i>
 																					</button>
 																				</td>
@@ -725,6 +725,8 @@
 				soonSelectedSubCategory: "",
 				validSelectedCategory: "",
 				validSelectedSubCategory: "",
+				targetDeleteId: "",
+				targetEditId: "",
 
 				init(){
 					let _this = this;
@@ -848,6 +850,126 @@
 						success: function (response) {
 							if (response.code == "C000"){
 								_this.validList = response.data;
+							}
+						},
+				  	});
+				},
+				openDeleteModal(receiveItemId){
+					let _this = this;
+					Swal.fire({
+						title: '確認要刪除？',
+						text: '點擊確認後商品將不再存在冰箱中',
+						icon: 'warning',
+						showCancelButton: true,
+						confirmButtonText: '確認',
+						cancelButtonText: '取消',
+						customClass: {
+							confirmButton: 'btn btn-success',
+							cancelButton: 'btn btn-danger'
+						}
+					}).then((result) => {
+						if (result.isConfirmed) {
+							_this.targetDeleteId = receiveItemId;
+							_this.deleteInventory();
+						}
+					});
+				},
+				openAmountModal(receiveItemId, amount){
+					let _this = this;
+					Swal.fire({
+						title: '填寫使用的數量',
+						text: '剩餘數量：' + amount,
+						input: 'number',
+						inputAttributes: {
+							min: 1,          // 最小值
+							max: amount,     // 最大值等於剩餘數量
+							step: 1
+						},
+						showCancelButton: true,
+						confirmButtonText: '確認',
+						cancelButtonText: '取消',
+						customClass: {
+							confirmButton: 'btn btn-success',
+							cancelButton: 'btn btn-danger'
+						}
+					}).then((result) => {
+						if (result.isConfirmed) {
+							let enteredAmount = result.value;
+							_this.targetEditId = receiveItemId;
+							_this.editAmountInventory(enteredAmount);
+						}
+					});
+				},
+				deleteInventory(){
+					let _this = this;
+				    $.ajax({
+						url: "deleteInventory/" + this.targetDeleteId,
+						type: "get",
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								Swal.fire({
+									title: '刪除成功！',
+									text: '',
+									icon: 'success',
+									confirmButtonText: '關閉',
+									customClass: {
+										confirmButton: 'btn btn-success'
+									}
+								}).then((result) => {
+									if (result.isConfirmed) {
+										_this.init();
+									}
+								});
+							} else {
+								Swal.fire({
+									title: '錯誤發生，請聯繫管理員！',
+									text: '',
+									icon: 'error',
+									confirmButtonText: '關閉',
+									customClass: {
+										confirmButton: 'btn btn-danger'
+									}
+								})
+							}
+						},
+				  	});
+				},
+				editAmountInventory(enteredAmount){
+					let _this = this;
+					let data = {};
+					data.receiveItemId = this.targetEditId;
+					data.usedAmount = enteredAmount;
+				    $.ajax({
+						url: "editAmountInventory",
+						type: "post",
+						data: JSON.stringify(data),
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								Swal.fire({
+									title: '編輯成功！',
+									text: '請至清單頁查看剩餘數量是否正確',
+									icon: 'success',
+									confirmButtonText: '關閉',
+									customClass: {
+										confirmButton: 'btn btn-success'
+									}
+								}).then((result) => {
+									if (result.isConfirmed) {
+										_this.init();
+									}
+								});
+							} else {
+								Swal.fire({
+									title: '錯誤發生，請聯繫管理員！',
+									text: '',
+									icon: 'error',
+									confirmButtonText: '關閉',
+									customClass: {
+										confirmButton: 'btn btn-danger'
+									}
+								})
 							}
 						},
 				  	});

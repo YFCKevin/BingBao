@@ -5,7 +5,7 @@ import com.yfckevin.bingBao.entity.Inventory;
 import java.util.List;
 
 public interface InventoryService {
-    void saveAll(List<Inventory> inventoryList);
+    List<Inventory> saveAll(List<Inventory> inventoryList);
 
     List<Inventory> findByIdIn(List<String> receiveItemIds);
 
@@ -15,13 +15,15 @@ public interface InventoryService {
 
     List<Inventory> findInventoryWithinValidityPeriodAndNoUsedAndNoDelete();
 
-    List<Inventory> todaySearchByName(String keyword, String type);
+    List<Inventory> searchByName(String keyword, String type);
 
-    List<Inventory> todaySearchByNameAndMainCategory(String keyword, String mainCategory, String type);
+    List<Inventory> searchByNameAndMainCategory(String keyword, String mainCategory, String type);
 
-    List<Inventory> todaySearchByMainCategory(String mainCategory, String type);
+    List<Inventory> searchByMainCategory(String mainCategory, String type);
 
-    List<Inventory> todaySearchByNameAndMainCategoryAndSubCategory(String keyword, String mainCategory, String subCategory, String type);
+    List<Inventory> searchByNameAndMainCategoryAndSubCategory(String keyword, String mainCategory, String subCategory, String type);
 
-    List<Inventory> todaySearchByMainCategoryAndSubCategory(String mainCategory, String subCategory, String type);
+    List<Inventory> searchByMainCategoryAndSubCategory(String mainCategory, String subCategory, String type);
+
+    List<Inventory> findByReceiveItemId(String receiveItemId);
 }
