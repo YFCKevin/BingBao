@@ -7,6 +7,7 @@ import com.yfckevin.bingBao.ConfigurationUtil;
 import com.yfckevin.bingBao.dto.InventoryDTO;
 import com.yfckevin.bingBao.entity.Inventory;
 import com.yfckevin.bingBao.entity.Product;
+import com.yfckevin.bingBao.enums.StorePlace;
 import com.yfckevin.bingBao.service.InventoryService;
 import com.yfckevin.bingBao.service.ProductService;
 import com.yfckevin.bingBao.utils.MailUtils;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +39,7 @@ public class NotifyController {
     private final ConfigProperties configProperties;
 
 
-//    @GetMapping("/overdueNotice")
+    //    @GetMapping("/overdueNotice")
     @Scheduled(cron = "0 0 8 * * ?")
     public void overdueNotice() throws IOException {
         logger.info("每日寄送快過期的庫存商品");
@@ -65,7 +67,15 @@ public class NotifyController {
                 (existing, replacement) -> existing
         ));
         //取得所有唯一的 Inventory
-        final List<InventoryDTO> finalInventoryDTOList = uniqueReceiveItemIds.stream().map(inventoryDTOMap::get).toList();
+        final List<InventoryDTO> tempInventoryDTOList = uniqueReceiveItemIds.stream()
+                .map(inventoryDTOMap::get)
+                .toList();
+        //相同storePlace放一起且根據有效期限做遞增排序
+        final Map<StorePlace, List<InventoryDTO>> groupedByStorePlace = tempInventoryDTOList.stream().collect(Collectors.groupingBy(InventoryDTO::getStorePlace));
+        final List<InventoryDTO> finalInventoryDTOList = groupedByStorePlace.values().stream()
+                .flatMap(inventoryDTOS -> inventoryDTOS.stream()
+                        .sorted(Comparator.comparing(InventoryDTO::getExpiryDate)))
+                .toList();
         logger.info("今日寄送過期商品有" + finalInventoryDTOList.size() + "件");
         System.out.println("每日通知快過期的商品資訊: " + finalInventoryDTOList);
 
