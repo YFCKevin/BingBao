@@ -126,8 +126,23 @@ public class InventoryController {
         Map<String, List<InventoryDTO>> inventoryMap = new HashMap<>();
 
         //今日放進冰箱的
-        final List<Inventory> inventoryTodayList = inventoryService.findByStoreDateIsTodayAndNoUsedAndNoDeleteAndInValidPeriod();
-        final Map<String, Long> todayReceiveItemIdInventoryAmountMap = inventoryTodayList.stream().collect(Collectors.groupingBy(Inventory::getReceiveItemId, Collectors.counting()));
+        final Map<String, Map<Long, List<Inventory>>> todayItemIdAmountInventoryMap = inventoryService.findByStoreDateIsTodayAndNoUsedAndNoDeleteAndInValidPeriod();
+        final Map<String, Long> todayReceiveItemIdInventoryAmountMap = todayItemIdAmountInventoryMap.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().values().stream().flatMap(List::stream).count()
+                ));
+        final List<Inventory> inventoryTodayList = todayItemIdAmountInventoryMap.values().stream()
+                .flatMap(innerMap -> innerMap.values().stream())
+                .flatMap(List::stream)
+                .collect(Collectors.toMap(
+                        Inventory::getReceiveItemId,
+                        Function.identity(),
+                        (existing, replacement) -> existing
+                ))
+                .values()
+                .stream()
+                .toList();
         final List<String> todayProductIds = inventoryTodayList.stream().map(Inventory::getProductId).toList();
         final Map<String, Product> tempTodayProductMap = productService.findByIdIn(todayProductIds).stream()
                 .collect(Collectors.toMap(Product::getId, Function.identity()));
@@ -142,8 +157,23 @@ public class InventoryController {
 
 
         //快過期的且沒用完
-        final List<Inventory> inventorySoonList = inventoryService.findInventoryExpiringSoonAndNoUsedAndNoDeleteAndInValidPeriod();
-        final Map<String, Long> soonReceiveItemIdInventoryAmountMap = inventoryTodayList.stream().collect(Collectors.groupingBy(Inventory::getReceiveItemId, Collectors.counting()));
+        final Map<String, Map<Long, List<Inventory>>> soonItemIdAmountInventoryMap = inventoryService.findInventoryExpiringSoonAndNoUsedAndNoDeleteAndInValidPeriod();
+        final Map<String, Long> soonReceiveItemIdInventoryAmountMap = soonItemIdAmountInventoryMap.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().values().stream().flatMap(List::stream).count()
+                ));
+        final List<Inventory> inventorySoonList = soonItemIdAmountInventoryMap.values().stream()
+                .flatMap(innerMap -> innerMap.values().stream())
+                .flatMap(List::stream)
+                .collect(Collectors.toMap(
+                        Inventory::getReceiveItemId,
+                        Function.identity(),
+                        (existing, replacement) -> existing
+                ))
+                .values()
+                .stream()
+                .toList();
         final List<String> soonProductIds = inventorySoonList.stream().map(Inventory::getProductId).toList();
         final Map<String, Product> tempSoonProductMap = productService.findByIdIn(soonProductIds).stream()
                 .collect(Collectors.toMap(Product::getId, Function.identity()));
@@ -158,8 +188,23 @@ public class InventoryController {
 
 
         //在有效期限內且沒用完
-        final List<Inventory> inventoryValidList = inventoryService.findInventoryWithinValidityPeriodAndNoUsedAndNoDelete();
-        final Map<String, Long> validReceiveItemIdInventoryAmountMap = inventoryTodayList.stream().collect(Collectors.groupingBy(Inventory::getReceiveItemId, Collectors.counting()));
+        final Map<String, Map<Long, List<Inventory>>> validItemIdAmountInventoryMap = inventoryService.findInventoryWithinValidityPeriodAndNoUsedAndNoDelete();
+        final Map<String, Long> validReceiveItemIdInventoryAmountMap = validItemIdAmountInventoryMap.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().values().stream().flatMap(List::stream).count()
+                ));
+        final List<Inventory> inventoryValidList = validItemIdAmountInventoryMap.values().stream()
+                .flatMap(innerMap -> innerMap.values().stream())
+                .flatMap(List::stream)
+                .collect(Collectors.toMap(
+                        Inventory::getReceiveItemId,
+                        Function.identity(),
+                        (existing, replacement) -> existing
+                ))
+                .values()
+                .stream()
+                .toList();
         final List<String> validProductIds = inventoryValidList.stream().map(Inventory::getProductId).toList();
         final Map<String, Product> tempValidProductMap = productService.findByIdIn(validProductIds).stream()
                 .collect(Collectors.toMap(Product::getId, Function.identity()));
@@ -197,28 +242,43 @@ public class InventoryController {
         final String subCategory = searchDTO.getSubCategory();
         final String type = searchDTO.getType();
         System.out.println(keyword + " / " + mainCategory + " / " + subCategory);
-        List<Inventory> inventoryList = new ArrayList<>();
+        Map<String, Map<Long, List<Inventory>>> itemIdAmountInventoryMap = new HashMap<>();
         if (StringUtils.isNotBlank(keyword) && StringUtils.isBlank(mainCategory) && StringUtils.isBlank(subCategory)) {
             // 只有輸入名稱
-            inventoryList = inventoryService.searchByName(keyword, type);
+            itemIdAmountInventoryMap = inventoryService.searchByName(keyword, type);
         } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isBlank(subCategory)) {
             // 有輸入名稱 + 只有主種類
-            inventoryList = inventoryService.searchByNameAndMainCategory(keyword, mainCategory, type);
+            itemIdAmountInventoryMap = inventoryService.searchByNameAndMainCategory(keyword, mainCategory, type);
         } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isBlank(subCategory)) {
             // 只有主種類
-            inventoryList = inventoryService.searchByMainCategory(mainCategory, type);
+            itemIdAmountInventoryMap = inventoryService.searchByMainCategory(mainCategory, type);
         } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory)) {
             // 有輸入名稱 + 有主種類 + 有副種類
-            inventoryList = inventoryService.searchByNameAndMainCategoryAndSubCategory(keyword, mainCategory, subCategory, type);
+            itemIdAmountInventoryMap = inventoryService.searchByNameAndMainCategoryAndSubCategory(keyword, mainCategory, subCategory, type);
         } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory)) {
             // 有主種類 + 有副種類
-            inventoryList = inventoryService.searchByMainCategoryAndSubCategory(mainCategory, subCategory, type);
+            itemIdAmountInventoryMap = inventoryService.searchByMainCategoryAndSubCategory(mainCategory, subCategory, type);
         } else {
             // 全空白搜尋全部
-            inventoryList = inventoryService.searchByName("", type);
+            itemIdAmountInventoryMap = inventoryService.searchByName("", type);
         }
 
-        final Map<String, Long> receiveItemIdInventoryAmountMap = inventoryList.stream().collect(Collectors.groupingBy(Inventory::getReceiveItemId, Collectors.counting()));
+        final Map<String, Long> receiveItemIdInventoryAmountMap = itemIdAmountInventoryMap.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().values().stream().flatMap(List::stream).count()
+                ));
+        final List<Inventory> inventoryList = itemIdAmountInventoryMap.values().stream()
+                .flatMap(innerMap -> innerMap.values().stream())
+                .flatMap(List::stream)
+                .collect(Collectors.toMap(
+                        Inventory::getReceiveItemId,
+                        Function.identity(),
+                        (existing, replacement) -> existing
+                ))
+                .values()
+                .stream()
+                .toList();
         final List<String> productIds = inventoryList.stream().map(Inventory::getProductId).toList();
         final Map<String, Product> tempProductMap = productService.findByIdIn(productIds).stream()
                 .collect(Collectors.toMap(Product::getId, Function.identity()));

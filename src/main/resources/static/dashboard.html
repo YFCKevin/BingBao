@@ -260,52 +260,52 @@
 																		</template>
 																		</tbody>
 																	</table>
-																	<nav class="mt-5 mb-4" x-show="pageCount() > 1">
+																	<nav class="mt-5 mb-4" x-show="pageCount_today() > 1">
 																		<ul class="pagination justify-content-center card-page">
-																			<li class="page-item" :class="{ 'disabled' : pageNumber==0 }">
+																			<li class="page-item" :class="{ 'disabled' : pageNumber_today==0 }">
 																				<a
 																						class="page-link page-prev"
 																						type="button"
-																						x-on:click="prevPage();"
-																						:disabled="pageNumber==0"
+																						x-on:click="prevPage_today();"
+																						:disabled="pageNumber_today==0"
 																				>
 																					<i class="fa fas fa-chevron-left"></i>
 																				</a>
 																			</li>
 																			<li
 																					class="page-item disabled"
-																					:class="{ 'd-none' : pageCount() <= 4 || pageNumber == 0 || ( pageCount() > 4 && pageNumber == pageCount() ) }"
+																					:class="{ 'd-none' : pageCount_today() <= 4 || pageNumber_today == 0 || ( pageCount_today() > 4 && pageNumber_today == pageCount_today() ) }"
 																			>
 																				<a class="page-link">···</a>
 																			</li>
-																			<template x-for="(page,index) in pages()" :key="index">
+																			<template x-for="(page,index) in pages_today()" :key="index">
 																				<li
 																						class="page-item"
-																						:class="{ 'active' : index === pageNumber , 'd-none' : pageCount() > 4 && ( (index < pageNumber && pageNumber < pageCount() -4) || (index < pageCount() -4 && pageNumber >= pageCount() -4) || index >= pageNumber+4 ) }"
+																						:class="{ 'active' : index === pageNumber_today , 'd-none' : pageCount_today() > 4 && ( (index < pageNumber_today && pageNumber_today < pageCount_today() -4) || (index < pageCount_today() -4 && pageNumber_today >= pageCount_today() -4) || index >= pageNumber_today+4 ) }"
 																				>
 																					<a
 																							class="page-link"
 																							type="button"
-																							x-on:click="viewPage(index);"
+																							x-on:click="viewPage_today(index);"
 																							x-text="index+1"
 																					></a>
 																				</li>
 																			</template>
 																			<li
 																					class="page-item disabled"
-																					:class="{ 'd-none' : pageCount() <= 4 || pageNumber >= pageCount() -4}"
+																					:class="{ 'd-none' : pageCount_today() <= 4 || pageNumber_today >= pageCount_today() -4}"
 																			>
 																				<a class="page-link">···</a>
 																			</li>
 																			<li
 																					class="page-item"
-																					:class="{ 'disabled' : pageNumber >= pageCount() -1 }"
+																					:class="{ 'disabled' : pageNumber_today >= pageCount_today() -1 }"
 																			>
 																				<a
 																						class="page-link page-next"
 																						type="button"
-																						x-on:click="nextPage();"
-																						:disabled="pageNumber >= pageCount() -1"
+																						x-on:click="nextPage_today();"
+																						:disabled="pageNumber_today >= pageCount_today() -1"
 																				>
 																					<i class="fa fas fa-chevron-right"></i>
 																				</a>
@@ -419,52 +419,52 @@
 																		</template>
 																		</tbody>
 																	</table>
-																	<nav class="mt-5 mb-4" x-show="pageCount() > 1">
+																	<nav class="mt-5 mb-4" x-show="pageCount_soon() > 1">
 																		<ul class="pagination justify-content-center card-page">
-																			<li class="page-item" :class="{ 'disabled' : pageNumber==0 }">
+																			<li class="page-item" :class="{ 'disabled' : pageNumber_soon==0 }">
 																				<a
 																						class="page-link page-prev"
 																						type="button"
-																						x-on:click="prevPage();"
-																						:disabled="pageNumber==0"
+																						x-on:click="prevPage_soon();"
+																						:disabled="pageNumber_soon==0"
 																				>
 																					<i class="fa fas fa-chevron-left"></i>
 																				</a>
 																			</li>
 																			<li
 																					class="page-item disabled"
-																					:class="{ 'd-none' : pageCount() <= 4 || pageNumber == 0 || ( pageCount() > 4 && pageNumber == pageCount() ) }"
+																					:class="{ 'd-none' : pageCount_soon() <= 4 || pageNumber_soon == 0 || ( pageCount_soon() > 4 && pageNumber_soon == pageCount_soon() ) }"
 																			>
 																				<a class="page-link">···</a>
 																			</li>
-																			<template x-for="(page,index) in pages()" :key="index">
+																			<template x-for="(page,index) in pages_soon()" :key="index">
 																				<li
 																						class="page-item"
-																						:class="{ 'active' : index === pageNumber , 'd-none' : pageCount() > 4 && ( (index < pageNumber && pageNumber < pageCount() -4) || (index < pageCount() -4 && pageNumber >= pageCount() -4) || index >= pageNumber+4 ) }"
+																						:class="{ 'active' : index === pageNumber_soon , 'd-none' : pageCount_soon() > 4 && ( (index < pageNumber_soon && pageNumber_soon < pageCount_soon() -4) || (index < pageCount_soon() -4 && pageNumber_soon >= pageCount_soon() -4) || index >= pageNumber_soon+4 ) }"
 																				>
 																					<a
 																							class="page-link"
 																							type="button"
-																							x-on:click="viewPage(index);"
+																							x-on:click="viewPage_soon(index);"
 																							x-text="index+1"
 																					></a>
 																				</li>
 																			</template>
 																			<li
 																					class="page-item disabled"
-																					:class="{ 'd-none' : pageCount() <= 4 || pageNumber >= pageCount() -4}"
+																					:class="{ 'd-none' : pageCount_soon() <= 4 || pageNumber_soon >= pageCount_soon() -4}"
 																			>
 																				<a class="page-link">···</a>
 																			</li>
 																			<li
 																					class="page-item"
-																					:class="{ 'disabled' : pageNumber >= pageCount() -1 }"
+																					:class="{ 'disabled' : pageNumber_soon >= pageCount_soon() -1 }"
 																			>
 																				<a
 																						class="page-link page-next"
 																						type="button"
-																						x-on:click="nextPage();"
-																						:disabled="pageNumber >= pageCount() -1"
+																						x-on:click="nextPage_soon();"
+																						:disabled="pageNumber_soon >= pageCount_soon() -1"
 																				>
 																					<i class="fa fas fa-chevron-right"></i>
 																				</a>
@@ -583,52 +583,52 @@
 																		</template>
 																		</tbody>
 																	</table>
-																	<nav class="mt-5 mb-4" x-show="pageCount() > 1">
+																	<nav class="mt-5 mb-4" x-show="pageCount_valid() > 1">
 																		<ul class="pagination justify-content-center card-page">
-																			<li class="page-item" :class="{ 'disabled' : pageNumber==0 }">
+																			<li class="page-item" :class="{ 'disabled' : pageNumber_valid==0 }">
 																				<a
 																						class="page-link page-prev"
 																						type="button"
-																						x-on:click="prevPage();"
-																						:disabled="pageNumber==0"
+																						x-on:click="prevPage_valid();"
+																						:disabled="pageNumber_valid==0"
 																				>
 																					<i class="fa fas fa-chevron-left"></i>
 																				</a>
 																			</li>
 																			<li
 																					class="page-item disabled"
-																					:class="{ 'd-none' : pageCount() <= 4 || pageNumber == 0 || ( pageCount() > 4 && pageNumber == pageCount() ) }"
+																					:class="{ 'd-none' : pageCount_valid() <= 4 || pageNumber_valid == 0 || ( pageCount_valid() > 4 && pageNumber_valid == pageCount_valid() ) }"
 																			>
 																				<a class="page-link">···</a>
 																			</li>
-																			<template x-for="(page,index) in pages()" :key="index">
+																			<template x-for="(page,index) in pages_valid()" :key="index">
 																				<li
 																						class="page-item"
-																						:class="{ 'active' : index === pageNumber , 'd-none' : pageCount() > 4 && ( (index < pageNumber && pageNumber < pageCount() -4) || (index < pageCount() -4 && pageNumber >= pageCount() -4) || index >= pageNumber+4 ) }"
+																						:class="{ 'active' : index === pageNumber_valid , 'd-none' : pageCount_valid() > 4 && ( (index < pageNumber_valid && pageNumber_valid < pageCount_valid() -4) || (index < pageCount_valid() -4 && pageNumber_valid >= pageCount_valid() -4) || index >= pageNumber_valid+4 ) }"
 																				>
 																					<a
 																							class="page-link"
 																							type="button"
-																							x-on:click="viewPage(index);"
+																							x-on:click="viewPage_valid(index);"
 																							x-text="index+1"
 																					></a>
 																				</li>
 																			</template>
 																			<li
 																					class="page-item disabled"
-																					:class="{ 'd-none' : pageCount() <= 4 || pageNumber >= pageCount() -4}"
+																					:class="{ 'd-none' : pageCount_valid() <= 4 || pageNumber_valid >= pageCount_valid() -4}"
 																			>
 																				<a class="page-link">···</a>
 																			</li>
 																			<li
 																					class="page-item"
-																					:class="{ 'disabled' : pageNumber >= pageCount() -1 }"
+																					:class="{ 'disabled' : pageNumber_valid >= pageCount_valid() -1 }"
 																			>
 																				<a
 																						class="page-link page-next"
 																						type="button"
-																						x-on:click="nextPage();"
-																						:disabled="pageNumber >= pageCount() -1"
+																						x-on:click="nextPage_valid();"
+																						:disabled="pageNumber_valid >= pageCount_valid() -1"
 																				>
 																					<i class="fa fas fa-chevron-right"></i>
 																				</a>
@@ -682,11 +682,11 @@
 		</div>
 
 	</div>
+
 	<!--   Core JS Files   -->
 	<script src="js/jquery-3.7.1.min.js"></script>
 	<script src="js/popper.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
-	
 	<!-- jQuery Scrollbar -->
 	<script src="js/jquery.scrollbar.min.js"></script>
 	<!-- Moment JS -->
@@ -712,9 +712,15 @@
 	<script>
 		function loadData() {
 			return {
-				pageNumber: 0,
-				size: 10,
-				total: "",
+				pageNumber_today: 0,
+				size_today: 10,
+				total_today: "",
+				pageNumber_soon: 0,
+				size_soon: 10,
+				total_soon: "",
+				pageNumber_valid: 0,
+				size_valid: 10,
+				total_valid: "",
 				todayList: [],
 				todayListLabel: [],
 				expiringSoonList: [],
@@ -745,7 +751,6 @@
 								_this.expiringSoonList = expiringSoon.map(item => ({
 									...item,
 								}))
-								console.log(_this.expiringSoonList)
 								_this.validList = valid.map(item => ({
 									...item,
 								}))
@@ -764,22 +769,37 @@
 						},
 				  	});
 				},
-				getTodayData(){
-					const start = this.pageNumber * this.size,
-						  end = start + this.size;
-					this.total = this.todayList.length;
+				getTodayData() {
+					this.todayList.forEach(item => {
+						if (item.coverPath.endsWith('/null')) {
+							item.coverPath = 'images/fridge002.jpg';
+						}
+					});
+					const start = this.pageNumber_today * this.size_today;
+					const end = start + this.size_today;
+					this.total_today = this.todayList.length;
 					return this.todayList.slice(start, end);
 				},
 				getExpiringSoonData(){
-					const start = this.pageNumber * this.size,
-						  end = start + this.size;
-					this.total = this.todayList.length;
+					this.expiringSoonList.forEach(item => {
+						if (item.coverPath.endsWith('/null')) {
+							item.coverPath = 'images/fridge002.jpg';
+						}
+					});
+					const start = this.pageNumber_soon * this.size_soon;
+					const end = start + this.size_soon;
+					this.total_soon = this.expiringSoonList.length;
 					return this.expiringSoonList.slice(start, end);
 				},
 				getValidData(){
-					const start = this.pageNumber * this.size,
-						  end = start + this.size;
-					this.total = this.todayList.length;
+					this.validList.forEach(item => {
+						if (item.coverPath.endsWith('/null')) {
+							item.coverPath = 'images/fridge002.jpg';
+						}
+					});
+					const start = this.pageNumber_valid * this.size_valid;
+					const end = start + this.size_valid;
+					this.total_valid = this.validList.length;
 					return this.validList.slice(start, end);
 				},
 				todayCategoryChange() {
@@ -974,15 +994,33 @@
 						},
 				  	});
 				},
-				pages() {
+				pages_today() {
 					return Array.from({
-						length: Math.ceil(this.total / this.size),
+						length: Math.ceil(this.total_today / this.size_today),
 					});
 				},
-				nextPage() { this.pageNumber++;},
-				prevPage() { this.pageNumber--;},
-				pageCount() { return Math.ceil(this.total / this.size);},
-				viewPage(index) { this.pageNumber = index;},
+				nextPage_today() { this.pageNumber_today++;},
+				prevPage_today() { this.pageNumber_today--;},
+				pageCount_today() { return Math.ceil(this.total_today / this.size_today);},
+				viewPage_today(index) { this.pageNumber_today = index;},
+				pages_soon() {
+					return Array.from({
+						length: Math.ceil(this.total_soon / this.size_soon),
+					});
+				},
+				nextPage_soon() { this.pageNumber_soon++;},
+				prevPage_soon() { this.pageNumber_soon--;},
+				pageCount_soon() { return Math.ceil(this.total_soon / this.size_soon);},
+				viewPage_soon(index) { this.pageNumber_soon = index;},
+				pages_valid() {
+					return Array.from({
+						length: Math.ceil(this.total_valid / this.size_valid),
+					});
+				},
+				nextPage_valid() { this.pageNumber_valid++;},
+				prevPage_valid() { this.pageNumber_valid--;},
+				pageCount_valid() { return Math.ceil(this.total_valid / this.size_valid);},
+				viewPage_valid(index) { this.pageNumber_valid = index;},
 			};
 		}
 	</script>

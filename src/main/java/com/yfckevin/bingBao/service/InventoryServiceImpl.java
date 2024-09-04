@@ -19,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,7 +44,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public List<Inventory> findByStoreDateIsTodayAndNoUsedAndNoDeleteAndInValidPeriod() {
+    public Map<String, Map<Long, List<Inventory>>> findByStoreDateIsTodayAndNoUsedAndNoDeleteAndInValidPeriod() {
         LocalDate today = LocalDate.now();
         String startOfDay = today.atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         String endOfDay = today.plusDays(1).atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -55,17 +56,24 @@ public class InventoryServiceImpl implements InventoryService {
                 );
         Query query = new Query(criteria);
         final List<Inventory> inventoryList = mongoTemplate.find(query, Inventory.class);
-        return inventoryList.stream().collect(Collectors.toMap(
+
+        Map<String, Long> itemCountMap = inventoryList.stream()
+                .collect(Collectors.groupingBy(Inventory::getReceiveItemId, Collectors.counting()));
+
+        Map<String, Map<Long, List<Inventory>>> result = inventoryList.stream()
+                .collect(Collectors.groupingBy(
                         Inventory::getReceiveItemId,
-                        inventory -> inventory,
-                        (existing, replacement) -> existing
-                ))
-                .values()
-                .stream().toList();
+                        Collectors.groupingBy(
+                                inventory -> itemCountMap.get(inventory.getReceiveItemId()),
+                                Collectors.toList()
+                        )
+                ));
+
+        return result;
     }
 
     @Override
-    public List<Inventory> findInventoryExpiringSoonAndNoUsedAndNoDeleteAndInValidPeriod() {
+    public Map<String, Map<Long, List<Inventory>>> findInventoryExpiringSoonAndNoUsedAndNoDeleteAndInValidPeriod() {
         LocalDate today = LocalDate.now();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String onlyDateEndOfDay = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
@@ -75,36 +83,40 @@ public class InventoryServiceImpl implements InventoryService {
                 Criteria.where("expiryDate").gte(onlyDateEndOfDay)
         );
         Query query = new Query(criteria);
-        List<Inventory> inventoryList = mongoTemplate.find(query, Inventory.class);
+        List<Inventory> inventoriesFromMongo = mongoTemplate.find(query, Inventory.class);
 
-        final List<Inventory> tempInventoryList = inventoryList.stream().collect(Collectors.toMap(
-                        Inventory::getReceiveItemId,
-                        inventory -> inventory,
-                        (existing, replacement) -> existing
-                ))
-                .values()
-                .stream().toList();
-
-        List<Inventory> result = new ArrayList<>();
-        for (Inventory inventory : tempInventoryList) {
+        List<Inventory> inventoryList = new ArrayList<>();
+        for (Inventory inventory : inventoriesFromMongo) {
             try {
                 int overdueNoticeDays = Integer.parseInt(inventory.getOverdueNotice());
                 LocalDate expiryDate = LocalDate.parse(inventory.getExpiryDate(), dateFormatter);
                 LocalDate noticeDate = today.plusDays(overdueNoticeDays);
 
                 if (expiryDate.isBefore(noticeDate) || expiryDate.isEqual(noticeDate)) {
-                    result.add(inventory);
+                    inventoryList.add(inventory);
                 }
             } catch (NumberFormatException | DateTimeParseException e) {
                 logger.error(e.getMessage(), e);
             }
         }
 
+        Map<String, Long> itemCountMap = inventoryList.stream()
+                .collect(Collectors.groupingBy(Inventory::getReceiveItemId, Collectors.counting()));
+
+        Map<String, Map<Long, List<Inventory>>> result = inventoryList.stream()
+                .collect(Collectors.groupingBy(
+                        Inventory::getReceiveItemId,
+                        Collectors.groupingBy(
+                                inventory -> itemCountMap.get(inventory.getReceiveItemId()),
+                                Collectors.toList()
+                        )
+                ));
+
         return result;
     }
 
     @Override
-    public List<Inventory> findInventoryWithinValidityPeriodAndNoUsedAndNoDelete() {
+    public Map<String, Map<Long, List<Inventory>>> findInventoryWithinValidityPeriodAndNoUsedAndNoDelete() {
         LocalDate today = LocalDate.now();
         String onlyDateEndOfDay = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         Criteria criteria = new Criteria().andOperator(
@@ -115,17 +127,21 @@ public class InventoryServiceImpl implements InventoryService {
         Query query = new Query(criteria);
         final List<Inventory> inventoryList = mongoTemplate.find(query, Inventory.class);
 
-        return inventoryList.stream().collect(Collectors.toMap(
+        Map<String, Long> itemCountMap = inventoryList.stream()
+                .collect(Collectors.groupingBy(Inventory::getReceiveItemId, Collectors.counting()));
+        Map<String, Map<Long, List<Inventory>>> result = inventoryList.stream()
+                .collect(Collectors.groupingBy(
                         Inventory::getReceiveItemId,
-                        inventory -> inventory,
-                        (existing, replacement) -> existing
-                ))
-                .values()
-                .stream().toList();
+                        Collectors.groupingBy(
+                                inventory -> itemCountMap.get(inventory.getReceiveItemId()),
+                                Collectors.toList()
+                        )
+                ));
+        return result;
     }
 
     @Override
-    public List<Inventory> searchByName(String keyword, String type) {
+    public Map<String, Map<Long, List<Inventory>>> searchByName(String keyword, String type) {
         LocalDate today = LocalDate.now();
         String startOfDay = today.atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         String endOfDay = today.plusDays(1).atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -183,17 +199,25 @@ public class InventoryServiceImpl implements InventoryService {
         // 用MongoTemplate執行之前的查詢條件，取得List<CountData>
         final AggregationResults<Inventory> results = mongoTemplate.aggregate(aggregation, "inventory", Inventory.class);
 
-        return results.getMappedResults().stream().collect(Collectors.toMap(
+        final List<Inventory> inventoryList = results.getMappedResults();
+
+        Map<String, Long> itemCountMap = inventoryList.stream()
+                .collect(Collectors.groupingBy(Inventory::getReceiveItemId, Collectors.counting()));
+
+        Map<String, Map<Long, List<Inventory>>> result = inventoryList.stream()
+                .collect(Collectors.groupingBy(
                         Inventory::getReceiveItemId,
-                        inventory -> inventory,
-                        (existing, replacement) -> existing
-                ))
-                .values()
-                .stream().toList();
+                        Collectors.groupingBy(
+                                inventory -> itemCountMap.get(inventory.getReceiveItemId()),
+                                Collectors.toList()
+                        )
+                ));
+
+        return result;
     }
 
     @Override
-    public List<Inventory> searchByNameAndMainCategory(String keyword, String mainCategory, String type) {
+    public Map<String, Map<Long, List<Inventory>>> searchByNameAndMainCategory(String keyword, String mainCategory, String type) {
         LocalDate today = LocalDate.now();
         String startOfDay = today.atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         String endOfDay = today.plusDays(1).atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -253,17 +277,25 @@ public class InventoryServiceImpl implements InventoryService {
         // 用MongoTemplate執行之前的查詢條件，取得List<CountData>
         final AggregationResults<Inventory> results = mongoTemplate.aggregate(aggregation, "inventory", Inventory.class);
 
-        return results.getMappedResults().stream().collect(Collectors.toMap(
+        final List<Inventory> inventoryList = results.getMappedResults();
+
+        Map<String, Long> itemCountMap = inventoryList.stream()
+                .collect(Collectors.groupingBy(Inventory::getReceiveItemId, Collectors.counting()));
+
+        Map<String, Map<Long, List<Inventory>>> result = inventoryList.stream()
+                .collect(Collectors.groupingBy(
                         Inventory::getReceiveItemId,
-                        inventory -> inventory,
-                        (existing, replacement) -> existing
-                ))
-                .values()
-                .stream().toList();
+                        Collectors.groupingBy(
+                                inventory -> itemCountMap.get(inventory.getReceiveItemId()),
+                                Collectors.toList()
+                        )
+                ));
+
+        return result;
     }
 
     @Override
-    public List<Inventory> searchByMainCategory(String mainCategory, String type) {
+    public Map<String, Map<Long, List<Inventory>>> searchByMainCategory(String mainCategory, String type) {
         LocalDate today = LocalDate.now();
         String startOfDay = today.atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         String endOfDay = today.plusDays(1).atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -317,17 +349,25 @@ public class InventoryServiceImpl implements InventoryService {
         // 用MongoTemplate執行之前的查詢條件，取得List<CountData>
         final AggregationResults<Inventory> results = mongoTemplate.aggregate(aggregation, "inventory", Inventory.class);
 
-        return results.getMappedResults().stream().collect(Collectors.toMap(
+        final List<Inventory> inventoryList = results.getMappedResults();
+
+        Map<String, Long> itemCountMap = inventoryList.stream()
+                .collect(Collectors.groupingBy(Inventory::getReceiveItemId, Collectors.counting()));
+
+        Map<String, Map<Long, List<Inventory>>> result = inventoryList.stream()
+                .collect(Collectors.groupingBy(
                         Inventory::getReceiveItemId,
-                        inventory -> inventory,
-                        (existing, replacement) -> existing
-                ))
-                .values()
-                .stream().toList();
+                        Collectors.groupingBy(
+                                inventory -> itemCountMap.get(inventory.getReceiveItemId()),
+                                Collectors.toList()
+                        )
+                ));
+
+        return result;
     }
 
     @Override
-    public List<Inventory> searchByNameAndMainCategoryAndSubCategory(String keyword, String mainCategory, String subCategory, String type) {
+    public Map<String, Map<Long, List<Inventory>>> searchByNameAndMainCategoryAndSubCategory(String keyword, String mainCategory, String subCategory, String type) {
         LocalDate today = LocalDate.now();
         String startOfDay = today.atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         String endOfDay = today.plusDays(1).atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -389,17 +429,25 @@ public class InventoryServiceImpl implements InventoryService {
         // 用MongoTemplate執行之前的查詢條件，取得List<CountData>
         final AggregationResults<Inventory> results = mongoTemplate.aggregate(aggregation, "inventory", Inventory.class);
 
-        return results.getMappedResults().stream().collect(Collectors.toMap(
+        final List<Inventory> inventoryList = results.getMappedResults();
+
+        Map<String, Long> itemCountMap = inventoryList.stream()
+                .collect(Collectors.groupingBy(Inventory::getReceiveItemId, Collectors.counting()));
+
+        Map<String, Map<Long, List<Inventory>>> result = inventoryList.stream()
+                .collect(Collectors.groupingBy(
                         Inventory::getReceiveItemId,
-                        inventory -> inventory,
-                        (existing, replacement) -> existing
-                ))
-                .values()
-                .stream().toList();
+                        Collectors.groupingBy(
+                                inventory -> itemCountMap.get(inventory.getReceiveItemId()),
+                                Collectors.toList()
+                        )
+                ));
+
+        return result;
     }
 
     @Override
-    public List<Inventory> searchByMainCategoryAndSubCategory(String mainCategory, String subCategory, String type) {
+    public Map<String, Map<Long, List<Inventory>>> searchByMainCategoryAndSubCategory(String mainCategory, String subCategory, String type) {
         LocalDate today = LocalDate.now();
         String startOfDay = today.atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         String endOfDay = today.plusDays(1).atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -455,13 +503,21 @@ public class InventoryServiceImpl implements InventoryService {
         // 用MongoTemplate執行之前的查詢條件，取得List<CountData>
         final AggregationResults<Inventory> results = mongoTemplate.aggregate(aggregation, "inventory", Inventory.class);
 
-        return results.getMappedResults().stream().collect(Collectors.toMap(
+        final List<Inventory> inventoryList = results.getMappedResults();
+
+        Map<String, Long> itemCountMap = inventoryList.stream()
+                .collect(Collectors.groupingBy(Inventory::getReceiveItemId, Collectors.counting()));
+
+        Map<String, Map<Long, List<Inventory>>> result = inventoryList.stream()
+                .collect(Collectors.groupingBy(
                         Inventory::getReceiveItemId,
-                        inventory -> inventory,
-                        (existing, replacement) -> existing
-                ))
-                .values()
-                .stream().toList();
+                        Collectors.groupingBy(
+                                inventory -> itemCountMap.get(inventory.getReceiveItemId()),
+                                Collectors.toList()
+                        )
+                ));
+
+        return result;
     }
 
     @Override
