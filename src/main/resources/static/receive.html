@@ -627,7 +627,7 @@
 										<tr role="row" class="odd">
 											<td x-html="item.name"></td>
 											<td>
-												<input type="number" min="0" x-model="item.quantity" x-on:input="updateTotal(index, $event.target.value)">
+												<input type="number" min="1" x-model="item.quantity" x-on:input="updateTotal(index, $event.target.value)">
 											</td>
 											<td>
 												<input type="number" disabled x-model="item.total">
@@ -663,25 +663,6 @@
 			</div>
 		</div>
 	</div>
-
-<!--	成功modal-->
-	<div class="swal-modal" role="dialog" aria-modal="true"><div class="swal-icon swal-icon--success">
-		<span class="swal-icon--success__line swal-icon--success__line--long"></span>
-		<span class="swal-icon--success__line swal-icon--success__line--tip"></span>
-
-		<div class="swal-icon--success__ring"></div>
-		<div class="swal-icon--success__hide-corners"></div>
-	</div><div class="swal-title" style="">Good job!</div><div class="swal-text" style="">You clicked the button!</div><div class="swal-footer"><div class="swal-button-container">
-
-		<button class="swal-button swal-button--confirm btn btn-success">OK</button>
-
-		<div class="swal-button__loader">
-			<div></div>
-			<div></div>
-			<div></div>
-		</div>
-
-	</div></div></div>
 
 	<!--   Core JS Files   -->
 	<script src="js/jquery-3.7.1.min.js"></script>
@@ -777,8 +758,8 @@
 				getSelectedProductData(){
 					return this.selectedProductList.map(item => ({
 						...item,
-						quantity: item.quantity || 0,
-						total: item.total || 0,
+						quantity: item.quantity || '',
+						total: item.total || '',
 						expiryDate: item.expiryDate || '',
 						storePlace: item.storePlace || ''
 					}));
