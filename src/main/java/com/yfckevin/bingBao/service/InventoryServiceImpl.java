@@ -524,4 +524,35 @@ public class InventoryServiceImpl implements InventoryService {
     public List<Inventory> findByReceiveItemId(String receiveItemId) {
         return inventoryRepository.findByReceiveItemId(receiveItemId);
     }
+
+    @Override
+    public List<Inventory> findInventoryNoticeDateIsBeforeExpiryDate() {
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String onlyDateEndOfDay = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        Criteria criteria = new Criteria().andOperator(
+                Criteria.where("usedDate").exists(false),
+                Criteria.where("deletionDate").exists(false),
+                Criteria.where("expiryDate").gte(onlyDateEndOfDay)
+        );
+        Query query = new Query(criteria);
+        List<Inventory> inventoriesFromMongo = mongoTemplate.find(query, Inventory.class);
+
+        List<Inventory> inventoryList = new ArrayList<>();
+        for (Inventory inventory : inventoriesFromMongo) {
+            try {
+                int overdueNoticeDays = Integer.parseInt(inventory.getOverdueNotice());
+                LocalDate expiryDate = LocalDate.parse(inventory.getExpiryDate(), dateFormatter);
+                LocalDate noticeDate = today.plusDays(overdueNoticeDays);
+
+                if (expiryDate.isEqual(noticeDate)) {
+                    inventoryList.add(inventory);
+                }
+            } catch (NumberFormatException | DateTimeParseException e) {
+                logger.error(e.getMessage(), e);
+            }
+        }
+
+        return inventoryList;
+    }
 }

@@ -35,16 +35,12 @@ public class InventoryController {
     private final ConfigProperties configProperties;
     private final InventoryService inventoryService;
     private final ProductService productService;
-    private final ReceiveFormService receiveFormService;
-    private final ReceiveItemService receiveItemService;
 
-    public InventoryController(@Qualifier("sdf") SimpleDateFormat sdf, ConfigProperties configProperties, InventoryService inventoryService, ProductService productService, ReceiveFormService receiveFormService, ReceiveItemService receiveItemService) {
+    public InventoryController(@Qualifier("sdf") SimpleDateFormat sdf, ConfigProperties configProperties, InventoryService inventoryService, ProductService productService) {
         this.sdf = sdf;
         this.configProperties = configProperties;
         this.inventoryService = inventoryService;
         this.productService = productService;
-        this.receiveFormService = receiveFormService;
-        this.receiveItemService = receiveItemService;
     }
 
     /**

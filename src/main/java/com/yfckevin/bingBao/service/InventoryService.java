@@ -27,4 +27,6 @@ public interface InventoryService {
     Map<String, Map<Long, List<Inventory>>> searchByMainCategoryAndSubCategory(String mainCategory, String subCategory, String type);
 
     List<Inventory> findByReceiveItemId(String receiveItemId);
+
+    List<Inventory> findInventoryNoticeDateIsBeforeExpiryDate();
 }
