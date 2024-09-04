@@ -74,14 +74,9 @@ public class ReceiveController {
         receiveForm.setReceiveNumber(RNUtil.generateReceiveNumber());
         receiveForm.setStoreDate(sdf.format(new Date()));
         receiveForm.setStoreNumber(storeNumber);
-        Optional<Supplier> supplierOpt = supplierService.findById(dto.getSupplierId());
-        if (supplierOpt.isEmpty()) {
-            resultStatus.setCode("C002");
-            resultStatus.setMessage("查無供應商");
-            return ResponseEntity.ok(receiveForm);
-        } else {
-            receiveForm.setSupplier(supplierOpt.get());
-        }
+        Optional.ofNullable(dto.getSupplierId())
+                .flatMap(supplierService::findById)
+                .ifPresent(receiveForm::setSupplier);
 
         //組收貨明細
         final List<ReceiveItem> receiveItemList = dto.getSelectedProducts().stream()

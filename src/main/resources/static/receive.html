@@ -606,7 +606,7 @@
 			<div class="modal-content">
 				<div class="modal-header border-0">
 					<h5 class="modal-title">
-						<span class="fw-mediumbold">收貨明細</span>
+						<span class="fw-mediumbold"></span>
 					</h5>
 					<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">×</span>
@@ -763,6 +763,11 @@
 							}
 						},
 				  	});
+
+				  	//預設放進冰箱的日期為當天
+					const today = new Date();
+              		this.receiveDate = today.toISOString().split("T")[0];
+
 				},
 				getSupplierData(){
 					const start = this.pageNumber * this.size,
@@ -1092,10 +1097,10 @@
 				alert('收貨日期不能為空！');
 				return false;
 			}
-			if (!supplierId) {
-				alert('需選擇一間供應商！');
-				return false;
-			}
+<!--			if (!supplierId) {-->
+<!--				alert('需選擇一間供應商！');-->
+<!--				return false;-->
+<!--			}-->
 
 			return true;
 		}

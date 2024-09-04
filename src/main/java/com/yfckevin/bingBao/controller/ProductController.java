@@ -287,7 +287,6 @@ public class ProductController {
             product.setCreationDate(sdf.format(new Date()));
             product.setPackageForm(dto.getPackageForm());
             product.setDescription(dto.getDescription());
-//            product.setExpiryDay(dto.getExpiryDay());
             product.setOverdueNotice(dto.getOverdueNotice());
             product.setMainCategory(dto.getMainCategory());
             product.setSubCategory(dto.getSubCategory());
