@@ -107,7 +107,7 @@
 						<li class="nav-item">
 							<a href="receive.html">
 								<i class="fas fa-box-open"></i>
-								<p>收貨放進冰箱</p>
+								<p>食材放進冰箱</p>
 							</a>
 						</li>
 					</ul>
@@ -151,21 +151,24 @@
 						<div class="col-md-12">
 							<div class="card">
 								<div class="card-header d-flex justify-content-between align-items-center">
-									<h4 class="card-title">放進冰箱</h4>
+									<h4 class="card-title">食材放進冰箱</h4>
 									<div class="d-flex ms-auto">
-										<button class="btn btn-primary me-2" x-on:click="showSelectedProductsModal()">查看收貨明細</button>
+										<button class="btn btn-primary me-2" x-on:click="showSelectedProductsModal()">
+											<i class="fas fa-cart-arrow-down"></i>
+											等待放進的食材 (<span x-text="selectedProductIds.length"></span>)
+										</button>
 									</div>
 								</div>
 								<div class="card-body">
 									<ul class="nav nav-pills nav-secondary nav-pills-no-bd" id="pills-tab-without-border" role="tablist">
 										<li class="nav-item" role="presentation">
-											<a class="nav-link active" id="pills-form-tab-nobd" data-bs-toggle="pill" href="#pills-form-nobd" role="tab" aria-controls="pills-home-nobd" aria-selected="true">主表單</a>
+											<a class="nav-link active" id="pills-form-tab-nobd" data-bs-toggle="pill" href="#pills-form-nobd" role="tab" aria-controls="pills-home-nobd" aria-selected="true"><i class="fas fa-keyboard me-2"></i>主表單</a>
 										</li>
 										<li class="nav-item" role="presentation">
-											<a class="nav-link" id="pills-supplier-tab-nobd" data-bs-toggle="pill" href="#pills-supplier-nobd" role="tab" aria-controls="pills-contact-nobd" aria-selected="false" tabindex="-1">選擇供應商</a>
+											<a class="nav-link" id="pills-supplier-tab-nobd" data-bs-toggle="pill" href="#pills-supplier-nobd" role="tab" aria-controls="pills-contact-nobd" aria-selected="false" tabindex="-1"><i class="far fa-building me-2"></i>選擇供應商</a>
 										</li>
 										<li class="nav-item" role="presentation">
-											<a class="nav-link" id="pills-detail-tab-nobd" data-bs-toggle="pill" href="#pills-detail-nobd" role="tab" aria-controls="pills-profile-nobd" aria-selected="false" tabindex="-1">選擇食材</a>
+											<a class="nav-link" id="pills-detail-tab-nobd" data-bs-toggle="pill" href="#pills-detail-nobd" role="tab" aria-controls="pills-profile-nobd" aria-selected="false" tabindex="-1"><i class="fas fa-fish me-2"></i>選擇食材</a>
 										</li>
 									</ul>
 									<div class="tab-content mt-2 mb-3" id="pills-without-border-tabContent">
@@ -210,7 +213,7 @@
 															<h4 class="card-title"></h4>
 															<button class="btn btn-primary btn-round ms-auto" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
 																<i class="fa fa-plus"></i>
-																新增
+																新增供應商
 															</button>
 														</div>
 													</div>
@@ -659,7 +662,7 @@
 				</div>
 				<div class="modal-footer border-0">
 					<button type="button" x-on:click="refrigerate()" class="btn btn-primary">
-						放進冰箱
+						食材放進冰箱
 					</button>
 					<button type="button" class="btn btn-danger" data-bs-dismiss="modal" x-on:click="clearSupplier()">
 						關閉
@@ -740,6 +743,13 @@
 									products: value,
 									allSelected: false
 								}));
+
+								// 根據creationDate做遞減排序
+								_this.productList.sort((a, b) => {
+									const dateA = a.products.length > 0 ? new Date(a.products[0].creationDate) : new Date(0);
+									const dateB = b.products.length > 0 ? new Date(b.products[0].creationDate) : new Date(0);
+									return dateB - dateA;
+								});
 							}
 						},
 				  	});
@@ -796,7 +806,6 @@
 						}
 					});
                     this.checkAllSelected(index);
-                    console.log(this.selectedProductIds)
                 },
                 update(event, index) {
                     const isChecked = $(event.target).is(':checked');

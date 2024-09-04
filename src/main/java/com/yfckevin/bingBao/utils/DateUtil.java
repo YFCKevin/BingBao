@@ -19,27 +19,21 @@ public class DateUtil {
         // 計算年、月、日差異
         Period period = Period.between(start.toLocalDate(), end.toLocalDate());
 
-        // 計算天數差異
-        long totalDaysBetween = ChronoUnit.DAYS.between(start.toLocalDate(), end.toLocalDate());
-        long daysInFullYears = period.getYears() * 365; // 基於365天的年份
-        long daysInFullMonths = period.getMonths() * 30; // 基於30天的月份
-        long daysInPeriods = daysInFullYears + daysInFullMonths + period.getDays();
-
-        long remainingDays = totalDaysBetween - daysInPeriods;
-
-        int years = period.getYears();
-        int months = period.getMonths();
-        int days = period.getDays() + (int) remainingDays; // 加上剩餘的天數
+        if (start.toLocalDate().isEqual(end.toLocalDate())) {
+            return "0天";
+        }
 
         // 構建結果字符串
         StringBuilder result = new StringBuilder();
-        if (years > 0) {
-            result.append(years).append("年");
+        if (period.getYears() > 0) {
+            result.append(period.getYears()).append("年");
         }
-        if (months > 0) {
-            result.append(months).append("個月");
+        if (period.getMonths() > 0) {
+            result.append(period.getMonths()).append("個月");
         }
-        result.append(days).append("天");
+        if (period.getDays() > 0) {
+            result.append(period.getDays()).append("天");
+        }
 
         return result.toString().trim();
     }

@@ -25,6 +25,8 @@ public class ConfigProperties {
     public String mongodbUri;
     @Value("${config.aiPicSavePath}")
     public String aiPicSavePath;
+    @Value("${config.aiPicShowPath}")
+    public String aiPicShowPath;
 
     public String getApiKey() {
         return apiKey;
@@ -64,5 +66,9 @@ public class ConfigProperties {
 
     public String getAiPicSavePath() {
         return aiPicSavePath;
+    }
+
+    public String getAiPicShowPath() {
+        return aiPicShowPath;
     }
 }

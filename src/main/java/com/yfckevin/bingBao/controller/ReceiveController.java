@@ -254,7 +254,7 @@ public class ReceiveController {
                         entry -> entry.getValue().stream()
                                 .map(ProductDTO::getName)
                                 .collect(Collectors.joining("<br>")) +
-                                " (" + entry.getValue().get(0).getPackageNumber() + ")",  // 加入CreationDate到key中
+                                "<br>(" + entry.getValue().get(0).getPackageNumber() + ")",  // 加入CreationDate到key中
                         Map.Entry::getValue
                 ));
         resultStatus.setCode("C000");

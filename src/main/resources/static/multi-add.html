@@ -30,7 +30,7 @@
 	<link rel="stylesheet" href="css/kaiadmin.min.css">
 	<style>
         .selected {
-            background-color: #007bff;  /* Bootstrap primary color */
+            background-color: #31ce36;  /* Bootstrap primary color */
             color: white;
         }
 	    .nav-link.error-style {
@@ -118,7 +118,7 @@
 						<li class="nav-item">
 							<a href="receive.html">
 								<i class="fas fa-box-open"></i>
-								<p>收貨放進冰箱</p>
+								<p>食材放進冰箱</p>
 							</a>
 						</li>
 					</ul>
@@ -165,7 +165,10 @@
 								<div class="card-header d-flex justify-content-between align-items-center">
 									<div class="card-title">食材建檔</div>
 									<div class="d-flex ms-auto">
-										<button type="submit" class="btn btn-success" id="saveProductBtn">建檔</button> <!--x-on:click="saveMultiProduct()"-->
+										<button type="submit" class="btn btn-primary" id="saveProductBtn">
+											<i class="fas fa-file-import"></i>
+											建檔
+										</button> <!--x-on:click="saveMultiProduct()"-->
 									</div>
 								</div>
 								<div class="card-body" style="display:flex;flex-direction:column;align-items:center">
@@ -320,22 +323,16 @@
 																<option value="PORTION">份</option>
 															</select>
 														</div>
+														<div class="mt-3">
+															<i class="far fa-hand-point-right me-2 ps-3"></i>
+															每<span x-text="packageUnitMap[item.packageUnit]"></span>有<span x-text="item.packageQuantity"></span>個
+														</div>
 													</div>
 												</div>
 												<div class="form-group">
 													<label :for="'comment-' + index">食材描述備註</label>
 													<textarea x-model="item.description" :name="'productDTOList[' + index + '].description'" class="form-control" :id="'comment-' + index" rows="5"></textarea>
 												</div>
-<!--&lt;!&ndash;											<div class="form-group">&ndash;&gt;-->
-<!--&lt;!&ndash;												<label for="mainCategory">存放位置</label>&ndash;&gt;-->
-<!--&lt;!&ndash;												<select class="form-select form-control" id="storePlace">&ndash;&gt;-->
-<!--&lt;!&ndash;													<option value="">請選擇</option>&ndash;&gt;-->
-<!--&lt;!&ndash;													<option value="HUALIEN_REF_2F_LEFT">花蓮2樓左側冰箱</option>&ndash;&gt;-->
-<!--&lt;!&ndash;													<option value="HUALIEN_REF_2F_RIGHT">花蓮2樓右側冰箱</option>&ndash;&gt;-->
-<!--&lt;!&ndash;													<option value="HUALIEN_REF_1F_RIGHT">花蓮1樓冰箱</option>&ndash;&gt;-->
-<!--&lt;!&ndash;													<option value="TAIPEI_REF">台北冰箱</option>&ndash;&gt;-->
-<!--&lt;!&ndash;												</select>&ndash;&gt;-->
-<!--&lt;!&ndash;											</div>&ndash;&gt;-->
 												<div class="form-group">
 													<label class="form-label d-block">快過期了</label>
 													<div class="d-flex align-items-center">
@@ -473,6 +470,19 @@
 				selectedTab: 0,
 				products: [],
 				todayListLabel: [],
+				packageUnitMap: {
+					"EACH": "個",
+					"BOX": "箱",
+					"PACK": "包",
+					"BOTTLE": "瓶",
+					"BAG": "袋",
+					"BARREL": "桶",
+					"CASE": "盒",
+					"CAN": "罐",
+					"BUNDLE": "捆",
+					"STRIP": "條",
+					"PORTION": "份"
+				},
 
 				init(){
 					const params = new URLSearchParams(window.location.search);

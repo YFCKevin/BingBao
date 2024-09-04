@@ -107,7 +107,7 @@
 						<li class="nav-item">
 							<a href="receive.html">
 								<i class="fas fa-box-open"></i>
-								<p>收貨放進冰箱</p>
+								<p>食材放進冰箱</p>
 							</a>
 						</li>
 					</ul>
@@ -156,13 +156,13 @@
 								<div class="card-body">
 									<ul class="nav nav-pills nav-secondary nav-pills-no-bd" id="pills-tab-without-border" role="tablist">
 										<li class="nav-item" role="presentation">
-											<a class="nav-link active" id="pills-today-tab-nobd" data-bs-toggle="pill" href="#pills-today-nobd" role="tab" aria-controls="pills-today-nobd" aria-selected="true">今日放進冰箱</a>
+											<a class="nav-link active" id="pills-today-tab-nobd" data-bs-toggle="pill" href="#pills-today-nobd" role="tab" aria-controls="pills-today-nobd" aria-selected="true"><i class="fas fa-laugh-beam me-2"></i>今日放進冰箱</a>
 										</li>
 										<li class="nav-item" role="presentation">
-											<a class="nav-link" id="pills-soon-tab-nobd" data-bs-toggle="pill" href="#pills-soon-nobd" role="tab" aria-controls="pills-soon-nobd" aria-selected="false" tabindex="-1">快過期</a>
+											<a class="nav-link" id="pills-soon-tab-nobd" data-bs-toggle="pill" href="#pills-soon-nobd" role="tab" aria-controls="pills-soon-nobd" aria-selected="false" tabindex="-1"><i class="fas fa-cookie-bite me-2"></i>快過期</a>
 										</li>
 										<li class="nav-item" role="presentation">
-											<a class="nav-link" id="pills-valid-tab-nobd" data-bs-toggle="pill" href="#pills-valid-nobd" role="tab" aria-controls="pills-valid-nobd" aria-selected="false" tabindex="-1">在有效期限內</a>
+											<a class="nav-link" id="pills-valid-tab-nobd" data-bs-toggle="pill" href="#pills-valid-nobd" role="tab" aria-controls="pills-valid-nobd" aria-selected="false" tabindex="-1"><i class="fas fa-cookie me-2"></i>在有效期限內</a>
 										</li>
 									</ul>
 									<div class="tab-content mt-2 mb-3" id="pills-without-border-tabContent">
@@ -244,7 +244,7 @@
 																		<template x-for="(item,index) in getTodayData()" :key="index">
 																			<tr role="row" class="odd">
 																				<td>
-																					<img :src="item.coverPath" style="width: 50px; height: 50px">
+																					<img :src="item.coverPath" style="width: 100px; height: 100px; border-radius: 10%;">
 																				</td>
 																				<td x-text="item.name"></td>
 																				<td x-text="item.totalAmount"></td>
@@ -252,13 +252,13 @@
 																				<td x-text="item.noticeDate"></td>
 																				<td>
 																					<button @click="openAmountModal(item.receiveItemId, item.totalAmount)" type="button" data-bs-toggle="tooltip" title="登錄使用數量" class="btn btn-link btn-primary">
-																						<i class="fas fa-edit"></i>
+																						<i class="fas fa-edit fs-4"></i>
 																					</button>
 																					<button @click="openDetailModal(item.id)" type="button" data-bs-toggle="tooltip" title="查看庫存食材細節" class="btn btn-link btn-info">
-																						<i class="fas fa-list"></i>
+																						<i class="fas fa-list fs-4"></i>
 																					</button>
 																					<button @click="openDeleteModal(item.receiveItemId)" type="button" data-bs-toggle="tooltip" title="丟棄" class="btn btn-link btn-danger">
-																						<i class="fas fa-trash-alt"></i>
+																						<i class="fas fa-trash-alt fs-4"></i>
 																					</button>
 																				</td>
 																			</tr>
@@ -405,22 +405,22 @@
 																		<template x-for="(item,index) in getExpiringSoonData()" :key="index">
 																			<tr role="row" class="odd">
 																				<td>
-																					<img :src="item.coverPath" style="width: 50px; height: 50px">
+																					<img :src="item.coverPath" style="width: 100px; height: 100px; border-radius: 10%;">
 																				</td>
 																				<td x-text="item.name"></td>
 																				<td x-text="item.totalAmount"></td>
 																				<td x-text="item.expiryDate"></td>
-																				<td x-text="item.expiryTime"></td>
-																				<td x-text="item.existedTime"></td>
+																				<td x-text="item.expiryTime === '0天' ? '今天到期' : item.expiryTime"></td>
+																				<td x-text="item.existedTime === '0天' ? '今天放進冰箱' : item.existedTime"></td>
 																				<td>
 																					<button @click="openAmountModal(item.receiveItemId, item.totalAmount)" type="button" data-bs-toggle="tooltip" title="登錄使用數量" class="btn btn-link btn-primary">
-																						<i class="fas fa-edit"></i>
+																						<i class="fas fa-edit fs-4"></i>
 																					</button>
 																					<button @click="openDetailModal(item.id)" type="button" data-bs-toggle="tooltip" title="查看庫存食材細節" class="btn btn-link btn-info">
-																						<i class="fas fa-list"></i>
+																						<i class="fas fa-list fs-4"></i>
 																					</button>
 																					<button @click="openDeleteModal(item.receiveItemId)" type="button" data-bs-toggle="tooltip" title="丟棄" class="btn btn-link btn-danger">
-																						<i class="fas fa-trash-alt"></i>
+																						<i class="fas fa-trash-alt fs-4"></i>
 																					</button>
 																				</td>
 																			</tr>
@@ -568,23 +568,23 @@
 																		<template x-for="(item,index) in getValidData()" :key="index">
 																			<tr role="row" class="odd">
 																				<td>
-																					<img :src="item.coverPath" style="width: 50px; height: 50px">
+																					<img :src="item.coverPath" style="width: 100px; height: 100px; border-radius: 10%;">
 																				</td>
 																				<td x-text="item.name"></td>
 																				<td x-text="item.totalAmount"></td>
 																				<td x-text="item.expiryDate"></td>
-																				<td x-text="item.expiryTime"></td>
-																				<td x-text="item.existedTime"></td>
+																				<td x-text="item.expiryTime === '0天' ? '今天到期' : item.expiryTime"></td>
+																				<td x-text="item.existedTime === '0天' ? '今天放進冰箱' : item.existedTime"></td>
 																				<td x-text="item.noticeDate"></td>
 																				<td>
 																					<button @click="openAmountModal(item.receiveItemId, item.totalAmount)" type="button" data-bs-toggle="tooltip" title="登錄使用數量" class="btn btn-link btn-primary">
-																						<i class="fas fa-edit"></i>
+																						<i class="fas fa-edit fs-4"></i>
 																					</button>
 																					<button @click="openDetailModal(item.id)" type="button" data-bs-toggle="tooltip" title="查看庫存食材細節" class="btn btn-link btn-info">
-																						<i class="fas fa-list"></i>
+																						<i class="fas fa-list fs-4"></i>
 																					</button>
 																					<button @click="openDeleteModal(item.receiveItemId)" type="button" data-bs-toggle="tooltip" title="丟棄" class="btn btn-link btn-danger">
-																						<i class="fas fa-trash-alt"></i>
+																						<i class="fas fa-trash-alt fs-4"></i>
 																					</button>
 																				</td>
 																			</tr>

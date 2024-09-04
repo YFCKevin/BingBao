@@ -319,10 +319,11 @@ public class ProductController {
         ResultStatus resultStatus = new ResultStatus();
 
         List<TempMaster> tempMasterList = tempMasterService.findAllByOrderByCreationDateDesc();
+        final List<TempMasterDTO> tempMasterDTOList = tempMasterList.stream().map(this::constructTempMasterDTO).toList();
 
         resultStatus.setCode("C000");
         resultStatus.setMessage("成功");
-        resultStatus.setData(tempMasterList);
+        resultStatus.setData(tempMasterDTOList);
         return ResponseEntity.ok(resultStatus);
     }
 
@@ -550,6 +551,22 @@ public class ProductController {
             dto.setSubCategoryLabel(d.getSubCategory().getLabel());
         }
         dto.setPackageForm(PackageForm.COMPLETE);
+        return dto;
+    }
+
+
+    private TempMasterDTO constructTempMasterDTO(TempMaster tempMaster) {
+        TempMasterDTO dto = new TempMasterDTO();
+        dto.setId(tempMaster.getId());
+        dto.setCreator(tempMaster.getCreator());
+        dto.setCreationDate(tempMaster.getCreationDate());
+        dto.setModifier(tempMaster.getModifier());
+        dto.setModificationDate(tempMaster.getModificationDate());
+        dto.setDeletionDate(tempMaster.getDeletionDate());
+        dto.setCoverPath(configProperties.getAiPicShowPath() + tempMaster.getCoverName());
+        final List<TempDetail> tempDetails = tempMaster.getTempDetails();
+        final List<TempDetailDTO> detailDTOList = tempDetails.stream().map(ProductController::constructTempDetailDTO).toList();
+        dto.setTempDetails(detailDTOList);
         return dto;
     }
 }
