@@ -200,7 +200,7 @@
 																		</select>
 																		<template x-if="todaySelectedCategory !== 'MEAT' && todaySelectedCategory !== 'SEAFOOD'">
 																			<select class="form-select form-control" x-model="todaySelectedSubCategory" disabled x-on:change="todayProductSearch()">
-																				<option value="x">-</option>
+																				<option value="">-</option>
 																			</select>
 																		</template>
 																		<template x-if="todaySelectedCategory === 'MEAT'">
@@ -360,7 +360,7 @@
 																		</select>
 																		<template x-if="soonSelectedCategory !== 'MEAT' && soonSelectedCategory !== 'SEAFOOD'">
 																			<select class="form-select form-control" x-model="soonSelectedSubCategory" disabled x-on:change="soonProductSearch()">
-																				<option value="x">-</option>
+																				<option value="">-</option>
 																			</select>
 																		</template>
 																		<template x-if="soonSelectedCategory === 'MEAT'">
@@ -519,7 +519,7 @@
 																		</select>
 																		<template x-if="validSelectedCategory !== 'MEAT' && validSelectedCategory !== 'SEAFOOD'">
 																			<select class="form-select form-control" x-model="validSelectedSubCategory" disabled x-on:change="validProductSearch()">
-																				<option value="x">-</option>
+																				<option value="">-</option>
 																			</select>
 																		</template>
 																		<template x-if="validSelectedCategory === 'MEAT'">
@@ -532,7 +532,7 @@
 																			</select>
 																		</template>
 																		<template x-if="validSelectedCategory === 'SEAFOOD'">
-																			<select class="form-select form-control" x-model="selectedSubCategory" x-on:change="validProductSearch()">
+																			<select class="form-select form-control" x-model="validSelectedSubCategory" x-on:change="validProductSearch()">
 																				<option value="">請選擇副類型</option>
 																				<option value="FISH">魚</option>
 																				<option value="SHRIMP">蝦</option>
