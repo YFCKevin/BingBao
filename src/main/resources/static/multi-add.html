@@ -1,9 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:x-on="http://www.w3.org/1999/xhtml">
+<html lang="zh-TW" xmlns:x-on="http://www.w3.org/1999/xhtml">
 <head>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<title>Avatars - Kaiadmin Bootstrap 5 Admin Dashboard</title>
+	<title>冰寶 - 您的冰箱智慧助手</title>
+	<meta property="og:title" content="冰寶 - 您的冰箱智慧助手">
+	<meta property="og:description" content="「冰寶」是一款智慧冰箱管理助手，專為食品管理而設計。幫助您輕鬆追蹤冰箱內的食材，提供有效的存放建議，並提醒您即將過期的食品。利用AI掃描技術，讓您的食材快速建檔，放進冰箱。冰寶都是提升食品管理的理想夥伴。">
+	<meta property="og:image" content="images/favicon.ico">
+	<meta property="og:url" content="https://www.gurula.cc/bingBao/dashboard.html">
+	<meta property="og:type" content="website">
 	<meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
 	<link rel="icon" href="images/favicon.ico" type="image/x-icon"/>
 
@@ -82,7 +87,7 @@
 						<li class="nav-item">
 							<a href="product.html">
 								<i class="fas fa-fish"></i>
-								<p>商品模板</p>
+								<p>食材模板</p>
 							</a>
 						</li>
 						<li class="nav-section">
@@ -94,7 +99,7 @@
 						<li class="nav-item submenu">
 							<a data-bs-toggle="collapse" href="#submenu" class="" aria-expanded="true">
 								<i class="fas fa-bars"></i>
-								<p>產品建檔</p>
+								<p>食材建檔</p>
 								<span class="caret"></span>
 							</a>
 							<div class="collapse" id="submenu" style="">
@@ -158,7 +163,7 @@
 						<div class="col-md-12">
 							<div class="card">
 								<div class="card-header d-flex justify-content-between align-items-center">
-									<div class="card-title">產品建檔</div>
+									<div class="card-title">食材建檔</div>
 									<div class="d-flex ms-auto">
 										<button type="submit" class="btn btn-success" id="saveProductBtn">建檔</button> <!--x-on:click="saveMultiProduct()"-->
 									</div>
@@ -193,7 +198,7 @@
 													</div>
 												</div>
 <!--												<div class="form-group">-->
-<!--													<label :for="'serialNumber-' + index">商品序號</label>-->
+<!--													<label :for="'serialNumber-' + index">食材序號</label>-->
 <!--													<input type="text" class="form-control" :id="'serialNumber-' + index" :name="'productDTOList[' + index + '].serialNumber'" placeholder="自動產生序號，無須填入" readonly>-->
 <!--												</div>-->
 												<div class="form-group">
@@ -217,7 +222,7 @@
 													</div>
 												</div>
 												<div class="form-group">
-													<label :for="'mainCategory-' + index">產品分類 *</label>
+													<label :for="'mainCategory-' + index">食材分類 *</label>
 													<div class="d-flex">
 														<select class="form-select form-control me-2"
 																:id="'mainCategory-' + index"
@@ -318,7 +323,7 @@
 													</div>
 												</div>
 												<div class="form-group">
-													<label :for="'comment-' + index">商品描述備註</label>
+													<label :for="'comment-' + index">食材描述備註</label>
 													<textarea x-model="item.description" :name="'productDTOList[' + index + '].description'" class="form-control" :id="'comment-' + index" rows="5"></textarea>
 												</div>
 <!--&lt;!&ndash;											<div class="form-group">&ndash;&gt;-->
@@ -421,7 +426,7 @@
 					</button>
 				</div>
 				<div class="modal-body">
-					您已完成商品建檔步驟，可前往管理頁面觀看商品資料！
+					您已完成食材建檔步驟，可前往管理頁面觀看食材資料！
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-primary" data-bs-dismiss="modal">關閉</button>
@@ -549,20 +554,20 @@
 					});
 				},
 				saveProduct(){
-					this.loadProducts();	//把form表單的商品資訊帶入Alpine內
+					this.loadProducts();	//把form表單的食材資訊帶入Alpine內
 					let hasError = false;
 					$('.has-error').removeClass('has-error');
 					$('.nav-link').removeClass('bg-danger text-white');
 
 					this.products.forEach((product, index) => {
-						// 商品名稱
+						// 食材名稱
 						if (product.name.trim() === '') {
 							$(`[name='productDTOList[${index}].name']`).closest('.form-group').addClass('has-error');
 							hasError = true;
 							changeNavLinkCss(index);
 						}
 
-						// 商品主種類
+						// 食材主種類
 						if (product.mainCategory.trim() === '') {
 							$(`[name='productDTOList[${index}].mainCategory']`).closest('.form-group').addClass('has-error');
 							hasError = true;

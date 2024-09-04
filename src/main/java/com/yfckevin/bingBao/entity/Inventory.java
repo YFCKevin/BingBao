@@ -11,12 +11,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Inventory {
     @Id
     private String id;
-    private String name;    //產品名稱
-    private String serialNumber;    //產品序號
+    private String name;    //食材名稱
+    private String serialNumber;    //食材序號
     private String receiveFormId; //收貨唯一編號
     private String receiveFormNumber; //收貨編號
     private String receiveItemId; //收貨明細唯一編號
-    private String usedDate;    //用產品日期
+    private String usedDate;    //用食材日期
     private String storeDate;   //入庫日期
     private String storeNumber; //入庫批號
     private String expiryDate;   //有效日期

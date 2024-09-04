@@ -11,9 +11,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class TempDetailDTO {
     private String id;
     private String name;    //名稱
-    private String description; //商品描述
+    private String description; //食材描述
     private int price;
-    private String mainCategoryLabel;  //商品種類 (水果、青菜、海鮮、藥品等等)
+    private String mainCategoryLabel;  //食材種類 (水果、青菜、海鮮、藥品等等)
     private String packageUnitLabel;    //包裝單位 (包、瓶、個等等)
     private String subCategoryLabel;
     private String packageQuantity;     //包裝數量
@@ -22,9 +22,9 @@ public class TempDetailDTO {
     //for multi-add頁面用
     private PackageUnit packageUnit;
     private MainCategory mainCategory;
-    private String title;   //產品建檔的nav名稱
+    private String title;   //食材建檔的nav名稱
     private SubCategory subCategory;
-    private PackageForm packageForm;    //用於在產品建檔呈現用
+    private PackageForm packageForm;    //用於在食材建檔呈現用
 
     public PackageForm getPackageForm() {
         return packageForm;

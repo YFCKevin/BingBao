@@ -7,7 +7,7 @@ public class ReceiveItemDTO {
     private String id;
     private String productId;
     private int amount;
-    private String expiryDate;  //產品有效期限日期
+    private String expiryDate;  //食材有效期限日期
     private StorePlace storePlace;  //存放位置
     private String storePlaceLabel;
     private String creationDate;

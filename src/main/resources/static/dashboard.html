@@ -1,9 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:x-on="http://www.w3.org/1999/xhtml">
+<html lang="zh-TW" xmlns:x-on="http://www.w3.org/1999/xhtml">
 <head>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<title>Avatars - Kaiadmin Bootstrap 5 Admin Dashboard</title>
+	<title>冰寶 - 您的冰箱智慧助手</title>
+	<meta property="og:title" content="冰寶 - 您的冰箱智慧助手">
+	<meta property="og:description" content="「冰寶」是一款智慧冰箱管理助手，專為食品管理而設計。幫助您輕鬆追蹤冰箱內的食材，提供有效的存放建議，並提醒您即將過期的食品。利用AI掃描技術，讓您的食材快速建檔，放進冰箱。冰寶都是提升食品管理的理想夥伴。">
+	<meta property="og:image" content="images/favicon.ico">
+	<meta property="og:url" content="https://www.gurula.cc/bingBao/dashboard.html">
+	<meta property="og:type" content="website">
 	<meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
 	<link rel="icon" href="images/favicon.ico" type="image/x-icon"/>
 
@@ -71,7 +76,7 @@
 						<li class="nav-item">
 							<a href="product.html">
 							  <i class="fas fa-fish"></i>
-							  <p>商品模板</p>
+							  <p>食材模板</p>
 							</a>
 						</li>
 						<li class="nav-section">
@@ -83,7 +88,7 @@
 						<li class="nav-item submenu">
 							<a data-bs-toggle="collapse" href="#submenu" class="" aria-expanded="true">
 								<i class="fas fa-bars"></i>
-								<p>產品建檔</p>
+								<p>食材建檔</p>
 								<span class="caret"></span>
 							</a>
 							<div class="collapse" id="submenu" style="">
@@ -146,7 +151,7 @@
 						<div class="col-md-12">
 							<div class="card">
 								<div class="card-header d-flex justify-content-between align-items-center">
-									<h4 class="card-title">管理</h4>
+									<h4 class="card-title">冰箱清單</h4>
 								</div>
 								<div class="card-body">
 									<ul class="nav nav-pills nav-secondary nav-pills-no-bd" id="pills-tab-without-border" role="tablist">
@@ -176,7 +181,7 @@
 															<div class="row">
 																<div class="col-sm-12 col-md-6">
 																	<div id="select-product_filter_today" class="mb-3">
-																		<input x-on:keydown.enter="todayProductSearch()" id="todayProductKeyword" type="search" class="form-control" placeholder="可搜尋商品名稱" aria-controls="add-row">
+																		<input x-on:keydown.enter="todayProductSearch()" id="todayProductKeyword" type="search" class="form-control" placeholder="可搜尋食材名稱" aria-controls="add-row">
 																	</div>
 																	<div class="d-flex flex-column flex-md-row align-items-start">
 																		<select class="form-select form-control me-2 mb-2 mb-md-0" x-model="todaySelectedCategory" x-on:change="todayCategoryChange()">
@@ -227,8 +232,8 @@
 																	<table id="add-row_1" class="display table table-striped table-hover dataTable" role="grid" aria-describedby="add-row_info">
 																		<thead>
 																		<tr role="row">
-																			<th>商品照片</th>
-																			<th>商品名稱</th>
+																			<th>食材照片</th>
+																			<th>食材名稱</th>
 																			<th>剩餘數量</th>
 																			<th>有效期限</th>
 																			<th>何時通知快過期</th>
@@ -249,7 +254,7 @@
 																					<button @click="openAmountModal(item.receiveItemId, item.totalAmount)" type="button" data-bs-toggle="tooltip" title="登錄使用數量" class="btn btn-link btn-primary">
 																						<i class="fas fa-edit"></i>
 																					</button>
-																					<button @click="openPackageModal(item.id)" type="button" data-bs-toggle="tooltip" title="查看包裝資訊" class="btn btn-link btn-info">
+																					<button @click="openDetailModal(item.id)" type="button" data-bs-toggle="tooltip" title="查看庫存食材細節" class="btn btn-link btn-info">
 																						<i class="fas fa-list"></i>
 																					</button>
 																					<button @click="openDeleteModal(item.receiveItemId)" type="button" data-bs-toggle="tooltip" title="丟棄" class="btn btn-link btn-danger">
@@ -336,7 +341,7 @@
 															<div class="row">
 																<div class="col-sm-12 col-md-6">
 																	<div id="select-product_filter_soon" class="mb-3">
-																		<input x-on:keydown.enter="soonProductSearch()" id="soonProductKeyword" type="search" class="form-control" placeholder="可搜尋商品名稱" aria-controls="add-row">
+																		<input x-on:keydown.enter="soonProductSearch()" id="soonProductKeyword" type="search" class="form-control" placeholder="可搜尋食材名稱" aria-controls="add-row">
 																	</div>
 																	<div class="d-flex flex-column flex-md-row align-items-start">
 																		<select class="form-select form-control me-2 mb-2 mb-md-0" x-model="soonSelectedCategory" x-on:change="soonCategoryChange()">
@@ -387,8 +392,8 @@
 																	<table id="add-row_2" class="display table table-striped table-hover dataTable" role="grid" aria-describedby="add-row_info">
 																		<thead>
 																		<tr role="row">
-																			<th>商品照片</th>
-																			<th>商品名稱</th>
+																			<th>食材照片</th>
+																			<th>食材名稱</th>
 																			<th>剩餘數量</th>
 																			<th>有效期限</th>
 																			<th>再過多久過期</th>
@@ -410,6 +415,9 @@
 																				<td>
 																					<button @click="openAmountModal(item.receiveItemId, item.totalAmount)" type="button" data-bs-toggle="tooltip" title="登錄使用數量" class="btn btn-link btn-primary">
 																						<i class="fas fa-edit"></i>
+																					</button>
+																					<button @click="openDetailModal(item.id)" type="button" data-bs-toggle="tooltip" title="查看庫存食材細節" class="btn btn-link btn-info">
+																						<i class="fas fa-list"></i>
 																					</button>
 																					<button @click="openDeleteModal(item.receiveItemId)" type="button" data-bs-toggle="tooltip" title="丟棄" class="btn btn-link btn-danger">
 																						<i class="fas fa-trash-alt"></i>
@@ -495,7 +503,7 @@
 															<div class="row">
 																<div class="col-sm-12 col-md-6">
 																	<div id="select-product_filter" class="mb-3">
-																		<input x-on:keydown.enter="validProductSearch()" id="validProductKeyword" type="search" class="form-control" placeholder="可搜尋商品名稱" aria-controls="add-row">
+																		<input x-on:keydown.enter="validProductSearch()" id="validProductKeyword" type="search" class="form-control" placeholder="可搜尋食材名稱" aria-controls="add-row">
 																	</div>
 																	<div class="d-flex flex-column flex-md-row align-items-start">
 																		<select class="form-select form-control me-2 mb-2 mb-md-0" x-model="validSelectedCategory" x-on:change="validCategoryChange()">
@@ -546,8 +554,8 @@
 																	<table id="add-row" class="display table table-striped table-hover dataTable" role="grid" aria-describedby="add-row_info">
 																		<thead>
 																		<tr role="row">
-																			<th>商品照片</th>
-																			<th>商品名稱</th>
+																			<th>食材照片</th>
+																			<th>食材名稱</th>
 																			<th>剩餘數量</th>
 																			<th>有效期限</th>
 																			<th>再過多久過期</th>
@@ -572,7 +580,7 @@
 																					<button @click="openAmountModal(item.receiveItemId, item.totalAmount)" type="button" data-bs-toggle="tooltip" title="登錄使用數量" class="btn btn-link btn-primary">
 																						<i class="fas fa-edit"></i>
 																					</button>
-																					<button @click="openPackageModal(item.id)" type="button" data-bs-toggle="tooltip" title="查看包裝資訊" class="btn btn-link btn-info">
+																					<button @click="openDetailModal(item.id)" type="button" data-bs-toggle="tooltip" title="查看庫存食材細節" class="btn btn-link btn-info">
 																						<i class="fas fa-list"></i>
 																					</button>
 																					<button @click="openDeleteModal(item.receiveItemId)" type="button" data-bs-toggle="tooltip" title="丟棄" class="btn btn-link btn-danger">
@@ -683,6 +691,78 @@
 
 	</div>
 
+
+	<!-- inventoryDetailModal -->
+	<div class="modal fade" id="inventoryDetailModal" tabindex="-1" aria-hidden="true" style="display: none;">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header border-0">
+					<h5 class="modal-title">
+						<span class="fw-mediumbold" x-text="inventoryDetail.name"></span>
+					</h5>
+					<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">×</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="table-responsive">
+						<div class="dataTables_wrapper container-fluid dt-bootstrap4">
+							<div class="row">
+								<div class="col-12">
+									<ul id="dataList" class="list-group" style="list-style-type: none; padding-left: 0;">
+										<li class="d-flex align-items-center fs-5 mb-2">
+											<i class="fas fa-kiwi-bird me-2"></i>
+											包裝類型：<span x-text="inventoryDetail.packageFormLabel"></span>
+										</li>
+										<li class="d-flex align-items-center fs-5 mb-2">
+											<i class="fas fa-kiwi-bird me-2"></i>
+											每<span x-text="inventoryDetail.packageUnitLabel"></span>有 <span x-text="inventoryDetail.packageQuantity"></span> 個
+										</li>
+										<li class="d-flex align-items-center fs-5 mb-2">
+											<i class="fas fa-kiwi-bird me-2"></i>
+											分類：
+											<span x-text="inventoryDetail.mainCategoryLabel"></span>
+											<template x-if="inventoryDetail.subCategory">
+												<span> (<span x-text="inventoryDetail.subCategoryLabel"></span>)</span>
+											</template>
+										</li>
+										<li class="d-flex align-items-center fs-5 mb-2">
+											<i class="fas fa-kiwi-bird me-2"></i>
+											放進冰箱者：
+											<template x-if="inventoryDetail.creator">
+												<span x-text="inventoryDetail.creator"></span>
+											</template>
+											<template x-if="!inventoryDetail.creator">
+												<i class="fas fa-minus-circle text-danger me-2"></i>
+											</template>
+										</li>
+										<li class="d-flex align-items-center fs-5 mb-2">
+											<i class="fas fa-kiwi-bird me-2"></i>
+											存放位置：
+											<template x-if="inventoryDetail.storePlace">
+												<span x-text="inventoryDetail.storePlaceLabel"></span>
+											</template>
+											<template x-if="!inventoryDetail.storePlace">
+												<i class="fas fa-minus-circle text-danger me-2"></i>
+											</template>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer border-0">
+					<button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+						關閉
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
 	<!--   Core JS Files   -->
 	<script src="js/jquery-3.7.1.min.js"></script>
 	<script src="js/popper.min.js"></script>
@@ -733,6 +813,7 @@
 				validSelectedSubCategory: "",
 				targetDeleteId: "",
 				targetEditId: "",
+				inventoryDetail: {},	//放庫存食材細節資訊，開啟modal時呈現
 
 				init(){
 					let _this = this;
@@ -878,7 +959,7 @@
 					let _this = this;
 					Swal.fire({
 						title: '確認要刪除？',
-						text: '點擊確認後商品將不再存在冰箱中',
+						text: '點擊確認後食材將不再存在冰箱中',
 						icon: 'warning',
 						showCancelButton: true,
 						confirmButtonText: '確認',
@@ -919,6 +1000,20 @@
 							_this.editAmountInventory(enteredAmount);
 						}
 					});
+				},
+				openDetailModal(inventoryId){
+					let _this = this;
+				    $.ajax({
+						url: "getInventoryInfo/" + inventoryId,
+						type: "get",
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.inventoryDetail = response.data;
+								$("#inventoryDetailModal").modal('show');
+							}
+						},
+				  	});
 				},
 				deleteInventory(){
 					let _this = this;

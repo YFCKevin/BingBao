@@ -23,6 +23,8 @@ public class ConfigProperties {
     public String globalDomain;
     @Value("${spring.data.mongodb.uri}")
     public String mongodbUri;
+    @Value("${config.aiPicSavePath}")
+    public String aiPicSavePath;
 
     public String getApiKey() {
         return apiKey;
@@ -58,5 +60,9 @@ public class ConfigProperties {
 
     public String getMongodbUri() {
         return mongodbUri;
+    }
+
+    public String getAiPicSavePath() {
+        return aiPicSavePath;
     }
 }

@@ -98,7 +98,7 @@ public class ReceiveController {
         receiveForm.setReceiveItems(receiveItemList);
         ReceiveForm savedReceiveForm = receiveFormService.save(receiveForm);
 
-        //商品放進冰箱(入庫)
+        //食材放進冰箱(入庫)
         final Map<String, Map<String, Integer>> receiveItemIdExpiryDateAmountMap =
                 savedReceiveForm.getReceiveItems().stream()
                         .collect(Collectors.toMap(

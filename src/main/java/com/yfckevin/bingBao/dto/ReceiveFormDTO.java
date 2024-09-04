@@ -12,8 +12,8 @@ public class ReceiveFormDTO {
     private String receiveDate;   //收貨日期
     private String storeNumber; //入庫編號
     private String storeDate;   //入庫日期
-    private String supplierId;  //產品供應商編號
-    private List<ReceiveItemRequestDTO> itemRequestDTOS = new ArrayList<>();    //收貨產品明細編號
+    private String supplierId;  //食材供應商編號
+    private List<ReceiveItemRequestDTO> itemRequestDTOS = new ArrayList<>();    //收貨食材明細編號
     private String creationDate;
     private String modificationDate;
     private String deletionDate;

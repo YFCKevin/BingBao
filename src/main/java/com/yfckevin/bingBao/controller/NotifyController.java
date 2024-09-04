@@ -42,7 +42,7 @@ public class NotifyController {
     //    @GetMapping("/overdueNotice")
     @Scheduled(cron = "0 0 8 * * ?")
     public void overdueNotice() throws IOException {
-        logger.info("每日寄送快過期的庫存商品");
+        logger.info("每日寄送快過期的庫存食材");
         List<Inventory> inventoryList = inventoryService.findInventoryNoticeDateIsBeforeExpiryDate();
         final List<String> productIds = inventoryList.stream().map(Inventory::getProductId).toList();
         final Map<String, Product> productMap = productService.findByIdIn(productIds).stream()
@@ -76,8 +76,8 @@ public class NotifyController {
                 .flatMap(inventoryDTOS -> inventoryDTOS.stream()
                         .sorted(Comparator.comparing(InventoryDTO::getExpiryDate)))
                 .toList();
-        logger.info("今日寄送過期商品有" + finalInventoryDTOList.size() + "件");
-        System.out.println("每日通知快過期的商品資訊: " + finalInventoryDTOList);
+        logger.info("今日寄送過期食材有" + finalInventoryDTOList.size() + "件");
+        System.out.println("每日通知快過期的食材資訊: " + finalInventoryDTOList);
 
         ConfigurationUtil.Configuration();
         File file = new File(configProperties.getJsonPath() + "sendEmailAccount.js");
@@ -87,7 +87,7 @@ public class NotifyController {
 
         StringBuilder contentBuilder = new StringBuilder();
         contentBuilder.append("<table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse;'>");
-        contentBuilder.append("<tr><th>商品圖片</th><th>商品名稱</th><th>有效期限</th><th>剩餘數量</th><th>存放位置</th></tr>");
+        contentBuilder.append("<tr><th>食材圖片</th><th>食材名稱</th><th>有效期限</th><th>剩餘數量</th><th>存放位置</th></tr>");
 
         for (InventoryDTO inventory : finalInventoryDTOList) {
             contentBuilder.append("<tr>");
@@ -96,7 +96,7 @@ public class NotifyController {
             contentBuilder.append("<td>")
                     .append("<img src='")
                     .append(coverPath)
-                    .append("' alt='商品圖片' style='width: 75px; height: auto;'>")
+                    .append("' alt='食材圖片' style='width: 75px; height: auto;'>")
                     .append("</td>");
 
             contentBuilder.append("<td>").append(inventory.getName()).append("</td>");
@@ -111,7 +111,7 @@ public class NotifyController {
         String content = contentBuilder.toString();
 
         for (String email : emailList) {
-            MailUtils.sendHtmlMail(email, "[每日通知] 快過期庫存商品" + finalInventoryDTOList.size() + "件", content);
+            MailUtils.sendHtmlMail(email, "[每日通知] 快過期庫存食材" + finalInventoryDTOList.size() + "件", content);
         }
     }
 

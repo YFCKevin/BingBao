@@ -28,6 +28,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -60,7 +62,7 @@ public class ProductController {
 
 
     /**
-     * 手寫輸入產品資訊
+     * 手寫輸入食材資訊
      *
      * @param dto
      * @param session
@@ -122,7 +124,7 @@ public class ProductController {
             Optional<Product> productOpt = productService.findById(dto.getId());
             if (productOpt.isEmpty()) {
                 resultStatus.setCode("C001");
-                resultStatus.setMessage("查無產品");
+                resultStatus.setMessage("查無食材");
                 return ResponseEntity.ok(resultStatus);
             } else {
                 Product product = productOpt.get();
@@ -173,7 +175,7 @@ public class ProductController {
 
 
     /**
-     * 拍照匯入產品資訊
+     * 拍照匯入食材資訊
      *
      * @param imageDTO
      * @param session
@@ -189,6 +191,20 @@ public class ProductController {
         ResultStatus resultStatus = new ResultStatus();
 
         final byte[] decodeImg = Base64.getDecoder().decode(imageDTO.getImage());
+
+        String fileName = "";
+        try {
+            //儲存照片
+            fileName = picSuffix.format(new Date()) + ".jpg";
+            System.out.println("fileName: " + fileName);
+            String filePath = configProperties.getAiPicSavePath() + fileName;
+            FileOutputStream fos = new FileOutputStream(filePath);
+            fos.write(decodeImg);
+            fos.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         ByteString imgBytes = ByteString.copyFrom(decodeImg);
         Image img = Image.newBuilder().setContent(imgBytes).build();
 
@@ -209,6 +225,7 @@ public class ProductController {
             final TempMaster tempMaster = openAiService.completion(rawText);
             if (tempMaster != null) {
                 tempMaster.setCreationDate(sdf.format(new Date()));
+                tempMaster.setCoverName(fileName);
 //                tempMaster.setCreator(member.getName());
                 final TempMaster savedTempMaster = tempMasterService.save(tempMaster);
                 resultStatus.setCode("C000");
@@ -337,7 +354,7 @@ public class ProductController {
 
 
     /**
-     * 我的產品清單
+     * 我的食材清單
      *
      * @param session
      * @return
@@ -366,7 +383,7 @@ public class ProductController {
 
 
     /**
-     * 刪除產品
+     * 刪除食材
      *
      * @param id
      * @param session
@@ -390,14 +407,14 @@ public class ProductController {
                 })
                 .orElseGet(() -> {
                     resultStatus.setCode("C001");
-                    resultStatus.setMessage("查無產品");
+                    resultStatus.setMessage("查無食材");
                     return ResponseEntity.ok(resultStatus);
                 });
     }
 
 
     /**
-     * 查詢單一產品資訊
+     * 查詢單一食材資訊
      *
      * @param id
      * @param session
@@ -421,14 +438,14 @@ public class ProductController {
                 })
                 .orElseGet(() -> {
                     resultStatus.setCode("C001");
-                    resultStatus.setMessage("查無產品");
+                    resultStatus.setMessage("查無食材");
                     return ResponseEntity.ok(resultStatus);
                 });
     }
 
 
     /**
-     * 模糊查詢產品資訊
+     * 模糊查詢食材資訊
      *
      * @param searchDTO
      * @param session

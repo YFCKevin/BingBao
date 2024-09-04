@@ -32,15 +32,15 @@ public class OpenAiServiceImpl implements OpenAiService{
         this.tempMasterService = tempMasterService;
     }
 
-    public final String prompt = "1.商品清單如上，我要把資訊整理出JSON檔，欄位包括：\n" +
-            "name：商品名稱\n" +
+    public final String prompt = "1.食材清單如上，我要把資訊整理出JSON檔，欄位包括：\n" +
+            "name：食材名稱\n" +
             "price：價格，以數字表示，沒有標示則為0\n" +
-            "mainCategory：商品主種類，限定其中一種MEAT,SEAFOOD,VEGETABLES,FRUITS,GRAINS,BEVERAGES,CONDIMENTS,SNACKS,BAKERY,MEDICINE,HEALTH_FOOD,CANNED_FOOD,SPICES,OILS,SWEETS,DRIED_FOOD\n" +
-            "subCategory：商品次種類，如果主種類是MEAT，則再從BEEF,PORK,CHICKEN選定一種。如果主種類是SEAFOOD，則再從FISH,SHRIMP選定一種。如果不是NEAT和SEAFOOD，則沒有subCategory屬性\n" +
-            "packageUnit：商品包裝形式，限定其中一種EACH,BOX,PACK,BOTTLE,BAG,BARREL,CASE,CAN,BUNDLE,STRIP,PORTION\n" +
-            "description：商品的介紹與描述，字數落在100-120字\n" +
-            "packageQuantity：內容物數量，從商品清單分析內容物有多少，以字串表示數字\n" +
-            "2.每份商品清單可能包含多個商品資訊，必須分開成獨立的JSON物件。\n" +
+            "mainCategory：食材主種類，限定其中一種MEAT,SEAFOOD,VEGETABLES,FRUITS,GRAINS,BEVERAGES,CONDIMENTS,SNACKS,BAKERY,MEDICINE,HEALTH_FOOD,CANNED_FOOD,SPICES,OILS,SWEETS,DRIED_FOOD\n" +
+            "subCategory：食材次種類，如果主種類是MEAT，則再從BEEF,PORK,CHICKEN選定一種。如果主種類是SEAFOOD，則再從FISH,SHRIMP選定一種。如果不是NEAT和SEAFOOD，則沒有subCategory屬性\n" +
+            "packageUnit：食材包裝形式，限定其中一種EACH,BOX,PACK,BOTTLE,BAG,BARREL,CASE,CAN,BUNDLE,STRIP,PORTION\n" +
+            "description：食材的介紹與描述，字數落在100-120字\n" +
+            "packageQuantity：內容物數量，從食材清單分析內容物有多少，以字串表示數字\n" +
+            "2.每份食材清單可能包含多個食材資訊，必須分開成獨立的JSON物件。\n" +
             "3.確保只匯出json格式\n";
 
     @Override

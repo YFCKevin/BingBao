@@ -13,10 +13,10 @@ public class TempDetail {
     @Id
     private String id;
     private String name;    //名稱
-    private String description; //商品描述
+    private String description; //食材描述
     private int price;
-    private MainCategory mainCategory;  //商品種類 (水果、青菜、海鮮、藥品等等)
-    private SubCategory subCategory;    //商品次種類
+    private MainCategory mainCategory;  //食材種類 (水果、青菜、海鮮、藥品等等)
+    private SubCategory subCategory;    //食材次種類
     private PackageUnit packageUnit;    //包裝單位 (包、瓶、個等等)
     private String packageQuantity;     //包裝數量
     private String overdueNotice;   //通知過期天數

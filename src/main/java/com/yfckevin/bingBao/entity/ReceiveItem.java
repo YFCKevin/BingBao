@@ -10,9 +10,9 @@ public class ReceiveItem {
     @Id
     private String id;
     private String productId;
-    private int amount; //收貨產品數量
-    private int totalAmount;    //收貨產品總數量(數量 * 包裝單位)
-    private String expiryDate;  //產品有效期限日期
+    private int amount; //收貨食材數量
+    private int totalAmount;    //收貨食材總數量(數量 * 包裝單位)
+    private String expiryDate;  //食材有效期限日期
     private StorePlace storePlace;  //存放位置
     private String creationDate;
     private String modificationDate;

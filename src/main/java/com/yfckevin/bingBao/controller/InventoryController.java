@@ -44,7 +44,7 @@ public class InventoryController {
     }
 
     /**
-     * 使用產品對庫存數量進行扣減
+     * 使用食材對庫存數量進行扣減
      *
      * @param session
      * @return
@@ -108,6 +108,44 @@ public class InventoryController {
         resultStatus.setMessage("成功");
         return ResponseEntity.ok(resultStatus);
     }
+
+
+    /**
+     * 查詢單一庫存食材資訊
+     * @param id
+     * @param session
+     * @return
+     */
+    @GetMapping("/getInventoryInfo/{id}")
+    public ResponseEntity<?> getInventoryInfo (@PathVariable String id, HttpSession session){
+
+        final MemberDTO member = (MemberDTO) session.getAttribute("member");
+        if (member != null) {
+            logger.info("[deleteInventory]");
+        }
+        ResultStatus resultStatus = new ResultStatus();
+
+        final Optional<Inventory> opt = inventoryService.findById(id);
+        if (opt.isEmpty()) {
+            resultStatus.setCode("C008");
+            resultStatus.setMessage("查無庫存資料");
+        } else {
+            final Inventory inventory = opt.get();
+            final Optional<Product> productOpt = productService.findById(inventory.getProductId());
+            if (productOpt.isEmpty()) {
+                resultStatus.setCode("C001");
+                resultStatus.setMessage("查無食材");
+            } else {
+                final Product product = productOpt.get();
+                final InventoryDTO inventoryDTO = constructInventoryDTO(inventory, product, null);
+                resultStatus.setCode("C000");
+                resultStatus.setMessage("成功");
+                resultStatus.setData(inventoryDTO);
+            }
+        }
+        return ResponseEntity.ok(resultStatus);
+    }
+
 
 
     @GetMapping("/dashboard")

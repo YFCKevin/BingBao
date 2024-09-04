@@ -20,6 +20,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -554,5 +555,10 @@ public class InventoryServiceImpl implements InventoryService {
         }
 
         return inventoryList;
+    }
+
+    @Override
+    public Optional<Inventory> findById(String id) {
+        return inventoryRepository.findById(id);
     }
 }

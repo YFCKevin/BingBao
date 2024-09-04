@@ -1,9 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:x-on="http://www.w3.org/1999/xhtml">
+<html lang="zh-TW" xmlns:x-on="http://www.w3.org/1999/xhtml">
 <head>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<title>Avatars - Kaiadmin Bootstrap 5 Admin Dashboard</title>
+	<title>冰寶 - 您的冰箱智慧助手</title>
+	<meta property="og:title" content="冰寶 - 您的冰箱智慧助手">
+	<meta property="og:description" content="「冰寶」是一款智慧冰箱管理助手，專為食品管理而設計。幫助您輕鬆追蹤冰箱內的食材，提供有效的存放建議，並提醒您即將過期的食品。利用AI掃描技術，讓您的食材快速建檔，放進冰箱。冰寶都是提升食品管理的理想夥伴。">
+	<meta property="og:image" content="images/favicon.ico">
+	<meta property="og:url" content="https://www.gurula.cc/bingBao/dashboard.html">
+	<meta property="og:type" content="website">
 	<meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
 	<link rel="icon" href="images/favicon.ico" type="image/x-icon"/>
 
@@ -71,7 +76,7 @@
 						<li class="nav-item">
 							<a href="product.html">
 								<i class="fas fa-fish"></i>
-								<p>商品模板</p>
+								<p>食材模板</p>
 							</a>
 						</li>
 						<li class="nav-section">
@@ -83,7 +88,7 @@
 						<li class="nav-item submenu">
 							<a data-bs-toggle="collapse" href="#submenu" class="" aria-expanded="true">
 								<i class="fas fa-bars"></i>
-								<p>產品建檔</p>
+								<p>食材建檔</p>
 								<span class="caret"></span>
 							</a>
 							<div class="collapse" id="submenu" style="">
@@ -183,8 +188,8 @@
 																		<button x-on:click="openUploadModal(item.id)" type="button" data-bs-toggle="tooltip" title="查看資料" class="btn btn-primary">
 																			查看資料
 																		</button>
-																		<a :href="'multi-add.html?id=' + item.id" type="button" data-bs-toggle="tooltip" title="填寫產品資料" class="btn btn-primary">
-																			填寫產品資料
+																		<a :href="'multi-add.html?id=' + item.id" type="button" data-bs-toggle="tooltip" title="填寫食材資料" class="btn btn-primary">
+																			食材建檔
 																		</a>
 																	</div>
 																</td>
@@ -351,7 +356,7 @@
 							<div class="d-flex">
 								<div class="flex-1 pt-1 ms-2">
 									<div class="d-flex align-items-center mb-1">
-										<span>商品名稱：</span>
+										<span>食材名稱：</span>
 										<p class="fw-bold mb-0 ms-2" x-text="item.name"></p>
 									</div>
 									<div class="d-flex align-items-center mb-1">
@@ -375,7 +380,7 @@
 <!--										<span>天</span>-->
 <!--									</div>-->
 									<div class="d-flex align-items-center mb-1">
-										<span>商品描述：</span>
+										<span>食材描述：</span>
 										<p class="fw-bold mb-0 ms-2" x-text="item.description"></p>
 									</div>
 								</div>
@@ -536,7 +541,7 @@
 								Swal.close();
 								if (response.code == 'C000') {
 									Swal.fire({
-										title: '產品資訊匯入成功！',
+										title: '食材資訊匯入成功！',
 										text: '',
 										icon: 'success',
 										confirmButtonText: '關閉',

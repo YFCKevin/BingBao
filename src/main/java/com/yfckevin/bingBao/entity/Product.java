@@ -11,11 +11,11 @@ public class Product {
     private String id;
     private String serialNumber; //序號
     private String name;    //名稱
-    private String description; //商品描述
+    private String description; //食材描述
     private String coverName;   //圖片檔名
     private int price;
-    private MainCategory mainCategory;  //商品種類 (水果、青菜、海鮮、藥品等等)
-    private SubCategory subCategory;    //商品副總類
+    private MainCategory mainCategory;  //食材種類 (水果、青菜、海鮮、藥品等等)
+    private SubCategory subCategory;    //食材副總類
     private PackageForm packageForm;    //包裝形式 (完整包裝、散裝)
     private PackageUnit packageUnit;    //包裝單位 (包、瓶、個等等)
     private String packageQuantity;     //包裝數量

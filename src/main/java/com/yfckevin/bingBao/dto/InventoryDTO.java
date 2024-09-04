@@ -4,12 +4,12 @@ import com.yfckevin.bingBao.enums.*;
 
 public class InventoryDTO {
     private String id;
-    private String name;    //產品名稱
-    private String serialNumber;    //產品序號
+    private String name;    //食材名稱
+    private String serialNumber;    //食材序號
     private String receiveFormId; //收貨唯一編號
     private String receiveFormNumber; //收貨編號
     private String receiveItemId; //收貨明細唯一編號
-    private String usedDate;    //用產品日期
+    private String usedDate;    //用食材日期
     private String storeDate;   //入庫日期
     private String storeNumber; //入庫批號
     private String expiryDate;   //有效日期
@@ -29,8 +29,8 @@ public class InventoryDTO {
     private String expiryTime;  //再過多久過期(天數or月數or年數)
     private String existedTime; //已存放多久(天數or月數or年數)
     private String noticeDate;  //預計何時通知(包含實際通知的年月日)
-    private String totalAmount; //商品庫存總數
-    private String coverPath;    //商品圖路徑(前端呈現用)
+    private String totalAmount; //食材庫存總數
+    private String coverPath;    //食材圖路徑(前端呈現用)
     private String creationDate;
     private String modificationDate;
     private String deletionDate;

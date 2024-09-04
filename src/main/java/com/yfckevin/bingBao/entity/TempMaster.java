@@ -12,6 +12,7 @@ public class TempMaster {
     @Id
     private String id;
     private List<TempDetail> tempDetails = new ArrayList<>();
+    private String coverName;   //使用者上傳的照片檔名
     private String creationDate;
     private String modificationDate;
     private String deletionDate;
@@ -82,5 +83,13 @@ public class TempMaster {
 
     public void setVersion(long version) {
         this.version = version;
+    }
+
+    public String getCoverName() {
+        return coverName;
+    }
+
+    public void setCoverName(String coverName) {
+        this.coverName = coverName;
     }
 }

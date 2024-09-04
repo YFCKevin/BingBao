@@ -16,7 +16,7 @@ public class ReceiveForm {
     private String receiveDate;   //收貨日期
     private String storeNumber; //入庫批號
     private String storeDate;   //入庫日期
-    private Supplier supplier;  //產品供應商
+    private Supplier supplier;  //食材供應商
     private List<ReceiveItem> receiveItems = new ArrayList<>();
     private String creationDate;
     private String modificationDate;

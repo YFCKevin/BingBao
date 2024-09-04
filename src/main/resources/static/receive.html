@@ -1,9 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:x-on="http://www.w3.org/1999/xhtml" xmlns:x-bind="http://www.w3.org/1999/xhtml">
+<html lang="zh-TW" xmlns:x-on="http://www.w3.org/1999/xhtml">
 <head>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<title>Avatars - Kaiadmin Bootstrap 5 Admin Dashboard</title>
+	<title>冰寶 - 您的冰箱智慧助手</title>
+	<meta property="og:title" content="冰寶 - 您的冰箱智慧助手">
+	<meta property="og:description" content="「冰寶」是一款智慧冰箱管理助手，專為食品管理而設計。幫助您輕鬆追蹤冰箱內的食材，提供有效的存放建議，並提醒您即將過期的食品。利用AI掃描技術，讓您的食材快速建檔，放進冰箱。冰寶都是提升食品管理的理想夥伴。">
+	<meta property="og:image" content="images/favicon.ico">
+	<meta property="og:url" content="https://www.gurula.cc/bingBao/dashboard.html">
+	<meta property="og:type" content="website">
 	<meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
 	<link rel="icon" href="images/favicon.ico" type="image/x-icon"/>
 
@@ -71,7 +76,7 @@
 						<li class="nav-item">
 							<a href="product.html">
 								<i class="fas fa-fish"></i>
-								<p>商品模板</p>
+								<p>食材模板</p>
 							</a>
 						</li>
 						<li class="nav-section">
@@ -83,7 +88,7 @@
 						<li class="nav-item submenu">
 							<a data-bs-toggle="collapse" href="#submenu" class="" aria-expanded="true">
 								<i class="fas fa-bars"></i>
-								<p>產品建檔</p>
+								<p>食材建檔</p>
 								<span class="caret"></span>
 							</a>
 							<div class="collapse" id="submenu" style="">
@@ -160,7 +165,7 @@
 											<a class="nav-link" id="pills-supplier-tab-nobd" data-bs-toggle="pill" href="#pills-supplier-nobd" role="tab" aria-controls="pills-contact-nobd" aria-selected="false" tabindex="-1">選擇供應商</a>
 										</li>
 										<li class="nav-item" role="presentation">
-											<a class="nav-link" id="pills-detail-tab-nobd" data-bs-toggle="pill" href="#pills-detail-nobd" role="tab" aria-controls="pills-profile-nobd" aria-selected="false" tabindex="-1">選擇商品</a>
+											<a class="nav-link" id="pills-detail-tab-nobd" data-bs-toggle="pill" href="#pills-detail-nobd" role="tab" aria-controls="pills-profile-nobd" aria-selected="false" tabindex="-1">選擇食材</a>
 										</li>
 									</ul>
 									<div class="tab-content mt-2 mb-3" id="pills-without-border-tabContent">
@@ -309,7 +314,7 @@
 
 										</div>
 										<div class="tab-pane fade" id="pills-detail-nobd" role="tabpanel" aria-labelledby="pills-profile-tab-nobd">
-<!--											選擇商品-->
+<!--											選擇食材-->
 											<div class="col-md-12">
 <!--												<div class="card">-->
 												<div class="card-header">
@@ -323,7 +328,7 @@
 															<div class="row">
 																<div class="col-sm-12 col-md-6">
 																	<div id="select-product_filter" class="mb-3">
-																		<input x-on:keydown.enter="productSearch()" id="productKeyword" type="search" class="form-control" placeholder="可搜尋商品名稱" aria-controls="add-row">
+																		<input x-on:keydown.enter="productSearch()" id="productKeyword" type="search" class="form-control" placeholder="可搜尋食材名稱" aria-controls="add-row">
 																	</div>
 																	<div class="d-flex flex-column flex-md-row align-items-start">
 																		<select class="form-select form-control me-2 mb-2 mb-md-0" x-model="selectedCategory" x-on:change="categoryChange()">
@@ -375,8 +380,8 @@
 																		<thead>
 																			<tr role="row">
 																				<th>動作</th>
-																				<th>商品名稱</th>
-																				<th>商品數量</th>
+																				<th>食材名稱</th>
+																				<th>食材數量</th>
 																				<th>新增時間</th>
 																			</tr>
 																		</thead>
@@ -707,9 +712,9 @@
 				productList: [],
 				openCollapseIndex: 0, // 追蹤是哪個 collapse 被打開
 				selectedProductIds: [],
-				selectedProductList: [],	//用來裝選定要放入冰箱的商品
+				selectedProductList: [],	//用來裝選定要放入冰箱的食材
 				selectedCategory: "",	//動態增減次種類選單
-				selectedSubCategory: "",	//搜尋商品用
+				selectedSubCategory: "",	//搜尋食材用
 				todayListLabel: [],
 
 				init(){
@@ -1051,25 +1056,25 @@
 
 		function validate(selectedProducts, receiveDate, supplierId) {
 			if (selectedProducts.length === 0) {
-				alert('至少選擇一種商品！');
+				alert('至少選擇一種食材！');
 				return false;
 			}
 
 			for (let item of selectedProducts) {
 				if (!item.quantity || item.quantity <= 0) {
-					alert('所有商品的數量不能為空或小於等於0！');
+					alert('所有食材的數量不能為空或小於等於0！');
 					return false;
 				}
 				if (!item.totalQuantity || item.totalQuantity <= 0) {
-					alert('所有商品的總份數不能為空或小於等於0！');
+					alert('所有食材的總份數不能為空或小於等於0！');
 					return false;
 				}
 				if (!item.storePlace) {
-					alert('所有商品的存放位置不能為空！');
+					alert('所有食材的存放位置不能為空！');
 					return false;
 				}
 				if (!item.expiryDate) {
-					alert('所有商品的有效期限不能為空！');
+					alert('所有食材的有效期限不能為空！');
 					return false;
 				}
 			}
