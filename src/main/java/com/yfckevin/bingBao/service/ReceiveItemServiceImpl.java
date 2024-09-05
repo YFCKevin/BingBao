@@ -5,6 +5,7 @@ import com.yfckevin.bingBao.repository.ReceiveItemRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ReceiveItemServiceImpl implements ReceiveItemService{
@@ -22,5 +23,10 @@ public class ReceiveItemServiceImpl implements ReceiveItemService{
     @Override
     public ReceiveItem save(ReceiveItem receiveItem) {
         return receiveItemRepository.save(receiveItem);
+    }
+
+    @Override
+    public Optional<ReceiveItem> findFirstByProductId(String id) {
+        return receiveItemRepository.findFirstByProductId(id);
     }
 }

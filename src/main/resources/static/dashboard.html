@@ -2,7 +2,7 @@
 <html lang="zh-TW" xmlns:x-on="http://www.w3.org/1999/xhtml">
 <head>
 	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>冰寶 - 您的冰箱智慧助手</title>
 	<meta property="og:title" content="冰寶 - 您的冰箱智慧助手">
 	<meta property="og:description" content="「冰寶」是一款智慧冰箱管理助手，專為食品管理而設計。幫助您輕鬆追蹤冰箱內的食材，提供有效的存放建議，並提醒您即將過期的食品。利用AI掃描技術，讓您的食材快速建檔，放進冰箱。冰寶都是提升食品管理的理想夥伴。">
@@ -185,7 +185,7 @@
 																	</div>
 																	<div class="d-flex flex-column flex-md-row align-items-start">
 																		<select class="form-select form-control me-2 mb-2 mb-md-0" x-model="todaySelectedCategory" x-on:change="todayCategoryChange()">
-																			<option value="">請選擇主類型</option>
+																			<option value="">請選擇主分類</option>
 																			<option value="MEAT">肉品</option>
 																			<option value="SEAFOOD">海鮮</option>
 																			<option value="VEGETABLES">青菜</option>
@@ -210,7 +210,7 @@
 																		</template>
 																		<template x-if="todaySelectedCategory === 'MEAT'">
 																			<select class="form-select form-control" x-model="todaySelectedSubCategory" x-on:change="todayProductSearch()">
-																				<option value="">請選擇副類型</option>
+																				<option value="">請選擇副分類</option>
 																				<option value="BEEF">牛肉</option>
 																				<option value="PORK">豬肉</option>
 																				<option value="CHICKEN">雞肉</option>
@@ -219,7 +219,7 @@
 																		</template>
 																		<template x-if="todaySelectedCategory === 'SEAFOOD'">
 																			<select class="form-select form-control" x-model="todaySelectedSubCategory" x-on:change="todayProductSearch()">
-																				<option value="">請選擇副類型</option>
+																				<option value="">請選擇副分類</option>
 																				<option value="FISH">魚</option>
 																				<option value="SHRIMP">蝦</option>
 																			</select>
@@ -345,7 +345,7 @@
 																	</div>
 																	<div class="d-flex flex-column flex-md-row align-items-start">
 																		<select class="form-select form-control me-2 mb-2 mb-md-0" x-model="soonSelectedCategory" x-on:change="soonCategoryChange()">
-																			<option value="">請選擇主類型</option>
+																			<option value="">請選擇主分類</option>
 																			<option value="MEAT">肉品</option>
 																			<option value="SEAFOOD">海鮮</option>
 																			<option value="VEGETABLES">青菜</option>
@@ -370,7 +370,7 @@
 																		</template>
 																		<template x-if="soonSelectedCategory === 'MEAT'">
 																			<select class="form-select form-control" x-model="soonSelectedSubCategory" x-on:change="soonProductSearch()">
-																				<option value="">請選擇副類型</option>
+																				<option value="">請選擇副分類</option>
 																				<option value="BEEF">牛肉</option>
 																				<option value="PORK">豬肉</option>
 																				<option value="CHICKEN">雞肉</option>
@@ -379,7 +379,7 @@
 																		</template>
 																		<template x-if="soonSelectedCategory === 'SEAFOOD'">
 																			<select class="form-select form-control" x-model="soonSelectedSubCategory" x-on:change="soonProductSearch()">
-																				<option value="">請選擇副類型</option>
+																				<option value="">請選擇副分類</option>
 																				<option value="FISH">魚</option>
 																				<option value="SHRIMP">蝦</option>
 																			</select>
@@ -507,7 +507,7 @@
 																	</div>
 																	<div class="d-flex flex-column flex-md-row align-items-start">
 																		<select class="form-select form-control me-2 mb-2 mb-md-0" x-model="validSelectedCategory" x-on:change="validCategoryChange()">
-																			<option value="">請選擇主類型</option>
+																			<option value="">請選擇主分類</option>
 																			<option value="MEAT">肉品</option>
 																			<option value="SEAFOOD">海鮮</option>
 																			<option value="VEGETABLES">青菜</option>
@@ -532,7 +532,7 @@
 																		</template>
 																		<template x-if="validSelectedCategory === 'MEAT'">
 																			<select class="form-select form-control" x-model="validSelectedSubCategory" x-on:change="validProductSearch()">
-																				<option value="">請選擇副類型</option>
+																				<option value="">請選擇副分類</option>
 																				<option value="BEEF">牛肉</option>
 																				<option value="PORK">豬肉</option>
 																				<option value="CHICKEN">雞肉</option>
@@ -541,7 +541,7 @@
 																		</template>
 																		<template x-if="validSelectedCategory === 'SEAFOOD'">
 																			<select class="form-select form-control" x-model="validSelectedSubCategory" x-on:change="validProductSearch()">
-																				<option value="">請選擇副類型</option>
+																				<option value="">請選擇副分類</option>
 																				<option value="FISH">魚</option>
 																				<option value="SHRIMP">蝦</option>
 																			</select>
@@ -720,7 +720,7 @@
 										</li>
 										<li class="d-flex align-items-center fs-5 mb-2">
 											<i class="fas fa-kiwi-bird me-2"></i>
-											分類：
+											食材分類：
 											<span x-text="inventoryDetail.mainCategoryLabel"></span>
 											<template x-if="inventoryDetail.subCategory">
 												<span> (<span x-text="inventoryDetail.subCategoryLabel"></span>)</span>
@@ -837,6 +837,18 @@
 								}))
 							}
 						},
+						error: function(error) {
+							Swal.fire({
+								title: '系統錯誤，請聯繫管理員！',
+								text: '',
+								icon: 'error',
+								confirmButtonText: '關閉',
+								customClass: {
+									confirmButton: 'btn btn-danger'
+								}
+							})
+							console.error('Error:', error);
+						}
 				  	});
 
 				    $.ajax({
@@ -913,6 +925,18 @@
 								_this.todayList = response.data;
 							}
 						},
+						error: function(error) {
+							Swal.fire({
+								title: '系統錯誤，請聯繫管理員！',
+								text: '',
+								icon: 'error',
+								confirmButtonText: '關閉',
+								customClass: {
+									confirmButton: 'btn btn-danger'
+								}
+							})
+							console.error('Error:', error);
+						}
 				  	});
 				},
 				soonProductSearch(){
@@ -933,6 +957,18 @@
 								_this.expiringSoonList = response.data;
 							}
 						},
+						error: function(error) {
+							Swal.fire({
+								title: '系統錯誤，請聯繫管理員！',
+								text: '',
+								icon: 'error',
+								confirmButtonText: '關閉',
+								customClass: {
+									confirmButton: 'btn btn-danger'
+								}
+							})
+							console.error('Error:', error);
+						}
 				  	});
 				},
 				validProductSearch(){
@@ -953,13 +989,25 @@
 								_this.validList = response.data;
 							}
 						},
+						error: function(error) {
+							Swal.fire({
+								title: '系統錯誤，請聯繫管理員！',
+								text: '',
+								icon: 'error',
+								confirmButtonText: '關閉',
+								customClass: {
+									confirmButton: 'btn btn-danger'
+								}
+							})
+							console.error('Error:', error);
+						}
 				  	});
 				},
 				openDeleteModal(receiveItemId){
 					let _this = this;
 					Swal.fire({
 						title: '確認要刪除？',
-						text: '點擊確認後食材將不再存在冰箱中',
+						text: '點擊確認後食材將從冰箱中消失',
 						icon: 'warning',
 						showCancelButton: true,
 						confirmButtonText: '確認',
@@ -1013,6 +1061,18 @@
 								$("#inventoryDetailModal").modal('show');
 							}
 						},
+						error: function(error) {
+							Swal.fire({
+								title: '系統錯誤，請聯繫管理員！',
+								text: '',
+								icon: 'error',
+								confirmButtonText: '關閉',
+								customClass: {
+									confirmButton: 'btn btn-danger'
+								}
+							})
+							console.error('Error:', error);
+						}
 				  	});
 				},
 				deleteInventory(){
@@ -1048,6 +1108,18 @@
 								})
 							}
 						},
+						error: function(error) {
+							Swal.fire({
+								title: '系統錯誤，請聯繫管理員！',
+								text: '',
+								icon: 'error',
+								confirmButtonText: '關閉',
+								customClass: {
+									confirmButton: 'btn btn-danger'
+								}
+							})
+							console.error('Error:', error);
+						}
 				  	});
 				},
 				editAmountInventory(enteredAmount){
@@ -1087,6 +1159,18 @@
 								})
 							}
 						},
+						error: function(error) {
+							Swal.fire({
+								title: '系統錯誤，請聯繫管理員！',
+								text: '',
+								icon: 'error',
+								confirmButtonText: '關閉',
+								customClass: {
+									confirmButton: 'btn btn-danger'
+								}
+							})
+							console.error('Error:', error);
+						}
 				  	});
 				},
 				pages_today() {

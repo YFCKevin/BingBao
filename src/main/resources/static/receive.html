@@ -2,7 +2,7 @@
 <html lang="zh-TW" xmlns:x-on="http://www.w3.org/1999/xhtml">
 <head>
 	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>冰寶 - 您的冰箱智慧助手</title>
 	<meta property="og:title" content="冰寶 - 您的冰箱智慧助手">
 	<meta property="og:description" content="「冰寶」是一款智慧冰箱管理助手，專為食品管理而設計。幫助您輕鬆追蹤冰箱內的食材，提供有效的存放建議，並提醒您即將過期的食品。利用AI掃描技術，讓您的食材快速建檔，放進冰箱。冰寶都是提升食品管理的理想夥伴。">
@@ -155,7 +155,7 @@
 									<div class="d-flex ms-auto">
 										<button class="btn btn-primary me-2" x-on:click="showSelectedProductsModal()">
 											<i class="fas fa-cart-arrow-down"></i>
-											等待放進的食材 (<span x-text="selectedProductIds.length"></span>)
+											等待進冰箱的食材 (<span x-text="selectedProductIds.length"></span>)
 										</button>
 									</div>
 								</div>
@@ -193,14 +193,14 @@
 													<input type="text" class="form-control" id="receiveNumber" placeholder="自動產生收貨編號，無須填寫" readonly>
 												</div>
 												<div class="form-group">
-													<label for="storeDate">入庫日期</label>
+													<label for="storeDate">放進冰箱日期</label>
 													<div class="d-flex justify-content-center align-items-center">
 														<input type="text" class="form-control" id="storeDate" placeholder="自動帶入日期，無須填寫" readonly>
 													</div>
 												</div>
 												<div class="form-group">
-													<label for="storeNumber">入庫編號</label>
-													<input type="text" class="form-control" id="storeNumber" placeholder="自動產生入庫編號，無須填寫" readonly>
+													<label for="storeNumber">放進冰箱編號</label>
+													<input type="text" class="form-control" id="storeNumber" placeholder="自動產生放進冰箱編號，無須填寫" readonly>
 												</div>
 											</div>
 										</div>
@@ -335,7 +335,7 @@
 																	</div>
 																	<div class="d-flex flex-column flex-md-row align-items-start">
 																		<select class="form-select form-control me-2 mb-2 mb-md-0" x-model="selectedCategory" x-on:change="categoryChange()">
-																			<option value="">請選擇主類型</option>
+																			<option value="">請選擇主分類</option>
 																			<option value="MEAT">肉品</option>
 																			<option value="SEAFOOD">海鮮</option>
 																			<option value="VEGETABLES">青菜</option>
@@ -360,7 +360,7 @@
 																		</template>
 																		<template x-if="selectedCategory === 'MEAT'">
 																			<select class="form-select form-control" x-model="selectedSubCategory" x-on:change="productSearch()">
-																					<option value="">請選擇副類型</option>
+																					<option value="">請選擇副分類</option>
 																					<option value="BEEF">牛肉</option>
 																					<option value="PORK">豬肉</option>
 																					<option value="CHICKEN">雞肉</option>
@@ -369,7 +369,7 @@
 																		</template>
 																		<template x-if="selectedCategory === 'SEAFOOD'">
 																			<select class="form-select form-control" x-model="selectedSubCategory" x-on:change="productSearch()">
-																				<option value="">請選擇副類型</option>
+																				<option value="">請選擇副分類</option>
 																				<option value="FISH">魚</option>
 																				<option value="SHRIMP">蝦</option>
 																			</select>
@@ -606,7 +606,7 @@
 			<div class="modal-content">
 				<div class="modal-header border-0">
 					<h5 class="modal-title">
-						<span class="fw-mediumbold"></span>
+						<span class="fw-mediumbold">等待進冰箱的食材</span>
 					</h5>
 					<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">×</span>
@@ -650,6 +650,7 @@
 													<option value="HUALIEN_REF_2F_RIGHT">花蓮2樓右側冰箱</option>
 													<option value="HUALIEN_REF_1F_RIGHT">花蓮1樓冰箱</option>
 													<option value="TAIPEI_REF">台北冰箱</option>
+													<option value="OTHER">其他</option>
 												</select>
 											</td>
 										</tr>
@@ -731,6 +732,18 @@
 								_this.supplierList = response.data;
 							}
 						},
+						error: function(error) {
+							Swal.fire({
+								title: '系統錯誤，請聯繫管理員！',
+								text: '',
+								icon: 'error',
+								confirmButtonText: '關閉',
+								customClass: {
+									confirmButton: 'btn btn-danger'
+								}
+							})
+							console.error('Error:', error);
+						}
 				  	});
 				    $.ajax({
 						url: "getGroupProducts",
@@ -752,6 +765,18 @@
 								});
 							}
 						},
+						error: function(error) {
+							Swal.fire({
+								title: '系統錯誤，請聯繫管理員！',
+								text: '',
+								icon: 'error',
+								confirmButtonText: '關閉',
+								customClass: {
+									confirmButton: 'btn btn-danger'
+								}
+							})
+							console.error('Error:', error);
+						}
 				  	});
 				    $.ajax({
 						url: "getTodaySize",
@@ -846,6 +871,18 @@
 								$("#selectedProductModal").modal('show');
 							}
 						},
+						error: function(error) {
+							Swal.fire({
+								title: '系統錯誤，請聯繫管理員！',
+								text: '',
+								icon: 'error',
+								confirmButtonText: '關閉',
+								customClass: {
+									confirmButton: 'btn btn-danger'
+								}
+							})
+							console.error('Error:', error);
+						}
 				  	});
                 },
 				updateTotal(index, quantity) {
@@ -898,6 +935,18 @@
 								_this.productList = newProductList;
 							}
 						},
+						error: function(error) {
+							Swal.fire({
+								title: '系統錯誤，請聯繫管理員！',
+								text: '',
+								icon: 'error',
+								confirmButtonText: '關閉',
+								customClass: {
+									confirmButton: 'btn btn-danger'
+								}
+							})
+							console.error('Error:', error);
+						}
 				  	});
 				},
                 refrigerate(){
@@ -964,7 +1013,7 @@
 							},
 							error: function(xhr, status, error) {
 								Swal.fire({
-									title: '錯誤發生，請稍後再試！',
+									title: '系統錯誤，請聯繫管理員！',
 									text: '',
 									icon: 'error',
 									confirmButtonText: '關閉',
@@ -993,6 +1042,18 @@
 								_this.clearSupplierCheckboxes();
 							}
 						},
+						error: function(error) {
+							Swal.fire({
+								title: '系統錯誤，請聯繫管理員！',
+								text: '',
+								icon: 'error',
+								confirmButtonText: '關閉',
+								customClass: {
+									confirmButton: 'btn btn-danger'
+								}
+							})
+							console.error('Error:', error);
+						}
 				  	});
 				},
 				clearSupplierCheckboxes() {
@@ -1044,6 +1105,18 @@
 								$("#addSupplierModal").modal('hide');
 							}
 						},
+						error: function(error) {
+							Swal.fire({
+								title: '系統錯誤，請聯繫管理員！',
+								text: '',
+								icon: 'error',
+								confirmButtonText: '關閉',
+								customClass: {
+									confirmButton: 'btn btn-danger'
+								}
+							})
+							console.error('Error:', error);
+						}
 				  	});
 				},
 				pages() {

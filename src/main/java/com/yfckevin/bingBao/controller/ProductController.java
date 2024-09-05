@@ -7,14 +7,12 @@ import com.google.protobuf.ByteString;
 import com.yfckevin.bingBao.ConfigProperties;
 import com.yfckevin.bingBao.dto.*;
 import com.yfckevin.bingBao.entity.Product;
+import com.yfckevin.bingBao.entity.ReceiveItem;
 import com.yfckevin.bingBao.entity.TempDetail;
 import com.yfckevin.bingBao.entity.TempMaster;
 import com.yfckevin.bingBao.enums.PackageForm;
 import com.yfckevin.bingBao.exception.ResultStatus;
-import com.yfckevin.bingBao.service.GoogleVisionService;
-import com.yfckevin.bingBao.service.OpenAiService;
-import com.yfckevin.bingBao.service.ProductService;
-import com.yfckevin.bingBao.service.TempMasterService;
+import com.yfckevin.bingBao.service.*;
 import com.yfckevin.bingBao.utils.FileUtils;
 import com.yfckevin.bingBao.utils.PNUtil;
 import com.yfckevin.bingBao.utils.SNUtil;
@@ -28,15 +26,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RestController
@@ -47,15 +41,17 @@ public class ProductController {
     private final ProductService productService;
     private final GoogleVisionService googleVisionService;
     private final TempMasterService tempMasterService;
+    private final ReceiveItemService receiveItemService;
     private final OpenAiService openAiService;
     private final ConfigProperties configProperties;
 
-    public ProductController(@Qualifier("sdf") SimpleDateFormat sdf, @Qualifier("picSuffix") SimpleDateFormat picSuffix, ProductService productService, GoogleVisionService googleVisionService, TempMasterService tempMasterService, OpenAiService openAiService, ConfigProperties configProperties) {
+    public ProductController(@Qualifier("sdf") SimpleDateFormat sdf, @Qualifier("picSuffix") SimpleDateFormat picSuffix, ProductService productService, GoogleVisionService googleVisionService, TempMasterService tempMasterService, ReceiveItemService receiveItemService, OpenAiService openAiService, ConfigProperties configProperties) {
         this.sdf = sdf;
         this.picSuffix = picSuffix;
         this.productService = productService;
         this.googleVisionService = googleVisionService;
         this.tempMasterService = tempMasterService;
+        this.receiveItemService = receiveItemService;
         this.openAiService = openAiService;
         this.configProperties = configProperties;
     }
@@ -77,12 +73,83 @@ public class ProductController {
         }
         ResultStatus resultStatus = new ResultStatus();
 
-        if (StringUtils.isBlank(dto.getId())) { //新增
-            Product product = new Product();
+        Product product = new Product();
+
+        final MultipartFile nameFile = dto.getMultipartFile();
+
+        if (nameFile != null && !nameFile.isEmpty() && nameFile.getSize() != 0) {
+            final String extension = FilenameUtils.getExtension(nameFile.getOriginalFilename());
+            String fileName = picSuffix.format(new Date()) + "." + extension;
+            System.out.println("fileName: " + fileName);
+
+            try {
+                System.out.println("上傳圖片");
+                FileUtils.saveUploadedFile(nameFile, configProperties.getPicSavePath() + fileName);
+            } catch (IOException e) {
+                System.out.println("圖片上傳失敗");
+                logger.error(e.getMessage(), e);
+                resultStatus.setCode("C009");
+                resultStatus.setMessage("圖片上傳失敗");
+                return ResponseEntity.ok(resultStatus);
+            }
+            product.setCoverName(fileName);
+        }
+
+//            product.setCreator(member.getName());
+        product.setName(dto.getName());
+        product.setCreationDate(sdf.format(new Date()));
+        product.setPackageForm(dto.getPackageForm());
+        product.setDescription(dto.getDescription());
+        product.setOverdueNotice(dto.getOverdueNotice());
+        product.setMainCategory(dto.getMainCategory());
+        if (PackageForm.COMPLETE.equals(dto.getPackageForm())) {
+            product.setPackageQuantity(dto.getPackageQuantity());
+        }
+        product.setPackageUnit(dto.getPackageUnit());
+        product.setPrice(dto.getPrice());
+        product.setSerialNumber(SNUtil.generateSerialNumber());
+        Product savedProduct = productService.save(product);
+
+        resultStatus.setCode("C000");
+        resultStatus.setMessage("成功");
+        resultStatus.setData(savedProduct);
+        return ResponseEntity.ok(resultStatus);
+    }
+
+
+    @PostMapping("/editProduct")
+    public ResponseEntity<?> editProduct(@ModelAttribute ProductDTO dto, HttpSession session) {
+
+        final MemberDTO member = (MemberDTO) session.getAttribute("member");
+        if (member != null) {
+            logger.info("[editProduct]");
+        }
+        ResultStatus resultStatus = new ResultStatus();
+
+        System.out.println(dto);
+
+        Optional<Product> productOpt = productService.findById(dto.getId());
+        if (productOpt.isEmpty()) {
+            resultStatus.setCode("C001");
+            resultStatus.setMessage("查無食材");
+            return ResponseEntity.ok(resultStatus);
+        } else {
+            Product product = productOpt.get();
+            product.setName(dto.getName());
+            product.setPrice(dto.getPrice());
+            product.setPackageUnit(dto.getPackageUnit());
+            product.setSerialNumber(dto.getSerialNumber());
+            product.setPackageQuantity(dto.getPackageQuantity());
+            product.setOverdueNotice(dto.getOverdueNotice());
+            product.setMainCategory(dto.getMainCategory());
+            product.setSubCategory(dto.getSubCategory());
+            product.setModificationDate(sdf.format(new Date()));
+//            product.setModifier(member.getName());
+            product.setDescription(dto.getDescription());
+            product.setPackageForm(dto.getPackageForm());
 
             final MultipartFile nameFile = dto.getMultipartFile();
-
-            if (nameFile != null && !nameFile.isEmpty() && nameFile.getSize() != 0) {
+            if (nameFile != null && !nameFile.isEmpty() && nameFile.getSize() != 0) {   //更新圖片
                 final String extension = FilenameUtils.getExtension(nameFile.getOriginalFilename());
                 String fileName = picSuffix.format(new Date()) + "." + extension;
                 System.out.println("fileName: " + fileName);
@@ -90,6 +157,11 @@ public class ProductController {
                 try {
                     System.out.println("上傳圖片");
                     FileUtils.saveUploadedFile(nameFile, configProperties.getPicSavePath() + fileName);
+
+                    //刪除舊圖檔
+                    if (StringUtils.isNotBlank(product.getCoverName())) {
+                        FileUtils.delete(Paths.get(configProperties.getPicSavePath() + product.getCoverName()));
+                    }
                 } catch (IOException e) {
                     System.out.println("圖片上傳失敗");
                     logger.error(e.getMessage(), e);
@@ -99,76 +171,10 @@ public class ProductController {
                 }
                 product.setCoverName(fileName);
             }
-
-//            product.setCreator(member.getName());
-            product.setName(dto.getName());
-            product.setCreationDate(sdf.format(new Date()));
-            product.setPackageForm(dto.getPackageForm());
-            product.setDescription(dto.getDescription());
-            product.setOverdueNotice(dto.getOverdueNotice());
-            product.setMainCategory(dto.getMainCategory());
-            if (PackageForm.COMPLETE.equals(dto.getPackageForm())) {
-                product.setPackageQuantity(dto.getPackageQuantity());
-            }
-            product.setPackageUnit(dto.getPackageUnit());
-            product.setPrice(dto.getPrice());
-            product.setSerialNumber(SNUtil.generateSerialNumber());
-            Product savedProduct = productService.save(product);
-
+            final Product savedProduct = productService.save(product);
             resultStatus.setCode("C000");
             resultStatus.setMessage("成功");
             resultStatus.setData(savedProduct);
-
-        } else {    //更新
-
-            Optional<Product> productOpt = productService.findById(dto.getId());
-            if (productOpt.isEmpty()) {
-                resultStatus.setCode("C001");
-                resultStatus.setMessage("查無食材");
-                return ResponseEntity.ok(resultStatus);
-            } else {
-                Product product = productOpt.get();
-                product.setName(dto.getName());
-                product.setPrice(dto.getPrice());
-                product.setPackageUnit(dto.getPackageUnit());
-                product.setSerialNumber(dto.getSerialNumber());
-                product.setPackageQuantity(dto.getPackageQuantity());
-                product.setOverdueNotice(dto.getOverdueNotice());
-                product.setMainCategory(dto.getMainCategory());
-                product.setModificationDate(sdf.format(new Date()));
-                product.setModifier(member.getName());
-                product.setDescription(dto.getDescription());
-                product.setPackageForm(dto.getPackageForm());
-
-                final MultipartFile nameFile = dto.getMultipartFile();
-                if (nameFile != null && !nameFile.isEmpty() && nameFile.getSize() != 0) {   //更新圖片
-                    final String extension = FilenameUtils.getExtension(nameFile.getOriginalFilename());
-                    String fileName = picSuffix.format(new Date()) + "." + extension;
-                    System.out.println("fileName: " + fileName);
-
-                    try {
-                        System.out.println("上傳圖片");
-                        FileUtils.saveUploadedFile(nameFile, configProperties.getPicSavePath() + fileName);
-
-                        //刪除舊圖檔
-                        if (StringUtils.isNotBlank(product.getCoverName())) {
-                            FileUtils.delete(Paths.get(configProperties.getPicSavePath() + product.getCoverName()));
-                        }
-                    } catch (IOException e) {
-                        System.out.println("圖片上傳失敗");
-                        logger.error(e.getMessage(), e);
-                        resultStatus.setCode("C009");
-                        resultStatus.setMessage("圖片上傳失敗");
-                        return ResponseEntity.ok(resultStatus);
-                    }
-                    product.setCoverName(fileName);
-                }
-                final Product savedProduct = productService.save(product);
-                resultStatus.setCode("C000");
-                resultStatus.setMessage("成功");
-                resultStatus.setData(savedProduct);
-            }
-
         }
         return ResponseEntity.ok(resultStatus);
     }
@@ -352,7 +358,6 @@ public class ProductController {
     }
 
 
-
     /**
      * 我的食材清單
      *
@@ -400,9 +405,20 @@ public class ProductController {
 
         return productService.findById(id)
                 .map(p -> {
-                    productService.deleteById(id);
-                    resultStatus.setCode("C000");
-                    resultStatus.setMessage("成功");
+                    Optional<ReceiveItem> opt = receiveItemService.findFirstByProductId(id);
+                    if (opt.isEmpty()) {
+                        try {
+                            FileUtils.delete(Paths.get(configProperties.getPicSavePath() + p.getCoverName()));
+                        } catch (IOException e) {
+                            logger.error(e.getMessage(), e);
+                        }
+                        productService.deleteById(id);
+                        resultStatus.setCode("C000");
+                        resultStatus.setMessage("成功");
+                    } else {
+                        resultStatus.setCode("C011");
+                        resultStatus.setMessage("該模板已使用");
+                    }
                     return ResponseEntity.ok(resultStatus);
                 })
                 .orElseGet(() -> {
@@ -480,7 +496,7 @@ public class ProductController {
         } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory)) {
             // 有主種類 + 有副種類
             productList = productService.searchProductByMainCategoryAndSubCategory(mainCategory, subCategory);
-        }  else {
+        } else {
             // 全空白搜尋全部
             productList = productService.searchProductByName("");
         }
@@ -516,7 +532,10 @@ public class ProductController {
         }
         dto.setSerialNumber(product.getSerialNumber());
         dto.setOverdueNotice(product.getOverdueNotice());
+        dto.setMainCategory(product.getMainCategory());
         dto.setMainCategoryLabel(product.getMainCategory().getLabel());
+        dto.setSubCategory(product.getSubCategory());
+        dto.setSubCategoryLabel(product.getSubCategory() != null ? product.getSubCategory().getLabel() : null);
         dto.setModificationDate(product.getModificationDate());
         dto.setModifier(product.getModifier());
         dto.setDescription(product.getDescription());
