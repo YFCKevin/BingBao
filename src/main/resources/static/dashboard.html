@@ -91,15 +91,15 @@
 								<p>食材建檔</p>
 								<span class="caret"></span>
 							</a>
-							<div class="collapse" id="submenu" style="">
+							<div class="collapse show" id="submenu" style="">
 								<ul class="nav nav-collapse">
 									<li class="submenu">
 										<a href="import.html">
 											<span class="sub-item">AI建檔</span>
 										</a>
-<!--										<a href="add.html">-->
-<!--											<span class="sub-item">手動輸入</span>-->
-<!--										</a>-->
+										<a href="add.html">
+											<span class="sub-item">手動輸入</span>
+										</a>
 									</li>
 								</ul>
 							</div>
@@ -735,7 +735,7 @@
 										<template x-if="inventoryDetail.packageForm == 'COMPLETE'">
 											<li class="d-flex align-items-center fs-5 mb-2">
 												<i class="fas fa-kiwi-bird me-2"></i>
-												包裝方式：每<span x-text="inventoryDetail.packageUnitLabel"></span>有 <span x-text="inventoryDetail.packageQuantity"></span> 個
+												包裝方式：每<span x-text="inventoryDetail.packageUnitLabel"></span>有 <span x-text="inventoryDetail.packageQuantity"></span> 份
 											</li>
 										</template>
 										<li class="d-flex align-items-center fs-5 mb-2">
