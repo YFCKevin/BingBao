@@ -732,10 +732,12 @@
 											<i class="fas fa-kiwi-bird me-2"></i>
 											包裝類型：<span x-text="inventoryDetail.packageFormLabel"></span>
 										</li>
-										<li class="d-flex align-items-center fs-5 mb-2">
-											<i class="fas fa-kiwi-bird me-2"></i>
-											每<span x-text="inventoryDetail.packageUnitLabel"></span>有 <span x-text="inventoryDetail.packageQuantity"></span> 個
-										</li>
+										<template x-if="inventoryDetail.packageForm == 'COMPLETE'">
+											<li class="d-flex align-items-center fs-5 mb-2">
+												<i class="fas fa-kiwi-bird me-2"></i>
+												包裝方式：每<span x-text="inventoryDetail.packageUnitLabel"></span>有 <span x-text="inventoryDetail.packageQuantity"></span> 個
+											</li>
+										</template>
 										<li class="d-flex align-items-center fs-5 mb-2">
 											<i class="fas fa-kiwi-bird me-2"></i>
 											食材分類：

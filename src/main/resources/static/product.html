@@ -228,9 +228,11 @@
                                                         <td x-show="item.mainCategory == 'MEAT' || item.mainCategory == 'SEAFOOD'">
                                                             <span x-text="item.mainCategoryLabel"></span>
                                                             <br>
-                                                            <span>(</span>
-                                                            <span x-text="item.subCategoryLabel"></span>
-                                                            <span>)</span>
+                                                            <template x-if="item.subCategoryLabel">
+                                                                <span>
+                                                                    (<span x-text="item.subCategoryLabel"></span>)
+                                                                </span>
+                                                            </template>
                                                         </td>
                                                         <td x-show="item.mainCategory !== 'MEAT' && item.mainCategory !== 'SEAFOOD'">
                                                             <span x-text="item.mainCategoryLabel"></span>
@@ -716,7 +718,7 @@
                                 _this.packageUnit = data.packageUnit || '';
                                 _this.description = data.description;
                                 _this.rangeValue = data.overdueNotice || 0;
-                                if (data.coverPath) {
+                                if (!data.coverPath.endsWith('/null')) {
                                     _this.imageSrc = data.coverPath;
                                     _this.hasImage = true;
                                 } else {
