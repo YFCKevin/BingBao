@@ -8,6 +8,7 @@ public class SearchDTO {
     private String mainCategory;
     private String subCategory;
     private String type;    // today, soon, valid
+    private String storePlace;
 
     public String getType() {
         return type;
@@ -63,5 +64,13 @@ public class SearchDTO {
 
     public void setSupplierName(String supplierName) {
         this.supplierName = supplierName;
+    }
+
+    public String getStorePlace() {
+        return storePlace;
+    }
+
+    public void setStorePlace(String storePlace) {
+        this.storePlace = storePlace;
     }
 }
