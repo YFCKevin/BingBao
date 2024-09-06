@@ -58,7 +58,7 @@ public class ProductController {
 
 
     /**
-     * 手寫輸入食材資訊
+     * 手寫儲存單筆食材資訊
      *
      * @param dto
      * @param session
@@ -73,13 +73,17 @@ public class ProductController {
         }
         ResultStatus resultStatus = new ResultStatus();
 
+        System.out.println(dto);
+
+        final String packageNumber = PNUtil.generatePackageNumber();
+
         Product product = new Product();
 
         final MultipartFile nameFile = dto.getMultipartFile();
 
         if (nameFile != null && !nameFile.isEmpty() && nameFile.getSize() != 0) {
             final String extension = FilenameUtils.getExtension(nameFile.getOriginalFilename());
-            String fileName = picSuffix.format(new Date()) + "." + extension;
+            String fileName = String.format("%d", System.currentTimeMillis()) + "." + extension;
             System.out.println("fileName: " + fileName);
 
             try {
@@ -95,28 +99,36 @@ public class ProductController {
             product.setCoverName(fileName);
         }
 
-//            product.setCreator(member.getName());
+//        product.setCreator(member.getName());
         product.setName(dto.getName());
         product.setCreationDate(sdf.format(new Date()));
         product.setPackageForm(dto.getPackageForm());
         product.setDescription(dto.getDescription());
         product.setOverdueNotice(dto.getOverdueNotice());
         product.setMainCategory(dto.getMainCategory());
+        product.setSubCategory(dto.getSubCategory());
         if (PackageForm.COMPLETE.equals(dto.getPackageForm())) {
             product.setPackageQuantity(dto.getPackageQuantity());
+            product.setPackageUnit(dto.getPackageUnit());
         }
-        product.setPackageUnit(dto.getPackageUnit());
         product.setPrice(dto.getPrice());
         product.setSerialNumber(SNUtil.generateSerialNumber());
-        Product savedProduct = productService.save(product);
+        product.setPackageNumber(packageNumber);
+
+        final Product savedProduct = productService.save(product);
 
         resultStatus.setCode("C000");
         resultStatus.setMessage("成功");
-        resultStatus.setData(savedProduct);
+        resultStatus.setData(constructProductDTO(savedProduct));
         return ResponseEntity.ok(resultStatus);
     }
 
-
+    /**
+     * 修改食材資訊
+     * @param dto
+     * @param session
+     * @return
+     */
     @PostMapping("/editProduct")
     public ResponseEntity<?> editProduct(@ModelAttribute ProductDTO dto, HttpSession session) {
 
@@ -244,7 +256,7 @@ public class ProductController {
                     resultStatus.setCode("C010");
                     resultStatus.setMessage("轉換失敗");
                 }
-            } else if ("C998".equals(completionResult.getCode())){
+            } else if ("C998".equals(completionResult.getCode())) {
                 resultStatus.setCode("C998");
                 resultStatus.setMessage("資料提供不符合");
             } else {
@@ -261,7 +273,12 @@ public class ProductController {
         return ResponseEntity.ok(resultStatus);
     }
 
-
+    /**
+     * 儲存多筆食材資訊
+     * @param productDTOListWrapperDTO
+     * @param session
+     * @return
+     */
     @PostMapping("/importIntoDB")
     public ResponseEntity<?> importIntoDB(@ModelAttribute ProductDTOListWrapperDTO productDTOListWrapperDTO, HttpSession session) {
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
@@ -325,7 +342,11 @@ public class ProductController {
         return ResponseEntity.ok(resultStatus);
     }
 
-
+    /**
+     * 查看所有匯入的食材資訊
+     * @param session
+     * @return
+     */
     @GetMapping("/allTempMasters")
     public ResponseEntity<?> allTempMasters(HttpSession session) {
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
@@ -343,7 +364,12 @@ public class ProductController {
         return ResponseEntity.ok(resultStatus);
     }
 
-
+    /**
+     * 查詢單筆匯入食材資訊
+     * @param id
+     * @param session
+     * @return
+     */
     @GetMapping("/getTempMasterInfo/{id}")
     public ResponseEntity<?> getTempMasterInfo(@PathVariable String id, HttpSession session) {
         final MemberDTO member = (MemberDTO) session.getAttribute("member");

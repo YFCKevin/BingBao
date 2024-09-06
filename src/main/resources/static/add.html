@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:x-on="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>冰寶 - 您的冰箱智慧助手</title>
+	<meta property="og:title" content="冰寶 - 您的冰箱智慧助手">
+	<meta property="og:description" content="「冰寶」是一款智慧冰箱管理助手，專為食品管理而設計。幫助您輕鬆追蹤冰箱內的食材，提供有效的存放建議，並提醒您即將過期的食品。利用AI掃描技術，讓您的食材快速建檔，放進冰箱。冰寶都是提升食品管理的理想夥伴。">
+	<meta property="og:image" content="images/favicon.ico">
+	<meta property="og:url" content="https://www.gurula.cc/bingBao/dashboard.html">
+	<meta property="og:type" content="website">
+	<meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
+	<link rel="icon" href="images/favicon.ico" type="image/x-icon"/>
+	<style>
+        .selected {
+            background-color: #31ce36;  /* Bootstrap primary color */
+            color: white;
+        }
+	    .nav-link.error-style {
+			border: 2px solid red; /* 红色邊框 */
+			background-color: white; /* 白色背景 */
+			color: black; /* 黑色文字 */
+		}
+    </style>
+
+	<!-- Fonts and icons -->
+	<script src="js/webfont.min.js"></script>
+	<script>
+		WebFont.load({
+			google: {"families":["Public Sans:300,400,500,600,700"]},
+			custom: {"families":["Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands", "simple-line-icons"], urls: ['css/fonts.min.css']},
+			active: function() {
+				sessionStorage.fonts = true;
+			}
+		});
+	</script>
+
+	<!-- CSS Files -->
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/plugins.min.css">
+	<link rel="stylesheet" href="css/kaiadmin.min.css">
+
+	<!-- CSS Just for demo purpose, don't include it in your project -->
+<!--	<link rel="stylesheet" href="css/demo.css">-->
+</head>
+<body x-data="loadData()" x-init="init()">
+	<div class="wrapper">
+		<!-- Sidebar -->
+		<div class="sidebar" data-background-color="dark">
+			<div class="sidebar-logo">
+				<!-- Logo Header -->
+				<div class="logo-header" data-background-color="dark">
+
+					<a href="dashboard.html" class="logo">
+						<img src="images/fridge001.jpg" alt="navbar brand" class="navbar-brand" height="20">
+					</a>
+					<div class="nav-toggle">
+						<button class="btn btn-toggle toggle-sidebar">
+							<i class="gg-menu-right"></i>
+						</button>
+						<button class="btn btn-toggle sidenav-toggler">
+							<i class="gg-menu-left"></i>
+						</button>
+					</div>
+					<button class="topbar-toggler more">
+						<i class="gg-more-vertical-alt"></i>
+					</button>
+				</div>
+				<!-- End Logo Header -->
+			</div>
+			<div class="sidebar-wrapper scrollbar scrollbar-inner">
+				<div class="sidebar-content">
+					<ul class="nav nav-secondary">
+						<li class="nav-section">
+								<span class="sidebar-mini-icon">
+									<i class="fa fa-ellipsis-h"></i>
+								</span>
+							<h4 class="text-section">清單</h4>
+						</li>
+						<li class="nav-item">
+							<a href="dashboard.html">
+								<i class="fas fa-desktop"></i>
+								<p>冰箱清單</p>
+								<span class="badge badge-success" x-text="todayListLabel"></span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="product.html">
+								<i class="fas fa-fish"></i>
+								<p>食材模板</p>
+							</a>
+						</li>
+						<li class="nav-section">
+								<span class="sidebar-mini-icon">
+									<i class="fa fa-ellipsis-h"></i>
+								</span>
+							<h4 class="text-section">動作</h4>
+						</li>
+						<li class="nav-item submenu">
+							<a data-bs-toggle="collapse" href="#submenu" class="" aria-expanded="true">
+								<i class="fas fa-bars"></i>
+								<p>食材建檔</p>
+								<span class="caret"></span>
+							</a>
+							<div class="collapse" id="submenu" style="">
+								<ul class="nav nav-collapse">
+									<li class="submenu">
+										<a href="import.html">
+											<span class="sub-item">AI建檔</span>
+										</a>
+<!--										<a href="add.html">-->
+<!--											<span class="sub-item">手動輸入</span>-->
+<!--										</a>-->
+									</li>
+								</ul>
+							</div>
+						</li>
+						<li class="nav-item">
+							<a href="receive.html">
+								<i class="fas fa-box-open"></i>
+								<p>食材放進冰箱</p>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<!-- End Sidebar -->
+
+		<div class="main-panel">
+			<div class="main-header">
+				<div class="main-header-logo">
+					<!-- Logo Header -->
+					<div class="logo-header" data-background-color="dark">
+
+						<a href="dashboard.html" class="logo">
+							<img src="images/fridge001.jpg" alt="navbar brand" class="navbar-brand" height="20">
+						</a>
+						<div class="nav-toggle">
+							<button class="btn btn-toggle toggle-sidebar">
+								<i class="gg-menu-right"></i>
+							</button>
+							<button class="btn btn-toggle sidenav-toggler">
+								<i class="gg-menu-left"></i>
+							</button>
+						</div>
+						<button class="topbar-toggler more">
+							<i class="gg-more-vertical-alt"></i>
+						</button>
+
+					</div>
+					<!-- End Logo Header -->
+				</div>
+				<!-- Navbar Header -->
+				<nav hidden="hidden" class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom"></nav>
+				<!-- End Navbar -->
+			</div>
+			
+			<div class="container">
+				<div class="page-inner">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="card">
+								<div class="card-header d-flex justify-content-between align-items-center">
+									<div class="card-title">食材建檔</div>
+									<div class="d-flex ms-auto">
+										<button id="saveProductBtn" type="button" class="btn btn-primary" x-on:click="saveProduct()">
+											<i class="fas fa-file-import"></i>
+											建檔
+										</button> <!--x-on:click="saveMultiProduct()"-->
+									</div>
+								</div>
+								<div class="card-body" style="display:flex;flex-direction:column;align-items:center">
+									<div class="col-md-6">
+										<div class="form-group">
+											<label for="name">物品名稱 *</label>
+											<div class="d-flex justify-content-center align-items-center">
+												<input x-model="name" type="text" id="name" name="name" placeholder="物品名稱" class="form-control">
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="image">照片</label>
+											<div class="selectgroup selectgroup-secondary selectgroup-pills">
+												<label class="selectgroup-item">
+													<input
+															type="file"
+															id="image"
+															class="selectgroup-input d-none"
+															accept="image/*"
+															name="multipartFile"
+															x-on:change="selectImage($event)">
+													<span :class="{'selectgroup-button selectgroup-button-icon': true, 'selected': hasImage}">
+														<i class="fas fa-image"></i>
+													</span>
+												</label>
+											</div>
+											<div class="image-container mt-2">
+												<img x-show="hasImage" :src="imageSrc" alt="照片呈現" style="width: 100px; height: 100px; object-fit: cover; border-radius: 10%;">
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="mainCategory">食材分類 *</label>
+											<div class="d-flex">
+												<select class="form-select form-control me-2"
+														id="mainCategory"
+														name="mainCategory"
+														x-model="mainCategory">
+													<option value="">請選擇</option>
+													<option value="MEAT">肉品</option>
+													<option value="SEAFOOD">海鮮</option>
+													<option value="VEGETABLES">青菜</option>
+													<option value="FRUITS">水果</option>
+													<option value="GRAINS">穀物</option>
+													<option value="BEVERAGES">飲料</option>
+													<option value="CONDIMENTS">醬料</option>
+													<option value="SNACKS">零食</option>
+													<option value="BAKERY">烘焙食品</option>
+													<option value="MEDICINE">藥品</option>
+													<option value="CANNED_FOOD">罐頭食品</option>
+													<option value="SPICES">香料</option>
+													<option value="OILS">食用油</option>
+													<option value="SWEETS">甜品</option>
+													<option value="DRIED_FOOD">乾貨</option>
+													<option value="HEALTH_FOOD">保健食品</option>
+												</select>
+												<template x-if="mainCategory === 'MEAT'">
+													<select class="form-select form-control"
+															name="subCategory"
+															x-model="subCategory">
+														<option value="">請選擇</option>
+														<option value="BEEF">牛肉</option>
+														<option value="PORK">豬肉</option>
+														<option value="CHICKEN">雞肉</option>
+														<option value="EGG">雞蛋</option>
+													</select>
+												</template>
+												<template x-if="mainCategory === 'SEAFOOD'">
+													<select class="form-select form-control"
+															name="subCategory"
+															x-model="subCategory">
+														<option value="">請選擇</option>
+														<option value="FISH">魚</option>
+														<option value="SHRIMP">蝦</option>
+													</select>
+												</template>
+												<template x-if="mainCategory !== 'MEAT' && mainCategory !== 'SEAFOOD'">
+													<select class="form-select form-control"
+															name="subCategory"
+															x-model="subCategory">
+														<option value="">-</option>
+													</select>
+												</template>
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="packageForm">包裝類型 *</label>
+											<div id="packageForm" class="d-flex">
+												<div class="form-check me-2">
+													<input x-model="packageForm" class="form-check-input" type="radio" name="completePackage" value="COMPLETE" id="completePackage">
+													<label class="form-check-label" for="completePackage">
+														完整包裝
+													</label>
+												</div>
+												<div class="form-check">
+													<input x-model="packageForm" class="form-check-input" type="radio" name="bulkPackage" value="BULK" id="bulkPackage">
+													<label class="form-check-label" for="bulkPackage">
+														散裝
+													</label>
+												</div>
+											</div>
+										</div>
+										<div class="form-group" x-show="packageForm === 'COMPLETE'">
+											<label for="packageUnit" class="col-form-label">包裝方式 *</label>
+											<div class="row" style="--bs-gutter-x: 0;">
+												<div class="col-8">
+													<input x-model="packageQuantity" type="text" class="form-control" id="packageQuantity" name="packageQuantity" placeholder="填入數量">
+												</div>
+												<div class="col-4">
+													<select class="form-select form-control"
+															id="packageUnit"
+															name="packageUnit"
+															x-model="packageUnit">
+														<option value="">請選擇</option>
+														<option value="EACH">個</option>
+														<option value="BOX">箱</option>
+														<option value="PACK">包</option>
+														<option value="BOTTLE">瓶</option>
+														<option value="BAG">袋</option>
+														<option value="BARREL">桶</option>
+														<option value="CASE">盒</option>
+														<option value="CAN">罐</option>
+														<option value="BUNDLE">捆</option>
+														<option value="STRIP">條</option>
+														<option value="PORTION">份</option>
+													</select>
+												</div>
+												<div class="mt-3">
+													<i class="far fa-hand-point-right me-2 ps-3"></i>
+													每<span class="fw-bold" x-text="packageUnitMap[packageUnit]"></span>有<span class="fw-bold" x-text="packageQuantity"></span>個
+												</div>
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="description">食材描述備註</label>
+											<textarea x-model="description" name="description" class="form-control" id="description" rows="5"></textarea>
+										</div>
+										<div class="form-group">
+											<label class="form-label d-block">快過期了</label>
+											<div class="d-flex align-items-center">
+												<label class="form-label">臨近有效日期幾天，提醒您即將過期？</label>
+												<label class="mx-2" x-text="rangeValue">0</label>
+												<label>天</label>
+											</div>
+											<input
+													id="overdueNotice"
+													name="overdueNotice"
+													class="form-range"
+													type="range"
+													min="0"
+													max="365"
+													step="1"
+													x-model="rangeValue">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<footer class="footer">
+				<div class="container-fluid d-flex justify-content-between">
+					<nav class="pull-left">
+						<ul class="nav">
+							<li class="nav-item">
+								<a class="nav-link" href="http://www.themekita.com">
+									ThemeKita
+								</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="#"> Help </a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="#"> Licenses </a>
+							</li>
+						</ul>
+					</nav>
+					<div class="copyright">
+						2024, made with <i class="fa fa-heart heart text-danger"></i> by
+						<a href="http://www.themekita.com">ThemeKita</a>
+					</div>
+					<div>
+						Distributed by
+						<a target="_blank" href="https://themewagon.com/">ThemeWagon</a>.
+					</div>
+				</div>
+			</footer>
+		</div>
+
+	</div>
+	<!--   Core JS Files   -->
+	<script src="js/jquery-3.7.1.min.js"></script>
+	<script src="js/popper.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<!-- jQuery Scrollbar -->
+	<script src="js/jquery.scrollbar.min.js"></script>
+	<!-- Moment JS -->
+	<script src="js/moment.min.js"></script>
+	<!-- Chart JS -->
+	<script src="js/chart.min.js"></script>
+	<!-- jQuery Sparkline -->
+	<script src="js/jquery.sparkline.min.js"></script>
+	<!-- Chart Circle -->
+	<script src="js/circles.min.js"></script>
+	<!-- Datatables -->
+	<script src="js/datatables.min.js"></script>
+	<!-- Bootstrap Notify -->
+	<script src="js/bootstrap-notify.min.js"></script>
+	<!-- jQuery Vector Maps -->
+	<script src="js/jsvectormap.min.js"></script>
+	<script src="js/world.js"></script>
+	<!-- Sweet Alert -->
+	<script src="js/sweetalert.min.js"></script>
+	<!-- Kaiadmin JS -->
+	<script src="js/kaiadmin.min.js"></script>
+	<script src="js/alpine.2.8.2.min.js"></script>
+	<script>
+		function loadData() {
+			return {
+				todayListLabel: [],
+                name: '',
+                imageSrc: '',
+                hasImage: false,
+                mainCategory: '',
+                subCategory: '',
+                packageForm: 'COMPLETE',
+                packageQuantity: '1',
+                packageUnit: 'EACH',
+                description: '',
+                rangeValue: 0,
+                multipartFile: null,
+				packageUnitMap: {
+					"EACH": "個",
+					"BOX": "箱",
+					"PACK": "包",
+					"BOTTLE": "瓶",
+					"BAG": "袋",
+					"BARREL": "桶",
+					"CASE": "盒",
+					"CAN": "罐",
+					"BUNDLE": "捆",
+					"STRIP": "條",
+					"PORTION": "份"
+				},
+
+				init(){
+					let _this = this;
+				    $.ajax({
+						url: "getTodaySize",
+						type: "get",
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.todayListLabel = response.data;
+							}
+						},
+				  	});
+				},
+                selectImage(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        this.multipartFile = file;
+                        this.imageSrc = URL.createObjectURL(file);
+                        this.hasImage = true;
+                    } else {
+                        this.imageSrc = '';
+                        this.hasImage = false;
+                    }
+                },
+                saveProduct(){
+                    let _this = this;
+                    let hasError = false;
+					$('.has-error').removeClass('has-error');
+
+					// 食材名稱
+					if (this.name.trim() === ''){
+					    $(`[name='name']`).closest('.form-group').addClass('has-error');
+					    hasError = true;
+					}
+					// 食材主種類
+					if (this.mainCategory.trim() === ''){
+					    $(`[name='mainCategory']`).closest('.form-group').addClass('has-error');
+					    hasError = true;
+					}
+					// 包裝方式
+					if (this.packageForm === 'COMPLETE'){
+					    if (this.packageQuantity.trim() === '' || this.packageQuantity.trim() == 0) {
+					       	$(`[name='packageQuantity']`).closest('.col-8').addClass('has-error');
+                            hasError = true;
+					    }
+
+						if (this.packageUnit.trim() === '') {
+							$(`[name='packageUnit']`).closest('.col-4').addClass('has-error');
+							hasError = true;
+						}
+					}
+
+					if (hasError) {
+						$('#errorModal').modal('show');
+						return;
+					}
+
+					const formData = new FormData();
+					formData.append("id", this.targetEditId);
+					formData.append("name", this.name);
+					formData.append("mainCategory", this.mainCategory);
+                    formData.append("subCategory", this.subCategory);
+					formData.append("packageForm", this.packageForm);
+					if (this.packageForm == 'COMPLETE'){
+						formData.append("packageQuantity", this.packageQuantity);
+						formData.append("packageUnit", this.packageUnit);
+					}
+					formData.append("description", this.description);
+					formData.append("overdueNotice", this.rangeValue);
+
+					if (this.multipartFile) {
+						formData.append("multipartFile", this.multipartFile);
+					}
+
+					$.ajax({
+						url: 'saveProduct',
+						type: 'POST',
+						data: formData,
+						processData: false,
+						contentType: false,
+						success: function(response) {
+							$("#saveProductBtn").prop('disabled', true);
+							if (response.code === "C000") {
+								$("#editModal").modal('hide');
+                                Swal.fire({
+									title: '新增成功！',
+									text: '',
+									icon: 'success',
+									confirmButtonText: '關閉',
+									customClass: {
+										confirmButton: 'btn btn-success'
+									}
+								}).then((result) => {
+									if (result.isConfirmed) {
+										_this.init();
+									}
+								});
+							} else {
+								Swal.fire({
+									title: '錯誤發生，請稍後再試！',
+									text: '',
+									icon: 'error',
+									confirmButtonText: '關閉',
+									customClass: {
+										confirmButton: 'btn btn-danger'
+									}
+								});
+							}
+						},
+						error: function(error) {
+							$("#saveProductBtn").prop('disabled', true);
+							Swal.fire({
+								title: '錯誤發生，請稍後再試！',
+								text: '',
+								icon: 'error',
+								confirmButtonText: '關閉',
+								customClass: {
+									confirmButton: 'btn btn-danger'
+								}
+							});
+						}
+					});
+                },
+			};
+		}
+	</script>
+</body>
+</html>
