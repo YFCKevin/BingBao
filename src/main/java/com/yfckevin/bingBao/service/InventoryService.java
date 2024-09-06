@@ -32,4 +32,16 @@ public interface InventoryService {
     List<Inventory> findInventoryNoticeDateIsBeforeExpiryDate();
 
     Optional<Inventory> findById(String id);
+
+    Map<String, Map<Long, List<Inventory>>> searchByNameAndStorePlace(String keyword, String type, String storePlace);
+
+    Map<String, Map<Long, List<Inventory>>> searchByNameAndMainCategoryAndStorePlace(String keyword, String mainCategory, String type, String storePlace);
+
+    Map<String, Map<Long, List<Inventory>>> searchByMainCategoryAndStorePlace(String mainCategory, String type, String storePlace);
+
+    Map<String, Map<Long, List<Inventory>>> searchByNameAndMainCategoryAndSubCategoryAndStorePlace(String keyword, String mainCategory, String subCategory, String type, String storePlace);
+
+    Map<String, Map<Long, List<Inventory>>> searchByMainCategoryAndSubCategoryAndStorePlace(String mainCategory, String subCategory, String type, String storePlace);
+
+    Map<String, Map<Long, List<Inventory>>> searchByStorePlace(String type, String storePlace);
 }

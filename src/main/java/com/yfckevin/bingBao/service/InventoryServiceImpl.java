@@ -28,6 +28,7 @@ public class InventoryServiceImpl implements InventoryService {
     Logger logger = LoggerFactory.getLogger(InventoryServiceImpl.class);
     private final InventoryRepository inventoryRepository;
     private final MongoTemplate mongoTemplate;
+    static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public InventoryServiceImpl(InventoryRepository inventoryRepository, MongoTemplate mongoTemplate) {
         this.inventoryRepository = inventoryRepository;
@@ -76,7 +77,6 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     public Map<String, Map<Long, List<Inventory>>> findInventoryExpiringSoonAndNoUsedAndNoDeleteAndInValidPeriod() {
         LocalDate today = LocalDate.now();
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String onlyDateEndOfDay = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         Criteria criteria = new Criteria().andOperator(
                 Criteria.where("usedDate").exists(false),
@@ -197,10 +197,28 @@ public class InventoryServiceImpl implements InventoryService {
                 matchOperation
         );
 
-        // 用MongoTemplate執行之前的查詢條件，取得List<CountData>
-        final AggregationResults<Inventory> results = mongoTemplate.aggregate(aggregation, "inventory", Inventory.class);
+        // 用MongoTemplate執行之前的查詢條件
+        List<Inventory> inventoriesFromMongo = mongoTemplate.aggregate(aggregation, "inventory", Inventory.class).getMappedResults();
+        List<Inventory> inventoryList = new ArrayList<>();
 
-        final List<Inventory> inventoryList = results.getMappedResults();
+        if ("soon".equals(type)) {
+
+            for (Inventory inventory : inventoriesFromMongo) {
+                try {
+                    int overdueNoticeDays = Integer.parseInt(inventory.getOverdueNotice());
+                    LocalDate expiryDate = LocalDate.parse(inventory.getExpiryDate(), dateFormatter);
+                    LocalDate noticeDate = today.plusDays(overdueNoticeDays);
+
+                    if (expiryDate.isBefore(noticeDate) || expiryDate.isEqual(noticeDate)) {
+                        inventoryList.add(inventory);
+                    }
+                } catch (NumberFormatException | DateTimeParseException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        } else {
+            inventoryList = inventoriesFromMongo;
+        }
 
         Map<String, Long> itemCountMap = inventoryList.stream()
                 .collect(Collectors.groupingBy(Inventory::getReceiveItemId, Collectors.counting()));
@@ -275,10 +293,28 @@ public class InventoryServiceImpl implements InventoryService {
                 matchOperation
         );
 
-        // 用MongoTemplate執行之前的查詢條件，取得List<CountData>
-        final AggregationResults<Inventory> results = mongoTemplate.aggregate(aggregation, "inventory", Inventory.class);
+        // 用MongoTemplate執行之前的查詢條件
+        List<Inventory> inventoriesFromMongo = mongoTemplate.aggregate(aggregation, "inventory", Inventory.class).getMappedResults();
+        List<Inventory> inventoryList = new ArrayList<>();
 
-        final List<Inventory> inventoryList = results.getMappedResults();
+        if ("soon".equals(type)) {
+
+            for (Inventory inventory : inventoriesFromMongo) {
+                try {
+                    int overdueNoticeDays = Integer.parseInt(inventory.getOverdueNotice());
+                    LocalDate expiryDate = LocalDate.parse(inventory.getExpiryDate(), dateFormatter);
+                    LocalDate noticeDate = today.plusDays(overdueNoticeDays);
+
+                    if (expiryDate.isBefore(noticeDate) || expiryDate.isEqual(noticeDate)) {
+                        inventoryList.add(inventory);
+                    }
+                } catch (NumberFormatException | DateTimeParseException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        } else {
+            inventoryList = inventoriesFromMongo;
+        }
 
         Map<String, Long> itemCountMap = inventoryList.stream()
                 .collect(Collectors.groupingBy(Inventory::getReceiveItemId, Collectors.counting()));
@@ -347,10 +383,28 @@ public class InventoryServiceImpl implements InventoryService {
                 matchOperation
         );
 
-        // 用MongoTemplate執行之前的查詢條件，取得List<CountData>
-        final AggregationResults<Inventory> results = mongoTemplate.aggregate(aggregation, "inventory", Inventory.class);
+        // 用MongoTemplate執行之前的查詢條件
+        List<Inventory> inventoriesFromMongo = mongoTemplate.aggregate(aggregation, "inventory", Inventory.class).getMappedResults();
+        List<Inventory> inventoryList = new ArrayList<>();
 
-        final List<Inventory> inventoryList = results.getMappedResults();
+        if ("soon".equals(type)) {
+
+            for (Inventory inventory : inventoriesFromMongo) {
+                try {
+                    int overdueNoticeDays = Integer.parseInt(inventory.getOverdueNotice());
+                    LocalDate expiryDate = LocalDate.parse(inventory.getExpiryDate(), dateFormatter);
+                    LocalDate noticeDate = today.plusDays(overdueNoticeDays);
+
+                    if (expiryDate.isBefore(noticeDate) || expiryDate.isEqual(noticeDate)) {
+                        inventoryList.add(inventory);
+                    }
+                } catch (NumberFormatException | DateTimeParseException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        } else {
+            inventoryList = inventoriesFromMongo;
+        }
 
         Map<String, Long> itemCountMap = inventoryList.stream()
                 .collect(Collectors.groupingBy(Inventory::getReceiveItemId, Collectors.counting()));
@@ -427,10 +481,28 @@ public class InventoryServiceImpl implements InventoryService {
                 matchOperation
         );
 
-        // 用MongoTemplate執行之前的查詢條件，取得List<CountData>
-        final AggregationResults<Inventory> results = mongoTemplate.aggregate(aggregation, "inventory", Inventory.class);
+        // 用MongoTemplate執行之前的查詢條件
+        List<Inventory> inventoriesFromMongo = mongoTemplate.aggregate(aggregation, "inventory", Inventory.class).getMappedResults();
+        List<Inventory> inventoryList = new ArrayList<>();
 
-        final List<Inventory> inventoryList = results.getMappedResults();
+        if ("soon".equals(type)) {
+
+            for (Inventory inventory : inventoriesFromMongo) {
+                try {
+                    int overdueNoticeDays = Integer.parseInt(inventory.getOverdueNotice());
+                    LocalDate expiryDate = LocalDate.parse(inventory.getExpiryDate(), dateFormatter);
+                    LocalDate noticeDate = today.plusDays(overdueNoticeDays);
+
+                    if (expiryDate.isBefore(noticeDate) || expiryDate.isEqual(noticeDate)) {
+                        inventoryList.add(inventory);
+                    }
+                } catch (NumberFormatException | DateTimeParseException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        } else {
+            inventoryList = inventoriesFromMongo;
+        }
 
         Map<String, Long> itemCountMap = inventoryList.stream()
                 .collect(Collectors.groupingBy(Inventory::getReceiveItemId, Collectors.counting()));
@@ -501,10 +573,28 @@ public class InventoryServiceImpl implements InventoryService {
                 matchOperation
         );
 
-        // 用MongoTemplate執行之前的查詢條件，取得List<CountData>
-        final AggregationResults<Inventory> results = mongoTemplate.aggregate(aggregation, "inventory", Inventory.class);
+        // 用MongoTemplate執行之前的查詢條件
+        List<Inventory> inventoriesFromMongo = mongoTemplate.aggregate(aggregation, "inventory", Inventory.class).getMappedResults();
+        List<Inventory> inventoryList = new ArrayList<>();
 
-        final List<Inventory> inventoryList = results.getMappedResults();
+        if ("soon".equals(type)) {
+
+            for (Inventory inventory : inventoriesFromMongo) {
+                try {
+                    int overdueNoticeDays = Integer.parseInt(inventory.getOverdueNotice());
+                    LocalDate expiryDate = LocalDate.parse(inventory.getExpiryDate(), dateFormatter);
+                    LocalDate noticeDate = today.plusDays(overdueNoticeDays);
+
+                    if (expiryDate.isBefore(noticeDate) || expiryDate.isEqual(noticeDate)) {
+                        inventoryList.add(inventory);
+                    }
+                } catch (NumberFormatException | DateTimeParseException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        } else {
+            inventoryList = inventoriesFromMongo;
+        }
 
         Map<String, Long> itemCountMap = inventoryList.stream()
                 .collect(Collectors.groupingBy(Inventory::getReceiveItemId, Collectors.counting()));
@@ -560,5 +650,587 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     public Optional<Inventory> findById(String id) {
         return inventoryRepository.findById(id);
+    }
+
+    @Override
+    public Map<String, Map<Long, List<Inventory>>> searchByNameAndStorePlace(String keyword, String type, String storePlace) {
+        LocalDate today = LocalDate.now();
+        String startOfDay = today.atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String endOfDay = today.plusDays(1).atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String onlyDateEndOfDay = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        AddFieldsOperation addFieldsOperation = AddFieldsOperation.addField("productId").withValue(ConvertOperators.ToObjectId.toObjectId("$productId")).build();
+
+        LookupOperation lookupOperation = LookupOperation.newLookup()
+                .from("product")
+                .localField("productId")
+                .foreignField("_id")
+                .as("product");
+
+        List<Criteria> andCriterias = new ArrayList<>();
+        List<Criteria> orCriterias = new ArrayList<>();
+
+        switch (type) {
+            case "today" -> {
+                final Criteria criteria_deletionDate = Criteria.where("deletionDate").exists(false);
+                final Criteria criteria_storeDate = Criteria.where("storeDate").gt(startOfDay).lt(endOfDay);
+                final Criteria criteria_usedDate = Criteria.where("usedDate").exists(false);
+                andCriterias.add(criteria_storeDate);
+                andCriterias.add(criteria_deletionDate);
+                andCriterias.add(criteria_usedDate);
+            }
+            case "soon", "valid" -> {
+                final Criteria criteria_usedDate = Criteria.where("usedDate").exists(false);
+                final Criteria criteria_deletionDate = Criteria.where("deletionDate").exists(false);
+                final Criteria criteria_expiryDate = Criteria.where("expiryDate").gte(onlyDateEndOfDay);
+                andCriterias.add(criteria_usedDate);
+                andCriterias.add(criteria_deletionDate);
+                andCriterias.add(criteria_expiryDate);
+            }
+        }
+
+        Criteria criteria_name = Criteria.where("product.name").regex(keyword, "i");
+        Criteria criteria_storePlace = Criteria.where("storePlace").is(storePlace);
+        orCriterias.add(criteria_name);
+        andCriterias.add(criteria_storePlace);
+
+        Criteria criteria = new Criteria();
+        if (!andCriterias.isEmpty()) {
+            criteria.andOperator(andCriterias.toArray(new Criteria[0]));
+        }
+        if (!orCriterias.isEmpty()) {
+            criteria.orOperator(orCriterias.toArray(new Criteria[0]));
+        }
+
+        MatchOperation matchOperation = Aggregation.match(criteria);
+        // 將第一到第四步的Operation條件組到Aggregation
+        Aggregation aggregation = Aggregation.newAggregation(
+                addFieldsOperation,
+                lookupOperation,
+                matchOperation
+        );
+
+        // 用MongoTemplate執行之前的查詢條件
+        List<Inventory> inventoriesFromMongo = mongoTemplate.aggregate(aggregation, "inventory", Inventory.class).getMappedResults();
+        List<Inventory> inventoryList = new ArrayList<>();
+
+        if ("soon".equals(type)) {
+
+            for (Inventory inventory : inventoriesFromMongo) {
+                try {
+                    int overdueNoticeDays = Integer.parseInt(inventory.getOverdueNotice());
+                    LocalDate expiryDate = LocalDate.parse(inventory.getExpiryDate(), dateFormatter);
+                    LocalDate noticeDate = today.plusDays(overdueNoticeDays);
+
+                    if (expiryDate.isBefore(noticeDate) || expiryDate.isEqual(noticeDate)) {
+                        inventoryList.add(inventory);
+                    }
+                } catch (NumberFormatException | DateTimeParseException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        } else {
+            inventoryList = inventoriesFromMongo;
+        }
+
+        Map<String, Long> itemCountMap = inventoryList.stream()
+                .collect(Collectors.groupingBy(Inventory::getReceiveItemId, Collectors.counting()));
+
+        Map<String, Map<Long, List<Inventory>>> result = inventoryList.stream()
+                .collect(Collectors.groupingBy(
+                        Inventory::getReceiveItemId,
+                        Collectors.groupingBy(
+                                inventory -> itemCountMap.get(inventory.getReceiveItemId()),
+                                Collectors.toList()
+                        )
+                ));
+
+        return result;
+    }
+
+    @Override
+    public Map<String, Map<Long, List<Inventory>>> searchByNameAndMainCategoryAndStorePlace(String keyword, String mainCategory, String type, String storePlace) {
+        LocalDate today = LocalDate.now();
+        String startOfDay = today.atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String endOfDay = today.plusDays(1).atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String onlyDateEndOfDay = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        AddFieldsOperation addFieldsOperation = AddFieldsOperation.addField("productId").withValue(ConvertOperators.ToObjectId.toObjectId("$productId")).build();
+
+        LookupOperation lookupOperation = LookupOperation.newLookup()
+                .from("product")
+                .localField("productId")
+                .foreignField("_id")
+                .as("product");
+
+        List<Criteria> andCriterias = new ArrayList<>();
+        List<Criteria> orCriterias = new ArrayList<>();
+
+        switch (type) {
+            case "today" -> {
+                final Criteria criteria_deletionDate = Criteria.where("deletionDate").exists(false);
+                final Criteria criteria_storeDate = Criteria.where("storeDate").gt(startOfDay).lt(endOfDay);
+                final Criteria criteria_usedDate = Criteria.where("usedDate").exists(false);
+                andCriterias.add(criteria_storeDate);
+                andCriterias.add(criteria_deletionDate);
+                andCriterias.add(criteria_usedDate);
+            }
+            case "soon", "valid" -> {
+                final Criteria criteria_usedDate = Criteria.where("usedDate").exists(false);
+                final Criteria criteria_deletionDate = Criteria.where("deletionDate").exists(false);
+                final Criteria criteria_expiryDate = Criteria.where("expiryDate").gte(onlyDateEndOfDay);
+                andCriterias.add(criteria_usedDate);
+                andCriterias.add(criteria_deletionDate);
+                andCriterias.add(criteria_expiryDate);
+            }
+        }
+
+        Criteria criteria_name = Criteria.where("product.name").regex(keyword, "i");
+        Criteria criteria_storePlace = Criteria.where("storePlace").is(storePlace);
+        Criteria criteria_mainCategory = Criteria.where("product.mainCategory").is(mainCategory);
+        orCriterias.add(criteria_name);
+        andCriterias.add(criteria_storePlace);
+        andCriterias.add(criteria_mainCategory);
+
+        Criteria criteria = new Criteria();
+        if (!andCriterias.isEmpty()) {
+            criteria.andOperator(andCriterias.toArray(new Criteria[0]));
+        }
+        if (!orCriterias.isEmpty()) {
+            criteria.orOperator(orCriterias.toArray(new Criteria[0]));
+        }
+
+        MatchOperation matchOperation = Aggregation.match(criteria);
+        // 將第一到第四步的Operation條件組到Aggregation
+        Aggregation aggregation = Aggregation.newAggregation(
+                addFieldsOperation,
+                lookupOperation,
+                matchOperation
+        );
+
+        // 用MongoTemplate執行之前的查詢條件
+        List<Inventory> inventoriesFromMongo = mongoTemplate.aggregate(aggregation, "inventory", Inventory.class).getMappedResults();
+        List<Inventory> inventoryList = new ArrayList<>();
+
+        if ("soon".equals(type)) {
+
+            for (Inventory inventory : inventoriesFromMongo) {
+                try {
+                    int overdueNoticeDays = Integer.parseInt(inventory.getOverdueNotice());
+                    LocalDate expiryDate = LocalDate.parse(inventory.getExpiryDate(), dateFormatter);
+                    LocalDate noticeDate = today.plusDays(overdueNoticeDays);
+
+                    if (expiryDate.isBefore(noticeDate) || expiryDate.isEqual(noticeDate)) {
+                        inventoryList.add(inventory);
+                    }
+                } catch (NumberFormatException | DateTimeParseException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        } else {
+            inventoryList = inventoriesFromMongo;
+        }
+
+        Map<String, Long> itemCountMap = inventoryList.stream()
+                .collect(Collectors.groupingBy(Inventory::getReceiveItemId, Collectors.counting()));
+
+        Map<String, Map<Long, List<Inventory>>> result = inventoryList.stream()
+                .collect(Collectors.groupingBy(
+                        Inventory::getReceiveItemId,
+                        Collectors.groupingBy(
+                                inventory -> itemCountMap.get(inventory.getReceiveItemId()),
+                                Collectors.toList()
+                        )
+                ));
+
+        return result;
+    }
+
+    @Override
+    public Map<String, Map<Long, List<Inventory>>> searchByMainCategoryAndStorePlace(String mainCategory, String type, String storePlace) {
+        LocalDate today = LocalDate.now();
+        String startOfDay = today.atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String endOfDay = today.plusDays(1).atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String onlyDateEndOfDay = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        AddFieldsOperation addFieldsOperation = AddFieldsOperation.addField("productId").withValue(ConvertOperators.ToObjectId.toObjectId("$productId")).build();
+
+        LookupOperation lookupOperation = LookupOperation.newLookup()
+                .from("product")
+                .localField("productId")
+                .foreignField("_id")
+                .as("product");
+
+        List<Criteria> andCriterias = new ArrayList<>();
+        List<Criteria> orCriterias = new ArrayList<>();
+
+        switch (type) {
+            case "today" -> {
+                final Criteria criteria_deletionDate = Criteria.where("deletionDate").exists(false);
+                final Criteria criteria_storeDate = Criteria.where("storeDate").gt(startOfDay).lt(endOfDay);
+                final Criteria criteria_usedDate = Criteria.where("usedDate").exists(false);
+                andCriterias.add(criteria_storeDate);
+                andCriterias.add(criteria_deletionDate);
+                andCriterias.add(criteria_usedDate);
+            }
+            case "soon", "valid" -> {
+                final Criteria criteria_usedDate = Criteria.where("usedDate").exists(false);
+                final Criteria criteria_deletionDate = Criteria.where("deletionDate").exists(false);
+                final Criteria criteria_expiryDate = Criteria.where("expiryDate").gte(onlyDateEndOfDay);
+                andCriterias.add(criteria_usedDate);
+                andCriterias.add(criteria_deletionDate);
+                andCriterias.add(criteria_expiryDate);
+            }
+        }
+
+        Criteria criteria_storePlace = Criteria.where("storePlace").is(storePlace);
+        Criteria criteria_mainCategory = Criteria.where("product.mainCategory").is(mainCategory);
+        andCriterias.add(criteria_storePlace);
+        andCriterias.add(criteria_mainCategory);
+
+        Criteria criteria = new Criteria();
+        if (!andCriterias.isEmpty()) {
+            criteria.andOperator(andCriterias.toArray(new Criteria[0]));
+        }
+        if (!orCriterias.isEmpty()) {
+            criteria.orOperator(orCriterias.toArray(new Criteria[0]));
+        }
+
+        MatchOperation matchOperation = Aggregation.match(criteria);
+        // 將第一到第四步的Operation條件組到Aggregation
+        Aggregation aggregation = Aggregation.newAggregation(
+                addFieldsOperation,
+                lookupOperation,
+                matchOperation
+        );
+
+        // 用MongoTemplate執行之前的查詢條件
+        List<Inventory> inventoriesFromMongo = mongoTemplate.aggregate(aggregation, "inventory", Inventory.class).getMappedResults();
+        List<Inventory> inventoryList = new ArrayList<>();
+
+        if ("soon".equals(type)) {
+
+            for (Inventory inventory : inventoriesFromMongo) {
+                try {
+                    int overdueNoticeDays = Integer.parseInt(inventory.getOverdueNotice());
+                    LocalDate expiryDate = LocalDate.parse(inventory.getExpiryDate(), dateFormatter);
+                    LocalDate noticeDate = today.plusDays(overdueNoticeDays);
+
+                    if (expiryDate.isBefore(noticeDate) || expiryDate.isEqual(noticeDate)) {
+                        inventoryList.add(inventory);
+                    }
+                } catch (NumberFormatException | DateTimeParseException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        } else {
+            inventoryList = inventoriesFromMongo;
+        }
+
+        Map<String, Long> itemCountMap = inventoryList.stream()
+                .collect(Collectors.groupingBy(Inventory::getReceiveItemId, Collectors.counting()));
+
+        Map<String, Map<Long, List<Inventory>>> result = inventoryList.stream()
+                .collect(Collectors.groupingBy(
+                        Inventory::getReceiveItemId,
+                        Collectors.groupingBy(
+                                inventory -> itemCountMap.get(inventory.getReceiveItemId()),
+                                Collectors.toList()
+                        )
+                ));
+
+        return result;
+    }
+
+    @Override
+    public Map<String, Map<Long, List<Inventory>>> searchByNameAndMainCategoryAndSubCategoryAndStorePlace(String keyword, String mainCategory, String subCategory, String type, String storePlace) {
+        LocalDate today = LocalDate.now();
+        String startOfDay = today.atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String endOfDay = today.plusDays(1).atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String onlyDateEndOfDay = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        AddFieldsOperation addFieldsOperation = AddFieldsOperation.addField("productId").withValue(ConvertOperators.ToObjectId.toObjectId("$productId")).build();
+
+        LookupOperation lookupOperation = LookupOperation.newLookup()
+                .from("product")
+                .localField("productId")
+                .foreignField("_id")
+                .as("product");
+
+        List<Criteria> andCriterias = new ArrayList<>();
+        List<Criteria> orCriterias = new ArrayList<>();
+
+        switch (type) {
+            case "today" -> {
+                final Criteria criteria_deletionDate = Criteria.where("deletionDate").exists(false);
+                final Criteria criteria_storeDate = Criteria.where("storeDate").gt(startOfDay).lt(endOfDay);
+                final Criteria criteria_usedDate = Criteria.where("usedDate").exists(false);
+                andCriterias.add(criteria_storeDate);
+                andCriterias.add(criteria_deletionDate);
+                andCriterias.add(criteria_usedDate);
+            }
+            case "soon", "valid" -> {
+                final Criteria criteria_usedDate = Criteria.where("usedDate").exists(false);
+                final Criteria criteria_deletionDate = Criteria.where("deletionDate").exists(false);
+                final Criteria criteria_expiryDate = Criteria.where("expiryDate").gte(onlyDateEndOfDay);
+                andCriterias.add(criteria_usedDate);
+                andCriterias.add(criteria_deletionDate);
+                andCriterias.add(criteria_expiryDate);
+            }
+        }
+
+        Criteria criteria_name = Criteria.where("product.name").regex(keyword, "i");
+        Criteria criteria_storePlace = Criteria.where("storePlace").is(storePlace);
+        Criteria criteria_mainCategory = Criteria.where("product.mainCategory").is(mainCategory);
+        Criteria criteria_subCategory = Criteria.where("product.subCategory").is(subCategory);
+        orCriterias.add(criteria_name);
+        andCriterias.add(criteria_storePlace);
+        andCriterias.add(criteria_mainCategory);
+        andCriterias.add(criteria_subCategory);
+
+        Criteria criteria = new Criteria();
+        if (!andCriterias.isEmpty()) {
+            criteria.andOperator(andCriterias.toArray(new Criteria[0]));
+        }
+        if (!orCriterias.isEmpty()) {
+            criteria.orOperator(orCriterias.toArray(new Criteria[0]));
+        }
+
+        MatchOperation matchOperation = Aggregation.match(criteria);
+        // 將第一到第四步的Operation條件組到Aggregation
+        Aggregation aggregation = Aggregation.newAggregation(
+                addFieldsOperation,
+                lookupOperation,
+                matchOperation
+        );
+
+        // 用MongoTemplate執行之前的查詢條件
+        List<Inventory> inventoriesFromMongo = mongoTemplate.aggregate(aggregation, "inventory", Inventory.class).getMappedResults();
+        List<Inventory> inventoryList = new ArrayList<>();
+
+        if ("soon".equals(type)) {
+
+            for (Inventory inventory : inventoriesFromMongo) {
+                try {
+                    int overdueNoticeDays = Integer.parseInt(inventory.getOverdueNotice());
+                    LocalDate expiryDate = LocalDate.parse(inventory.getExpiryDate(), dateFormatter);
+                    LocalDate noticeDate = today.plusDays(overdueNoticeDays);
+
+                    if (expiryDate.isBefore(noticeDate) || expiryDate.isEqual(noticeDate)) {
+                        inventoryList.add(inventory);
+                    }
+                } catch (NumberFormatException | DateTimeParseException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        } else {
+            inventoryList = inventoriesFromMongo;
+        }
+
+        Map<String, Long> itemCountMap = inventoryList.stream()
+                .collect(Collectors.groupingBy(Inventory::getReceiveItemId, Collectors.counting()));
+
+        Map<String, Map<Long, List<Inventory>>> result = inventoryList.stream()
+                .collect(Collectors.groupingBy(
+                        Inventory::getReceiveItemId,
+                        Collectors.groupingBy(
+                                inventory -> itemCountMap.get(inventory.getReceiveItemId()),
+                                Collectors.toList()
+                        )
+                ));
+
+        return result;
+    }
+
+    @Override
+    public Map<String, Map<Long, List<Inventory>>> searchByMainCategoryAndSubCategoryAndStorePlace(String mainCategory, String subCategory, String type, String storePlace) {
+        LocalDate today = LocalDate.now();
+        String startOfDay = today.atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String endOfDay = today.plusDays(1).atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String onlyDateEndOfDay = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        AddFieldsOperation addFieldsOperation = AddFieldsOperation.addField("productId").withValue(ConvertOperators.ToObjectId.toObjectId("$productId")).build();
+
+        LookupOperation lookupOperation = LookupOperation.newLookup()
+                .from("product")
+                .localField("productId")
+                .foreignField("_id")
+                .as("product");
+
+        List<Criteria> andCriterias = new ArrayList<>();
+        List<Criteria> orCriterias = new ArrayList<>();
+
+        switch (type) {
+            case "today" -> {
+                final Criteria criteria_deletionDate = Criteria.where("deletionDate").exists(false);
+                final Criteria criteria_storeDate = Criteria.where("storeDate").gt(startOfDay).lt(endOfDay);
+                final Criteria criteria_usedDate = Criteria.where("usedDate").exists(false);
+                andCriterias.add(criteria_storeDate);
+                andCriterias.add(criteria_deletionDate);
+                andCriterias.add(criteria_usedDate);
+            }
+            case "soon", "valid" -> {
+                final Criteria criteria_usedDate = Criteria.where("usedDate").exists(false);
+                final Criteria criteria_deletionDate = Criteria.where("deletionDate").exists(false);
+                final Criteria criteria_expiryDate = Criteria.where("expiryDate").gte(onlyDateEndOfDay);
+                andCriterias.add(criteria_usedDate);
+                andCriterias.add(criteria_deletionDate);
+                andCriterias.add(criteria_expiryDate);
+            }
+        }
+
+        Criteria criteria_storePlace = Criteria.where("storePlace").is(storePlace);
+        Criteria criteria_mainCategory = Criteria.where("product.mainCategory").is(mainCategory);
+        Criteria criteria_subCategory = Criteria.where("product.subCategory").is(subCategory);
+        andCriterias.add(criteria_storePlace);
+        andCriterias.add(criteria_mainCategory);
+        andCriterias.add(criteria_subCategory);
+
+        Criteria criteria = new Criteria();
+        if (!andCriterias.isEmpty()) {
+            criteria.andOperator(andCriterias.toArray(new Criteria[0]));
+        }
+        if (!orCriterias.isEmpty()) {
+            criteria.orOperator(orCriterias.toArray(new Criteria[0]));
+        }
+
+        MatchOperation matchOperation = Aggregation.match(criteria);
+        // 將第一到第四步的Operation條件組到Aggregation
+        Aggregation aggregation = Aggregation.newAggregation(
+                addFieldsOperation,
+                lookupOperation,
+                matchOperation
+        );
+
+        // 用MongoTemplate執行之前的查詢條件
+        List<Inventory> inventoriesFromMongo = mongoTemplate.aggregate(aggregation, "inventory", Inventory.class).getMappedResults();
+        List<Inventory> inventoryList = new ArrayList<>();
+
+        if ("soon".equals(type)) {
+
+            for (Inventory inventory : inventoriesFromMongo) {
+                try {
+                    int overdueNoticeDays = Integer.parseInt(inventory.getOverdueNotice());
+                    LocalDate expiryDate = LocalDate.parse(inventory.getExpiryDate(), dateFormatter);
+                    LocalDate noticeDate = today.plusDays(overdueNoticeDays);
+
+                    if (expiryDate.isBefore(noticeDate) || expiryDate.isEqual(noticeDate)) {
+                        inventoryList.add(inventory);
+                    }
+                } catch (NumberFormatException | DateTimeParseException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        } else {
+            inventoryList = inventoriesFromMongo;
+        }
+
+        Map<String, Long> itemCountMap = inventoryList.stream()
+                .collect(Collectors.groupingBy(Inventory::getReceiveItemId, Collectors.counting()));
+
+        Map<String, Map<Long, List<Inventory>>> result = inventoryList.stream()
+                .collect(Collectors.groupingBy(
+                        Inventory::getReceiveItemId,
+                        Collectors.groupingBy(
+                                inventory -> itemCountMap.get(inventory.getReceiveItemId()),
+                                Collectors.toList()
+                        )
+                ));
+
+        return result;
+    }
+
+    @Override
+    public Map<String, Map<Long, List<Inventory>>> searchByStorePlace(String type, String storePlace) {
+        LocalDate today = LocalDate.now();
+        String startOfDay = today.atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String endOfDay = today.plusDays(1).atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String onlyDateEndOfDay = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        AddFieldsOperation addFieldsOperation = AddFieldsOperation.addField("productId").withValue(ConvertOperators.ToObjectId.toObjectId("$productId")).build();
+
+        LookupOperation lookupOperation = LookupOperation.newLookup()
+                .from("product")
+                .localField("productId")
+                .foreignField("_id")
+                .as("product");
+
+        List<Criteria> andCriterias = new ArrayList<>();
+        List<Criteria> orCriterias = new ArrayList<>();
+
+        switch (type) {
+            case "today" -> {
+                final Criteria criteria_deletionDate = Criteria.where("deletionDate").exists(false);
+                final Criteria criteria_storeDate = Criteria.where("storeDate").gt(startOfDay).lt(endOfDay);
+                final Criteria criteria_usedDate = Criteria.where("usedDate").exists(false);
+                andCriterias.add(criteria_storeDate);
+                andCriterias.add(criteria_deletionDate);
+                andCriterias.add(criteria_usedDate);
+            }
+            case "soon", "valid" -> {
+                final Criteria criteria_usedDate = Criteria.where("usedDate").exists(false);
+                final Criteria criteria_deletionDate = Criteria.where("deletionDate").exists(false);
+                final Criteria criteria_expiryDate = Criteria.where("expiryDate").gte(onlyDateEndOfDay);
+                andCriterias.add(criteria_usedDate);
+                andCriterias.add(criteria_deletionDate);
+                andCriterias.add(criteria_expiryDate);
+            }
+        }
+
+        Criteria criteria_storePlace = Criteria.where("storePlace").is(storePlace);
+        andCriterias.add(criteria_storePlace);
+
+        Criteria criteria = new Criteria();
+        if (!andCriterias.isEmpty()) {
+            criteria.andOperator(andCriterias.toArray(new Criteria[0]));
+        }
+        if (!orCriterias.isEmpty()) {
+            criteria.orOperator(orCriterias.toArray(new Criteria[0]));
+        }
+
+        MatchOperation matchOperation = Aggregation.match(criteria);
+        // 將第一到第四步的Operation條件組到Aggregation
+        Aggregation aggregation = Aggregation.newAggregation(
+                addFieldsOperation,
+                lookupOperation,
+                matchOperation
+        );
+
+        // 用MongoTemplate執行之前的查詢條件
+        List<Inventory> inventoriesFromMongo = mongoTemplate.aggregate(aggregation, "inventory", Inventory.class).getMappedResults();
+        List<Inventory> inventoryList = new ArrayList<>();
+
+        if ("soon".equals(type)) {
+
+            for (Inventory inventory : inventoriesFromMongo) {
+                try {
+                    int overdueNoticeDays = Integer.parseInt(inventory.getOverdueNotice());
+                    LocalDate expiryDate = LocalDate.parse(inventory.getExpiryDate(), dateFormatter);
+                    LocalDate noticeDate = today.plusDays(overdueNoticeDays);
+
+                    if (expiryDate.isBefore(noticeDate) || expiryDate.isEqual(noticeDate)) {
+                        inventoryList.add(inventory);
+                    }
+                } catch (NumberFormatException | DateTimeParseException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        } else {
+            inventoryList = inventoriesFromMongo;
+        }
+
+        Map<String, Long> itemCountMap = inventoryList.stream()
+                .collect(Collectors.groupingBy(Inventory::getReceiveItemId, Collectors.counting()));
+
+        Map<String, Map<Long, List<Inventory>>> result = inventoryList.stream()
+                .collect(Collectors.groupingBy(
+                        Inventory::getReceiveItemId,
+                        Collectors.groupingBy(
+                                inventory -> itemCountMap.get(inventory.getReceiveItemId()),
+                                Collectors.toList()
+                        )
+                ));
+
+        return result;
     }
 }
