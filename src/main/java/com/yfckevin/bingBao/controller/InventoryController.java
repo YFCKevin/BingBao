@@ -10,6 +10,8 @@ import com.yfckevin.bingBao.service.InventoryService;
 import com.yfckevin.bingBao.service.ProductService;
 import com.yfckevin.bingBao.service.ReceiveFormService;
 import com.yfckevin.bingBao.service.ReceiveItemService;
+import com.yfckevin.bingBao.utils.FileUtils;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -341,8 +343,6 @@ public class InventoryController {
         }
         ResultStatus resultStatus = new ResultStatus();
 
-        Map<String, List<InventoryDTO>> inventoryMap = new HashMap<>();
-
         //今日放進冰箱的
         final int size = inventoryService.findByStoreDateIsTodayAndNoUsedAndNoDeleteAndInValidPeriod().size();
 
@@ -351,6 +351,18 @@ public class InventoryController {
         resultStatus.setData(size);
         return ResponseEntity.ok(resultStatus);
     }
+
+
+    @PostMapping("/exportExcel/{type}")
+    public void exportExcel (@PathVariable String type, @RequestBody List<InventoryDTO> inventoryDTOList, HttpSession session, HttpServletResponse response) throws Exception {
+
+        final MemberDTO member = (MemberDTO) session.getAttribute("member");
+        if (member != null) {
+            logger.info("[exportExcel]");
+        }
+        FileUtils.constructExcel(inventoryDTOList, type, response, member);
+    }
+
 
     private InventoryDTO constructInventoryDTO(Inventory inventory, Product product, String totalAmount) {
         InventoryDTO dto = new InventoryDTO();

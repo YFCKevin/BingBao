@@ -226,6 +226,12 @@
 																		</template>
 																	</div>
 																</div>
+																<div class="col-sm-12 col-md-6 d-flex justify-content-end align-items-start mt-md-0 mt-2">
+																	<button type="button" class="btn btn-primary" x-on:click="exportExcel('today')">
+																		<i class="fas fa-file-excel me-2"></i>
+																		匯出Excel
+																	</button>
+																</div>
 															</div>
 															<div class="row">
 																<div class="col-sm-12">
@@ -385,6 +391,12 @@
 																			</select>
 																		</template>
 																	</div>
+																</div>
+																<div class="col-sm-12 col-md-6 d-flex justify-content-end align-items-start mt-md-0 mt-2">
+																	<button type="button" class="btn btn-primary" x-on:click="exportExcel('soon')">
+																		<i class="fas fa-file-excel me-2"></i>
+																		匯出Excel
+																	</button>
 																</div>
 															</div>
 															<div class="row">
@@ -547,6 +559,12 @@
 																			</select>
 																		</template>
 																	</div>
+																</div>
+																<div class="col-sm-12 col-md-6 d-flex justify-content-end align-items-start mt-md-0 mt-2">
+																	<button type="button" class="btn btn-primary" x-on:click="exportExcel('valid')">
+																	<i class="fas fa-file-excel me-2"></i>
+																		匯出Excel
+																	</button>
 																</div>
 															</div>
 															<div class="row">
@@ -1172,6 +1190,64 @@
 							console.error('Error:', error);
 						}
 				  	});
+				},
+				exportExcel(type){
+					let _this = this;
+					let data = [];
+					if (type == 'today'){
+						type = '今日放進冰箱';
+						data = this.todayList
+					} else if (type == 'soon'){
+						type = '快過期的';
+						data = this.expiringSoonList;
+					} else if (type == 'valid'){
+						type = '在有效期限內';
+						data = this.validList;
+					}
+
+					if (data.length == 0){
+						Swal.fire({
+							title: '無資料匯出！',
+							text: '',
+							icon: 'info',
+							confirmButtonText: '關閉',
+							customClass: {
+								confirmButton: 'btn btn-secondary'
+							}
+						});
+						return;
+					}
+
+					fetch("exportExcel/" + type, {
+						method: "POST",
+						body: JSON.stringify(data),
+						headers: {
+							"Content-Type": "application/json; charset=utf-8"
+						}
+					})
+					.then(response => response.blob())
+					.then(blob => {
+						const url = window.URL.createObjectURL(blob);
+						const a = document.createElement('a');
+						a.href = url;
+						a.download = "食材庫存清單.xlsx";
+						document.body.appendChild(a);
+						a.click();
+						a.remove();
+						window.URL.revokeObjectURL(url);
+					})
+					.catch(error => {
+						Swal.fire({
+							title: '系統錯誤，請聯繫管理員！',
+							text: '',
+							icon: 'error',
+							confirmButtonText: '關閉',
+							customClass: {
+								confirmButton: 'btn btn-danger'
+							}
+						});
+						console.error('Error:', error);
+					});
 				},
 				pages_today() {
 					return Array.from({
