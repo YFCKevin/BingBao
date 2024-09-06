@@ -20,6 +20,7 @@ public class WebConfig implements WebMvcConfigurer {
 
         registry.addResourceHandler("/bingBao_files/**").addResourceLocations("file:"+ configProperties.getFileSavePath());
         registry.addResourceHandler("/bingBao_images/**").addResourceLocations("file:"+ configProperties.getPicSavePath());
+        registry.addResourceHandler("/ai_images/**").addResourceLocations("file:"+ configProperties.getAiPicSavePath());
         registry.addResourceHandler("/bingBao/**")
                 .addResourceLocations("classpath:/static/");
 //        super.addResourceHandlers(registry);

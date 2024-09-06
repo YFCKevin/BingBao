@@ -9,5 +9,5 @@ import com.yfckevin.bingBao.exception.ResultStatus;
 import java.util.List;
 
 public interface OpenAiService {
-    TempMaster completion(String textBuilder) throws JsonProcessingException;
+    ResultStatus<TempMaster> completion(String textBuilder) throws JsonProcessingException;
 }

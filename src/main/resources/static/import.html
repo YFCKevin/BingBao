@@ -538,7 +538,17 @@
 									})
 									_this.tempMasterList = response.data;
 									_this.init()
-								} else {
+								} else if (response.code == 'C998'){
+									Swal.fire({
+										title: '您的照片不符合，請重新上傳一張與食材相關的照片！',
+										text: '',
+										icon: 'error',
+										confirmButtonText: '關閉',
+										customClass: {
+											confirmButton: 'btn btn-danger'
+										}
+									})
+								}else {
 									Swal.fire({
 										title: '系統錯誤，若嘗試3次仍失敗，請聯繫管理員！',
 										text: '',

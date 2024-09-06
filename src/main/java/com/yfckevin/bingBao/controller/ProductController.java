@@ -228,19 +228,30 @@ public class ProductController {
             rawText = rawText.replaceAll("\\r?\\n", "");
             logger.info("圖轉文：{}", rawText);
 
-            final TempMaster tempMaster = openAiService.completion(rawText);
-            if (tempMaster != null) {
-                tempMaster.setCreationDate(sdf.format(new Date()));
-                tempMaster.setCoverName(fileName);
+            final ResultStatus<TempMaster> completionResult = openAiService.completion(rawText);
+
+            if ("C000".equals(completionResult.getCode())) {
+                final TempMaster tempMaster = completionResult.getData();
+                if (tempMaster != null) {
+                    tempMaster.setCreationDate(sdf.format(new Date()));
+                    tempMaster.setCoverName(fileName);
 //                tempMaster.setCreator(member.getName());
-                final TempMaster savedTempMaster = tempMasterService.save(tempMaster);
-                resultStatus.setCode("C000");
-                resultStatus.setMessage("成功");
-                resultStatus.setData(savedTempMaster);
+                    final TempMaster savedTempMaster = tempMasterService.save(tempMaster);
+                    resultStatus.setCode("C000");
+                    resultStatus.setMessage("成功");
+                    resultStatus.setData(savedTempMaster);
+                } else {
+                    resultStatus.setCode("C010");
+                    resultStatus.setMessage("轉換失敗");
+                }
+            } else if ("C998".equals(completionResult.getCode())){
+                resultStatus.setCode("C998");
+                resultStatus.setMessage("資料提供不符合");
             } else {
-                resultStatus.setCode("C010");
-                resultStatus.setMessage("轉換失敗");
+                resultStatus.setCode("C999");
+                resultStatus.setMessage("異常發生");
             }
+
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

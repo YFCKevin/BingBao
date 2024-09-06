@@ -7,6 +7,7 @@ import com.yfckevin.bingBao.ConfigProperties;
 import com.yfckevin.bingBao.dto.ChatCompletionResponse;
 import com.yfckevin.bingBao.entity.TempDetail;
 import com.yfckevin.bingBao.entity.TempMaster;
+import com.yfckevin.bingBao.exception.ResultStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
@@ -32,7 +33,8 @@ public class OpenAiServiceImpl implements OpenAiService{
         this.tempMasterService = tempMasterService;
     }
 
-    public final String prompt = "1.食材清單如上，我要把資訊整理出JSON檔，欄位包括：\n" +
+    public final String prompt = "0.文字內容跟食材無相關，直接回傳「資料不符合食材」7個字就好\n" +
+            "1.食材清單如上，我要把資訊整理出JSON檔，欄位包括：\n" +
             "name：食材名稱\n" +
             "price：價格，以數字表示，沒有標示則為0\n" +
             "mainCategory：食材主種類，限定其中一種MEAT,SEAFOOD,VEGETABLES,FRUITS,GRAINS,BEVERAGES,CONDIMENTS,SNACKS,BAKERY,MEDICINE,HEALTH_FOOD,CANNED_FOOD,SPICES,OILS,SWEETS,DRIED_FOOD\n" +
@@ -41,10 +43,11 @@ public class OpenAiServiceImpl implements OpenAiService{
             "description：食材的介紹與描述，字數落在100-120字\n" +
             "packageQuantity：內容物數量，從食材清單分析內容物有多少，以字串表示數字\n" +
             "2.每份食材清單可能包含多個食材資訊，必須分開成獨立的JSON物件。\n" +
-            "3.確保只匯出json格式\n";
+            "3.確保只匯出json格式";
 
     @Override
-    public TempMaster completion(String rawText) throws JsonProcessingException {
+    public ResultStatus<TempMaster> completion(String rawText) throws JsonProcessingException {
+        ResultStatus<TempMaster> resultStatus = new ResultStatus<>();
         String url = "https://api.openai.com/v1/chat/completions";
 
         HttpHeaders headers = new HttpHeaders();
@@ -63,14 +66,26 @@ public class OpenAiServiceImpl implements OpenAiService{
             String content = extractContent(responseBody);
             System.out.println("GPT回傳資料 ======> " + content);
 
+            if ("資料不符合食材".equals(content)){
+                logger.error("客戶提供資料不符合");
+                resultStatus.setCode("C998");
+                resultStatus.setMessage("客戶提供資料不符合");
+                return resultStatus;
+            }
+
             TempMaster tempMaster = new TempMaster();
             List<TempDetail> tempDetailList = objectMapper.readValue(content, new TypeReference<>() {
             });
             tempMaster.setTempDetails(tempDetailList);
-            return tempMaster;
+            resultStatus.setCode("C000");
+            resultStatus.setMessage("成功");
+            resultStatus.setData(tempMaster);
         } else {
-            return null;
+            logger.error("openAI錯誤發生");
+            resultStatus.setCode("C999");
+            resultStatus.setMessage("異常發生");
         }
+        return resultStatus;
     }
 
 
