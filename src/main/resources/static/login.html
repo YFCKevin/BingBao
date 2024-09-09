@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>冰寶 - 您的冰箱智慧助手</title>
+  <meta property="og:title" content="冰寶 - 您的冰箱智慧助手">
+  <meta property="og:description" content="「冰寶」是一款智慧冰箱管理助手，專為食品管理而設計。幫助您輕鬆追蹤冰箱內的食材，提供有效的存放建議，並提醒您即將過期的食品。利用AI掃描技術，讓您的食材快速建檔，放進冰箱。冰寶都是提升食品管理的理想夥伴。">
+  <meta property="og:image" content="images/favicon.ico">
+  <meta property="og:url" content="https://www.gurula.cc/bingBao/dashboard.html">
+  <meta property="og:type" content="website">
+  <meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
+  <link rel="icon" href="images/favicon.ico" type="image/x-icon"/>
+  <link rel="stylesheet" href="css/styles.min.css" />
+</head>
+
+<body>
+  <!--  Body Wrapper -->
+  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+    data-sidebar-position="fixed" data-header-position="fixed">
+    <div
+      class="position-relative overflow-hidden radial-gradient min-vh-100 d-flex align-items-center justify-content-center">
+      <div class="d-flex align-items-center justify-content-center w-100">
+        <div class="row justify-content-center w-100">
+          <div class="col-md-8 col-lg-6 col-xxl-3">
+            <div class="card mb-0">
+              <div class="card-body">
+                <a href="dashboard.html" class="text-nowrap logo-img text-center d-block py-3 w-100">
+                  <img src="images/fridge001.jpg" width="100" alt="" style="border-radius: 50%">
+                </a>
+                <p class="text-center">冰寶 ---- 您的冰箱智慧助手</p>
+                <form>
+                  <div class="mb-3">
+                    <label for="account" class="form-label">帳號</label>
+                    <input type="email" class="form-control" id="account" aria-describedby="emailHelp">
+                  </div>
+                  <div class="mb-4">
+                    <label for="password" class="form-label">密碼</label>
+                    <input type="password" class="form-control" id="password">
+                  </div>
+                  <div class="d-flex align-items-center justify-content-between mb-4">
+                    <div class="form-check">
+                      <input class="form-check-input primary" type="checkbox" value="" id="flexCheckChecked" checked>
+                      <label class="form-check-label text-dark" for="flexCheckChecked">
+                        記住帳號密碼
+                      </label>
+                    </div>
+<!--                    <a class="text-primary fw-bold" href="./dashboard.html">Forgot Password ?</a>-->
+                  </div>
+                  <a onclick="login()" class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">登入</a>
+<!--                  <div class="d-flex align-items-center justify-content-center">-->
+<!--                    <p class="fs-4 mb-0 fw-bold">New to Modernize?</p>-->
+<!--                    <a class="text-primary fw-bold ms-2" href="./authentication-register.html">Create an account</a>-->
+<!--                  </div>-->
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--   Core JS Files   -->
+  <script src="js/jquery-3.7.1.min.js"></script>
+  <script src="js/popper.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <!-- jQuery Scrollbar -->
+  <script src="js/jquery.scrollbar.min.js"></script>
+  <!-- Moment JS -->
+  <script src="js/moment.min.js"></script>
+  <!-- Chart JS -->
+  <script src="js/chart.min.js"></script>
+  <!-- jQuery Sparkline -->
+  <script src="js/jquery.sparkline.min.js"></script>
+  <!-- Chart Circle -->
+  <script src="js/circles.min.js"></script>
+  <!-- Datatables -->
+  <script src="js/datatables.min.js"></script>
+  <!-- Bootstrap Notify -->
+  <script src="js/bootstrap-notify.min.js"></script>
+  <!-- jQuery Vector Maps -->
+  <script src="js/jsvectormap.min.js"></script>
+  <script src="js/world.js"></script>
+  <!-- Sweet Alert -->
+  <script src="js/sweetalert.min.js"></script>
+  <!-- Kaiadmin JS -->
+  <script src="js/kaiadmin.min.js"></script>
+  <script>
+    function login(){
+        let data = {};
+        data.account = $("#account").val();
+        data.password = $("#password").val();
+	    $.ajax({
+		    url: "loginCheck",
+			type: "post",
+			data: JSON.stringify(data),
+			contentType: "application/json; charset=utf-8",
+			success: function (response) {
+			    if (response.code == "C000"){
+					location.href = "dashboard.html";
+				} else {
+                    Swal.fire({
+					    title: '帳號或密碼錯誤！',
+						text: '',
+						icon: 'error',
+						confirmButtonText: '關閉',
+						customClass: {
+						    confirmButton: 'btn btn-danger'
+						}
+					});
+				}
+			},
+		});
+    }
+  </script>
+</body>
+
+</html>

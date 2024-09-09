@@ -193,6 +193,53 @@
                             <div class="table-responsive">
                                 <div id="add-row_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
                                     <div class="row">
+                                        <div class="col-sm-12 col-md-6">
+                                            <div id="select-product_filter_today" class="mb-3">
+                                                <input x-on:keydown.enter="productSearch()" id="productKeyword" type="search" class="form-control" placeholder="可搜尋食材名稱" aria-controls="add-row">
+                                            </div>
+                                            <div class="d-flex flex-column flex-md-row align-items-start mb-3">
+                                                <select class="form-select form-control me-2 mb-2 mb-md-0" x-model="selectedCategory" x-on:change="categoryChange()">
+                                                    <option value="">請選擇主分類</option>
+                                                    <option value="MEAT">肉品</option>
+                                                    <option value="SEAFOOD">海鮮</option>
+                                                    <option value="VEGETABLES">青菜</option>
+                                                    <option value="FRUITS">水果</option>
+                                                    <option value="GRAINS">穀物</option>
+                                                    <option value="BEVERAGES">飲料</option>
+                                                    <option value="CONDIMENTS">醬料</option>
+                                                    <option value="SNACKS">零食</option>
+                                                    <option value="BAKERY">烘焙食品</option>
+                                                    <option value="MEDICINE">藥品</option>
+                                                    <option value="CANNED_FOOD">罐頭食品</option>
+                                                    <option value="SPICES">香料</option>
+                                                    <option value="OILS">食用油</option>
+                                                    <option value="SWEETS">甜品</option>
+                                                    <option value="DRIED_FOOD">乾貨</option>
+                                                    <option value="HEALTH_FOOD">保健食品</option>
+                                                </select>
+                                                <template x-if="selectedCategory !== 'MEAT' && selectedCategory !== 'SEAFOOD'">
+                                                    <select class="form-select form-control" x-model="selectedSubCategory" disabled x-on:change="productSearch()">
+                                                        <option value="">-</option>
+                                                    </select>
+                                                </template>
+                                                <template x-if="selectedCategory === 'MEAT'">
+                                                    <select class="form-select form-control" x-model="selectedSubCategory" x-on:change="productSearch()">
+                                                        <option value="">請選擇副分類</option>
+                                                        <option value="BEEF">牛肉</option>
+                                                        <option value="PORK">豬肉</option>
+                                                        <option value="CHICKEN">雞肉</option>
+                                                        <option value="EGG">雞蛋</option>
+                                                    </select>
+                                                </template>
+                                                <template x-if="selectedCategory === 'SEAFOOD'">
+                                                    <select class="form-select form-control" x-model="selectedSubCategory" x-on:change="productSearch()">
+                                                        <option value="">請選擇副分類</option>
+                                                        <option value="FISH">魚</option>
+                                                        <option value="SHRIMP">蝦</option>
+                                                    </select>
+                                                </template>
+                                            </div>
+                                        </div>
                                         <div class="col-sm-12">
                                             <table id="add-row" class="display table table-striped table-hover dataTable" role="grid" aria-describedby="add-row_info">
                                                 <thead>
@@ -557,6 +604,8 @@
 				targetEditId: "",
 				imageSrc: '',
                 hasImage: false,
+                selectedCategory: "",
+				selectedSubCategory: "",
                 //for edit product
                 name: '',
                 imageSrc: '',
@@ -850,6 +899,41 @@
 						}
 					});
                 },
+                categoryChange() {
+					this.selectedSubCategory = '';
+					this.productSearch();
+				},
+				productSearch(){
+					let _this = this;
+					let data = {};
+					data.keyword = $("#productKeyword").val();
+					data.mainCategory = this.selectedCategory;
+					data.subCategory = this.selectedSubCategory;
+
+				    $.ajax({
+						url: "searchProductTemplate",
+						type: "post",
+						data: JSON.stringify(data),
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.productList = response.data;
+							}
+						},
+						error: function(error) {
+							Swal.fire({
+								title: '系統錯誤，請聯繫管理員！',
+								text: '',
+								icon: 'error',
+								confirmButtonText: '關閉',
+								customClass: {
+									confirmButton: 'btn btn-danger'
+								}
+							})
+							console.error('Error:', error);
+						}
+				  	});
+				},
 				getData(){
 					const start = this.pageNumber * this.size,
 						  end = start + this.size;

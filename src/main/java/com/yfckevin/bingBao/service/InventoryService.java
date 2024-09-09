@@ -44,4 +44,6 @@ public interface InventoryService {
     Map<String, Map<Long, List<Inventory>>> searchByMainCategoryAndSubCategoryAndStorePlace(String mainCategory, String subCategory, String type, String storePlace);
 
     Map<String, Map<Long, List<Inventory>>> searchByStorePlace(String type, String storePlace);
+
+    List<Inventory> findInventoryWithExpiryDateInSevenDays();
 }

@@ -1233,4 +1233,38 @@ public class InventoryServiceImpl implements InventoryService {
 
         return result;
     }
+
+    @Override
+    public List<Inventory> findInventoryWithExpiryDateInSevenDays() {
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String onlyDateEndOfDay = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        // 設定查詢條件
+        Criteria criteria = new Criteria().andOperator(
+                Criteria.where("usedDate").exists(false),
+                Criteria.where("deletionDate").exists(false),
+                Criteria.where("expiryDate").gte(onlyDateEndOfDay)
+        );
+        Query query = new Query(criteria);
+        List<Inventory> inventoriesFromMongo = mongoTemplate.find(query, Inventory.class);
+
+        List<Inventory> inventoryList = new ArrayList<>();
+        LocalDate noticeDate = today.plusDays(7); // 計算今天加7天的日期
+
+        for (Inventory inventory : inventoriesFromMongo) {
+            try {
+                LocalDate expiryDate = LocalDate.parse(inventory.getExpiryDate(), dateFormatter);
+
+                // 如果expiryDate等於今天加7天的日期，則加入清單
+                if (expiryDate.isEqual(noticeDate)) {
+                    inventoryList.add(inventory);
+                }
+            } catch (DateTimeParseException e) {
+                logger.error(e.getMessage(), e);
+            }
+        }
+
+        return inventoryList;
+    }
 }

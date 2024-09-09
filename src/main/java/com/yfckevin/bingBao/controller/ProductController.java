@@ -497,6 +497,60 @@ public class ProductController {
     }
 
 
+
+    /**
+     * 模糊查詢食材模板資訊
+     *
+     * @param searchDTO
+     * @param session
+     * @return
+     */
+    @PostMapping("/searchProductTemplate")
+    public ResponseEntity<?> searchProductTemplate(@RequestBody SearchDTO searchDTO, HttpSession session) {
+
+        final MemberDTO member = (MemberDTO) session.getAttribute("member");
+        if (member != null) {
+            logger.info("[productSearch]");
+        }
+        ResultStatus resultStatus = new ResultStatus();
+
+        final String keyword = searchDTO.getKeyword().trim();
+        final String mainCategory = searchDTO.getMainCategory();
+        final String subCategory = searchDTO.getSubCategory();
+        System.out.println(keyword + " / " + mainCategory + " / " + subCategory);
+        List<Product> productList = new ArrayList<>();
+        if (StringUtils.isNotBlank(keyword) && StringUtils.isBlank(mainCategory) && StringUtils.isBlank(subCategory)) {
+            // 只有輸入名稱
+            productList = productService.searchProductByName(keyword);
+        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isBlank(subCategory)) {
+            // 有輸入名稱 + 只有主種類
+            productList = productService.searchProductByNameAndMainCategory(keyword, mainCategory);
+        } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isBlank(subCategory)) {
+            // 只有主種類
+            productList = productService.searchProductByMainCategory(mainCategory);
+        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory)) {
+            // 有輸入名稱 + 有主種類 + 有副種類
+            productList = productService.searchProductByNameAndMainCategoryAndSubCategory(keyword, mainCategory, subCategory);
+        } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory)) {
+            // 有主種類 + 有副種類
+            productList = productService.searchProductByMainCategoryAndSubCategory(mainCategory, subCategory);
+        } else {
+            // 全空白搜尋全部
+            productList = productService.searchProductByName("");
+        }
+
+        final List<ProductDTO> productDTOList = productList.stream()
+                .map(this::constructProductDTO)
+                .sorted(Comparator.comparing(ProductDTO::getCreationDate).reversed())
+                .toList();
+
+        resultStatus.setCode("C000");
+        resultStatus.setMessage("成功");
+        resultStatus.setData(productDTOList);
+        return ResponseEntity.ok(resultStatus);
+    }
+
+
     /**
      * 模糊查詢食材資訊
      *
@@ -504,7 +558,7 @@ public class ProductController {
      * @param session
      * @return
      */
-    @PostMapping("productSearch")
+    @PostMapping("/productSearch")
     public ResponseEntity<?> productSearch(@RequestBody SearchDTO searchDTO, HttpSession session) {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
@@ -581,7 +635,7 @@ public class ProductController {
         dto.setCreationDate(product.getCreationDate());
         dto.setCreator(product.getCreator());
         dto.setId(product.getId());
-        dto.setCoverPath(configProperties.picShowPath + product.getCoverName());
+        dto.setCoverPath(product.getCoverName() == null ? "images/fridge002.jpg" : configProperties.picShowPath + product.getCoverName());
         dto.setPackageNumber(product.getPackageNumber());
         return dto;
     }

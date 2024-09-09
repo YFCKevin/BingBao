@@ -27,6 +27,8 @@ public class ConfigProperties {
     public String aiPicSavePath;
     @Value("${config.aiPicShowPath}")
     public String aiPicShowPath;
+    @Value("${config.channelAccessToken}")
+    public String channelAccessToken;
 
     public String getApiKey() {
         return apiKey;
@@ -70,5 +72,9 @@ public class ConfigProperties {
 
     public String getAiPicShowPath() {
         return aiPicShowPath;
+    }
+
+    public String getChannelAccessToken() {
+        return channelAccessToken;
     }
 }
