@@ -27,6 +27,7 @@ public class Inventory {
     private String packageNumber;
     private String overdueNotice;   //通知過期天數
     private String productId;
+    private boolean addShoppingList;    //庫存是否放進回購清單，用來避免重複加入
     private String creationDate;
     private String modificationDate;
     private String deletionDate;
@@ -217,5 +218,13 @@ public class Inventory {
 
     public void setStorePlace(StorePlace storePlace) {
         this.storePlace = storePlace;
+    }
+
+    public boolean isAddShoppingList() {
+        return addShoppingList;
+    }
+
+    public void setAddShoppingList(boolean addShoppingList) {
+        this.addShoppingList = addShoppingList;
     }
 }

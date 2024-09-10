@@ -69,7 +69,7 @@ public class ReceiveController {
         final String storeNumber = INUtil.generateStoreNumber();
         ReceiveForm receiveForm = new ReceiveForm();
         receiveForm.setCreationDate(sdf.format(new Date()));
-//            receiveForm.setCreator(member.getName());
+        receiveForm.setCreator(member.getName());
         receiveForm.setReceiveDate(sdf.format(new Date()));
         receiveForm.setReceiveNumber(RNUtil.generateReceiveNumber());
         receiveForm.setStoreDate(sdf.format(new Date()));

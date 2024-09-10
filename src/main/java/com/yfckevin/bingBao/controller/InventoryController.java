@@ -5,6 +5,7 @@ import com.yfckevin.bingBao.dto.*;
 import com.yfckevin.bingBao.entity.Inventory;
 import com.yfckevin.bingBao.entity.Product;
 import com.yfckevin.bingBao.entity.ReceiveItem;
+import com.yfckevin.bingBao.enums.StorePlace;
 import com.yfckevin.bingBao.exception.ResultStatus;
 import com.yfckevin.bingBao.service.InventoryService;
 import com.yfckevin.bingBao.service.ProductService;
@@ -86,6 +87,43 @@ public class InventoryController {
             resultStatus.setCode("C007");
             resultStatus.setMessage("庫存不足");
         } else {
+            resultStatus.setCode("C000");
+            resultStatus.setMessage("成功");
+        }
+        return ResponseEntity.ok(resultStatus);
+    }
+
+
+    /**
+     * 變更庫存食材的存放位置
+     * @param dto
+     * @param session
+     * @return
+     */
+    @PostMapping("/editStorePlaceInventory")
+    public ResponseEntity<?> editStorePlaceInventory(@RequestBody ChangeStorePlaceRequestDTO dto, HttpSession session) {
+
+        final MemberDTO member = (MemberDTO) session.getAttribute("member");
+        if (member != null) {
+            logger.info("[editStorePlaceInventory]");
+        }
+        ResultStatus resultStatus = new ResultStatus();
+
+        List<Inventory> inventoryList = inventoryService.findByReceiveItemId(dto.getReceiveItemId());
+        if (inventoryList.size() == 0) {
+            resultStatus.setCode("C006");
+            resultStatus.setMessage("無庫存");
+            return ResponseEntity.ok(resultStatus);
+        }
+
+        List<Inventory> inventoriesToUpdate = new ArrayList<>();
+        final String newStorePlace = dto.getNewStorePlace();
+        for (Inventory inventory : inventoryList) {
+            inventory.setStorePlace(StorePlace.valueOf(newStorePlace));
+            inventoriesToUpdate.add(inventory);
+        }
+        if (!inventoriesToUpdate.isEmpty()) {
+            inventoryService.saveAll(inventoriesToUpdate);
             resultStatus.setCode("C000");
             resultStatus.setMessage("成功");
         }

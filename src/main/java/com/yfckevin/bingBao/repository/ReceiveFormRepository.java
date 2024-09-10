@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface ReceiveFormRepository extends MongoRepository<ReceiveForm, String> {
     List<ReceiveForm> findAllByDeletionDateIsNullOrderByCreationDateDesc();
+
+    List<ReceiveForm> findByIdIn(List<String> receiveFormIds);
 }

@@ -70,8 +70,7 @@ public class LineController {
     }
 
 
-//    @Scheduled(cron = "0 0 8 * * ?")
-    @GetMapping("/nearExpiryProductNoticeByLine")
+    @Scheduled(cron = "0 0 8 * * ?")
     public void nearExpiryProductNoticeByLine(){
         try {
             final Map<String, Object> textTemplate = flexMessageUtil.assembleTextTemplate();
@@ -94,6 +93,37 @@ public class LineController {
         }
     }
 
+
+    @GetMapping("/nearExpiryProductNoticeByLine")
+    public ResponseEntity<?> nearExpiryProductNoticeByLine_test(){
+        ResultStatus resultStatus = new ResultStatus();
+        try {
+            final Map<String, Object> textTemplate = flexMessageUtil.assembleTextTemplate();
+            //今日無即期的庫存食材則不傳送任何資訊
+            if ("今日無即期的庫存食材".equals(textTemplate.getOrDefault("error", null))) {
+                resultStatus.setCode("C997");
+                resultStatus.setMessage("今日無即期的庫存食材");
+                return ResponseEntity.ok(resultStatus);
+            }
+            String url = "https://api.line.me/v2/bot/message/multicast";
+            Map<String, Object> data = new HashMap<>();
+            final List<String> followerIdList = followerService.findAll().stream().map(Follower::getUserId).toList();
+            data.put("to", followerIdList);
+            data.put("messages", List.of(textTemplate));
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(configProperties.getChannelAccessToken());
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(data, headers);
+            ResponseEntity<LineUserProfileResponseDTO> response = restTemplate.exchange(url, HttpMethod.POST, entity, LineUserProfileResponseDTO.class);
+            resultStatus.setCode("C000");
+            resultStatus.setMessage("成功");
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            resultStatus.setCode("C999");
+            resultStatus.setMessage("例外發生");
+        }
+        return ResponseEntity.ok(resultStatus);
+    }
 
 
     @GetMapping("/sendOverdueNoticeByLine")

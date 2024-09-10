@@ -115,6 +115,12 @@
                             <p>食材模板</p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="shopping-list.html">
+                            <i class="fas fa-shopping-basket"></i>
+                            <p>回購清單</p>
+                        </a>
+                    </li>
                     <li class="nav-section">
 							<span class="sidebar-mini-icon">
 								<i class="fa fa-ellipsis-h"></i>
@@ -251,6 +257,7 @@
                                                     <th>包裝方式</th>
                                                     <th>食材分類</th>
                                                     <th>距離<br>有效期限前<br>多久通知<br>(天)</th>
+                                                    <th>是否回購<br>(警戒庫存量)</th>
                                                     <th>建檔日期</th>
                                                     <th>動作</th>
                                                 </tr>
@@ -259,7 +266,7 @@
                                                 <template x-for="(item,index) in getData()" :key="index">
                                                     <tr role="row" class="odd">
                                                         <td>
-                                                            <img :src="item.coverPath" style="width: 100px; height: 100px; border-radius: 10%;">
+                                                            <img :src="item.coverPath" style="width: 75px; height: 75px; border-radius: 10%;">
                                                         </td>
                                                         <td x-text="item.name"></td>
                                                         <td x-text="item.packageFormLabel"></td>
@@ -286,6 +293,23 @@
                                                             <span x-text="item.mainCategoryLabel"></span>
                                                         </td>
                                                         <td x-text="item.overdueNotice"></td>
+                                                        <td x-show="item.addShoppingList && item.packageForm == 'COMPLETE'">
+                                                            <i class="fas fa-check fs-6"></i>
+                                                            <span>(</span>
+                                                            <span x-text="item.inventoryAlert"></span>
+                                                            <span x-text="item.packageUnitLabel"></span>
+                                                            <span>)</span>
+                                                        </td>
+                                                        <td x-show="item.addShoppingList && item.packageForm == 'BULK'">
+                                                            <i class="fas fa-check fs-6"></i>
+                                                            <span>(</span>
+                                                            <span x-text="item.inventoryAlert"></span>
+                                                            <span>份</span>
+                                                            <span>)</span>
+                                                        </td>
+                                                        <td x-show="!item.addShoppingList">
+                                                            <i class="fas fa-times fs-6"></i>
+                                                        </td>
                                                         <td x-text="item.creationDate"></td>
                                                         <td>
                                                             <div class="form-button-action d-flex gap-2 flex-wrap">
@@ -505,7 +529,7 @@
                             <label for="packageUnit" class="col-form-label">包裝方式 *</label>
                             <div class="row" style="--bs-gutter-x: 0;">
                                 <div class="col-8">
-                                    <input x-model="packageQuantity" type="text" class="form-control" id="packageQuantity" name="packageQuantity" placeholder="填入數量">
+                                    <input x-model="packageQuantity" type="number" class="form-control" id="packageQuantity" name="packageQuantity" placeholder="填入數量">
                                 </div>
                                 <div class="col-4">
                                     <select class="form-select form-control"
@@ -552,6 +576,40 @@
                                     max="365"
                                     step="1"
                                     x-model="rangeValue">
+                        </div>
+                        <div class="form-group">
+                            <div class="d-flex mb-3 align-items-center">
+                                <div class="form-label me-2" for="addShoppingList">是否加入回購</div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="addShoppingList" x-model="addShoppingList" x-on:change="toggleInventoryAlert($event)">
+                                </div>
+                            </div>
+                            <div x-show="addShoppingList">
+                                <div class="d-flex flex-column align-items-start">
+                                    <label class="form-label d-block">當數量低於庫存警戒線，</label>
+                                    <div class="d-flex align-items-center">
+                                        <label class="form-label">系統自動把食材加入回購清單。</label>
+                                        <label class="mx-2" x-text="alertValue">0</label>
+                                        <template x-if="packageForm == 'COMPLETE'">
+                                            <label x-text="packageUnitMap[packageUnit]"></label>
+                                        </template>
+                                        <template x-if="packageForm == 'BULK'">
+                                            <label>份</label>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <input
+                                        id="inventoryAlert"
+                                        name="inventoryAlert"
+                                        class="form-control"
+                                        type="number"
+                                        min="1"
+                                        max="365"
+                                        step="1"
+                                        placeholder="完整包裝填寫包裝數量，散裝直接填寫數量，系統會自動計算總數量"
+                                        x-model="alertValue">
+                            </div>
                         </div>
                     </div>
                     <div class="separator-dashed"></div>
@@ -619,6 +677,9 @@
                 description: '',
                 rangeValue: 0,
                 multipartFile: null,
+                alertValue: 1,
+                inventoryAlert: '',
+                addShoppingList: false,
 				packageUnitMap: {
 					"EACH": "個",
 					"BOX": "箱",
@@ -768,6 +829,8 @@
                                 _this.packageUnit = data.packageUnit || '';
                                 _this.description = data.description;
                                 _this.rangeValue = data.overdueNotice || 0;
+                                _this.alertValue = data.inventoryAlert || 1;
+                                _this.addShoppingList = data.addShoppingList;
                                 if (!data.coverPath.endsWith('/null')) {
                                     _this.imageSrc = data.coverPath;
                                     _this.hasImage = true;
@@ -803,6 +866,9 @@
                         this.hasImage = false;
                     }
                 },
+				toggleInventoryAlert(event) {
+					this.addShoppingList = event.target.checked;
+				},
                 editProduct(){
                     let _this = this;
                     let hasError = false;
@@ -820,7 +886,7 @@
 					}
 					// 包裝方式
 					if (this.packageForm === 'COMPLETE'){
-					    if (this.packageQuantity.trim() === '' || this.packageQuantity.trim() == 0) {
+					    if (this.packageQuantity.trim() === '' || this.packageQuantity.trim() == 0 || isNaN(this.packageQuantity)) {
 					       	$(`[name='packageQuantity']`).closest('.col-8').addClass('has-error');
                             hasError = true;
 					    }
@@ -830,6 +896,15 @@
 							hasError = true;
 						}
 					}
+
+					//回購
+					if (this.addShoppingList == true){
+						if (this.alertValue.trim() === '' || this.alertValue.trim() == 0 || isNaN(this.alertValue)){
+							$("#inventoryAlert").closest('div').addClass('has-error');
+							hasError = true;
+						}
+					}
+
 
 					if (hasError) {
 						$('#errorModal').modal('show');
@@ -848,6 +923,10 @@
 					}
 					formData.append("description", this.description);
 					formData.append("overdueNotice", this.rangeValue);
+					formData.append("addShoppingList", this.addShoppingList);
+					if (this.addShoppingList == true){
+						formData.append("inventoryAlert", this.alertValue);
+					}
 
 					if (this.multipartFile) {
 						formData.append("multipartFile", this.multipartFile);

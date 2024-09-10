@@ -1,8 +1,9 @@
 package com.yfckevin.bingBao.service;
 
-import com.yfckevin.bingBao.controller.LoginController;
 import com.yfckevin.bingBao.entity.Inventory;
 import com.yfckevin.bingBao.entity.Product;
+import com.yfckevin.bingBao.enums.PackageForm;
+import com.yfckevin.bingBao.enums.StorePlace;
 import com.yfckevin.bingBao.repository.InventoryRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -13,25 +14,28 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 public class InventoryServiceImpl implements InventoryService {
     Logger logger = LoggerFactory.getLogger(InventoryServiceImpl.class);
     private final InventoryRepository inventoryRepository;
+    private final ProductService productService;
     private final MongoTemplate mongoTemplate;
     static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public InventoryServiceImpl(InventoryRepository inventoryRepository, MongoTemplate mongoTemplate) {
+    public InventoryServiceImpl(InventoryRepository inventoryRepository, ProductService productService, MongoTemplate mongoTemplate) {
         this.inventoryRepository = inventoryRepository;
+        this.productService = productService;
         this.mongoTemplate = mongoTemplate;
     }
 
@@ -690,7 +694,17 @@ public class InventoryServiceImpl implements InventoryService {
         }
 
         Criteria criteria_name = Criteria.where("product.name").regex(keyword, "i");
-        Criteria criteria_storePlace = Criteria.where("storePlace").is(storePlace);
+        Criteria criteria_storePlace;
+        if ("HUALIEN_ALL".equals(storePlace)) {
+            criteria_storePlace = new Criteria().orOperator(
+                    Criteria.where("storePlace").is(StorePlace.HUALIEN_REF_2F_LEFT.name()),
+                    Criteria.where("storePlace").is(StorePlace.HUALIEN_REF_2F_RIGHT.name()),
+                    Criteria.where("storePlace").is(StorePlace.HUALIEN_REF_1F_RIGHT.name()),
+                    Criteria.where("storePlace").is(StorePlace.HUALIEN_OTHER.name())
+            );
+        } else {
+            criteria_storePlace = Criteria.where("storePlace").is(storePlace);
+        }
         orCriterias.add(criteria_name);
         andCriterias.add(criteria_storePlace);
 
@@ -786,7 +800,17 @@ public class InventoryServiceImpl implements InventoryService {
         }
 
         Criteria criteria_name = Criteria.where("product.name").regex(keyword, "i");
-        Criteria criteria_storePlace = Criteria.where("storePlace").is(storePlace);
+        Criteria criteria_storePlace;
+        if ("HUALIEN_ALL".equals(storePlace)) {
+            criteria_storePlace = new Criteria().orOperator(
+                    Criteria.where("storePlace").is(StorePlace.HUALIEN_REF_2F_LEFT.name()),
+                    Criteria.where("storePlace").is(StorePlace.HUALIEN_REF_2F_RIGHT.name()),
+                    Criteria.where("storePlace").is(StorePlace.HUALIEN_REF_1F_RIGHT.name()),
+                    Criteria.where("storePlace").is(StorePlace.HUALIEN_OTHER.name())
+            );
+        } else {
+            criteria_storePlace = Criteria.where("storePlace").is(storePlace);
+        }
         Criteria criteria_mainCategory = Criteria.where("product.mainCategory").is(mainCategory);
         orCriterias.add(criteria_name);
         andCriterias.add(criteria_storePlace);
@@ -883,7 +907,17 @@ public class InventoryServiceImpl implements InventoryService {
             }
         }
 
-        Criteria criteria_storePlace = Criteria.where("storePlace").is(storePlace);
+        Criteria criteria_storePlace;
+        if ("HUALIEN_ALL".equals(storePlace)) {
+            criteria_storePlace = new Criteria().orOperator(
+                    Criteria.where("storePlace").is(StorePlace.HUALIEN_REF_2F_LEFT.name()),
+                    Criteria.where("storePlace").is(StorePlace.HUALIEN_REF_2F_RIGHT.name()),
+                    Criteria.where("storePlace").is(StorePlace.HUALIEN_REF_1F_RIGHT.name()),
+                    Criteria.where("storePlace").is(StorePlace.HUALIEN_OTHER.name())
+            );
+        } else {
+            criteria_storePlace = Criteria.where("storePlace").is(storePlace);
+        }
         Criteria criteria_mainCategory = Criteria.where("product.mainCategory").is(mainCategory);
         andCriterias.add(criteria_storePlace);
         andCriterias.add(criteria_mainCategory);
@@ -980,7 +1014,17 @@ public class InventoryServiceImpl implements InventoryService {
         }
 
         Criteria criteria_name = Criteria.where("product.name").regex(keyword, "i");
-        Criteria criteria_storePlace = Criteria.where("storePlace").is(storePlace);
+        Criteria criteria_storePlace;
+        if ("HUALIEN_ALL".equals(storePlace)) {
+            criteria_storePlace = new Criteria().orOperator(
+                    Criteria.where("storePlace").is(StorePlace.HUALIEN_REF_2F_LEFT.name()),
+                    Criteria.where("storePlace").is(StorePlace.HUALIEN_REF_2F_RIGHT.name()),
+                    Criteria.where("storePlace").is(StorePlace.HUALIEN_REF_1F_RIGHT.name()),
+                    Criteria.where("storePlace").is(StorePlace.HUALIEN_OTHER.name())
+            );
+        } else {
+            criteria_storePlace = Criteria.where("storePlace").is(storePlace);
+        }
         Criteria criteria_mainCategory = Criteria.where("product.mainCategory").is(mainCategory);
         Criteria criteria_subCategory = Criteria.where("product.subCategory").is(subCategory);
         orCriterias.add(criteria_name);
@@ -1079,7 +1123,17 @@ public class InventoryServiceImpl implements InventoryService {
             }
         }
 
-        Criteria criteria_storePlace = Criteria.where("storePlace").is(storePlace);
+        Criteria criteria_storePlace;
+        if ("HUALIEN_ALL".equals(storePlace)) {
+            criteria_storePlace = new Criteria().orOperator(
+                    Criteria.where("storePlace").is(StorePlace.HUALIEN_REF_2F_LEFT.name()),
+                    Criteria.where("storePlace").is(StorePlace.HUALIEN_REF_2F_RIGHT.name()),
+                    Criteria.where("storePlace").is(StorePlace.HUALIEN_REF_1F_RIGHT.name()),
+                    Criteria.where("storePlace").is(StorePlace.HUALIEN_OTHER.name())
+            );
+        } else {
+            criteria_storePlace = Criteria.where("storePlace").is(storePlace);
+        }
         Criteria criteria_mainCategory = Criteria.where("product.mainCategory").is(mainCategory);
         Criteria criteria_subCategory = Criteria.where("product.subCategory").is(subCategory);
         andCriterias.add(criteria_storePlace);
@@ -1177,7 +1231,17 @@ public class InventoryServiceImpl implements InventoryService {
             }
         }
 
-        Criteria criteria_storePlace = Criteria.where("storePlace").is(storePlace);
+        Criteria criteria_storePlace;
+        if ("HUALIEN_ALL".equals(storePlace)) {
+            criteria_storePlace = new Criteria().orOperator(
+                    Criteria.where("storePlace").is(StorePlace.HUALIEN_REF_2F_LEFT.name()),
+                    Criteria.where("storePlace").is(StorePlace.HUALIEN_REF_2F_RIGHT.name()),
+                    Criteria.where("storePlace").is(StorePlace.HUALIEN_REF_1F_RIGHT.name()),
+                    Criteria.where("storePlace").is(StorePlace.HUALIEN_OTHER.name())
+            );
+        } else {
+            criteria_storePlace = Criteria.where("storePlace").is(storePlace);
+        }
         andCriterias.add(criteria_storePlace);
 
         Criteria criteria = new Criteria();
@@ -1266,5 +1330,45 @@ public class InventoryServiceImpl implements InventoryService {
         }
 
         return inventoryList;
+    }
+
+    @Override
+    public Map<String, Map<Long, List<Inventory>>> findAllAndDeletionDateIsNull() {
+        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        Criteria criteria = new Criteria().andOperator(
+                Criteria.where("usedDate").exists(false),
+                Criteria.where("deletionDate").exists(false),
+                Criteria.where("expiryDate").gte(today)
+        );
+        Query query = new Query(criteria);
+        List<Inventory> inventoriesFromMongo = mongoTemplate.find(query, Inventory.class);
+
+        Map<String, Long> itemCountMap = inventoriesFromMongo.stream()
+                .collect(Collectors.groupingBy(Inventory::getReceiveItemId, Collectors.counting()));
+
+        return inventoriesFromMongo.stream()
+                .filter(inventory -> {
+                    return productService.findById(inventory.getProductId())
+                            .map(product -> {
+                                if (StringUtils.isBlank(product.getInventoryAlert())) {
+                                    return false;
+                                }
+                                BigDecimal inventoryAlert = new BigDecimal(product.getInventoryAlert());
+                                BigDecimal totalAmount = new BigDecimal(itemCountMap.get(inventory.getReceiveItemId()));
+                                BigDecimal totalInventoryAlert = PackageForm.COMPLETE.equals(product.getPackageForm())
+                                        ? inventoryAlert.multiply(new BigDecimal(product.getPackageQuantity()))
+                                        : inventoryAlert;
+                                // 只保留 totalAmount 小於等於 inventoryAlert 的Inventory
+                                return totalInventoryAlert.compareTo(totalAmount) >= 0;
+                            })
+                            .orElse(false);  // 如果找不到產品，回傳 false
+                })
+                .collect(Collectors.groupingBy(
+                        Inventory::getReceiveItemId,
+                        Collectors.groupingBy(
+                                inventory -> itemCountMap.get(inventory.getReceiveItemId()),
+                                Collectors.toList()
+                        )
+                ));
     }
 }

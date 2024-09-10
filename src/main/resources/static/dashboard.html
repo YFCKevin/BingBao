@@ -80,6 +80,12 @@
 							  <p>食材模板</p>
 							</a>
 						</li>
+						<li class="nav-item">
+							<a href="shopping-list.html">
+								<i class="fas fa-shopping-basket"></i>
+								<p>回購清單</p>
+							</a>
+						</li>
 						<li class="nav-section">
 							<span class="sidebar-mini-icon">
 								<i class="fa fa-ellipsis-h"></i>
@@ -229,11 +235,13 @@
 																	<div class="d-flex flex-column flex-md-row align-items-start">
 																		<select class="form-select form-control" x-model="todayStorePlace" x-on:change="todayProductSearch()">
 																			<option value="">請選擇存放位置</option>
+																			<option value="HUALIEN_ALL">花蓮全部</option>
 																			<option value="HUALIEN_REF_2F_LEFT">花蓮2樓左側冰箱</option>
 																			<option value="HUALIEN_REF_2F_RIGHT">花蓮2樓右側冰箱</option>
 																			<option value="HUALIEN_REF_1F_RIGHT">花蓮1樓冰箱</option>
+																			<option value="HUALIEN_OTHER">花蓮其他</option>
 																			<option value="TAIPEI_REF">台北冰箱</option>
-																			<option value="OTHER">其他</option>
+																			<option value="TAIPEI_OTHER">台北其他</option>
 																		</select>
 																	</div>
 																</div>
@@ -270,6 +278,9 @@
 																				<td>
 																					<button @click="openAmountModal(item.receiveItemId, item.totalAmount)" type="button" data-bs-toggle="tooltip" title="登錄使用數量" class="btn btn-link btn-primary">
 																						<i class="fas fa-edit fs-4"></i>
+																					</button>
+																					<button @click="openPlaceModal(item.receiveItemId, item.storePlaceLabel)" type="button" data-bs-toggle="tooltip" title="變更存放位置" class="btn btn-link btn-primary">
+																						<i class="fas fa-map-marker fs-4"></i>
 																					</button>
 																					<button @click="openDetailModal(item.id)" type="button" data-bs-toggle="tooltip" title="查看庫存食材細節" class="btn btn-link btn-info">
 																						<i class="fas fa-list fs-4"></i>
@@ -405,11 +416,13 @@
 																	<div class="d-flex flex-column flex-md-row align-items-start">
 																		<select class="form-select form-control" x-model="soonStorePlace" x-on:change="soonProductSearch()">
 																			<option value="">請選擇存放位置</option>
+																			<option value="HUALIEN_ALL">花蓮全部</option>
 																			<option value="HUALIEN_REF_2F_LEFT">花蓮2樓左側冰箱</option>
 																			<option value="HUALIEN_REF_2F_RIGHT">花蓮2樓右側冰箱</option>
 																			<option value="HUALIEN_REF_1F_RIGHT">花蓮1樓冰箱</option>
+																			<option value="HUALIEN_OTHER">花蓮其他</option>
 																			<option value="TAIPEI_REF">台北冰箱</option>
-																			<option value="OTHER">其他</option>
+																			<option value="TAIPEI_OTHER">台北其他</option>
 																		</select>
 																	</div>
 																</div>
@@ -448,6 +461,9 @@
 																				<td>
 																					<button @click="openAmountModal(item.receiveItemId, item.totalAmount)" type="button" data-bs-toggle="tooltip" title="登錄使用數量" class="btn btn-link btn-primary">
 																						<i class="fas fa-edit fs-4"></i>
+																					</button>
+																					<button @click="openPlaceModal(item.receiveItemId, item.storePlaceLabel)" type="button" data-bs-toggle="tooltip" title="變更存放位置" class="btn btn-link btn-primary">
+																						<i class="fas fa-map-marker fs-4"></i>
 																					</button>
 																					<button @click="openDetailModal(item.id)" type="button" data-bs-toggle="tooltip" title="查看庫存食材細節" class="btn btn-link btn-info">
 																						<i class="fas fa-list fs-4"></i>
@@ -583,11 +599,13 @@
 																	<div class="d-flex flex-column flex-md-row align-items-start">
 																		<select class="form-select form-control" x-model="validStorePlace" x-on:change="validProductSearch()">
 																			<option value="">請選擇存放位置</option>
+																			<option value="HUALIEN_ALL">花蓮全部</option>
 																			<option value="HUALIEN_REF_2F_LEFT">花蓮2樓左側冰箱</option>
 																			<option value="HUALIEN_REF_2F_RIGHT">花蓮2樓右側冰箱</option>
 																			<option value="HUALIEN_REF_1F_RIGHT">花蓮1樓冰箱</option>
+																			<option value="HUALIEN_OTHER">花蓮其他</option>
 																			<option value="TAIPEI_REF">台北冰箱</option>
-																			<option value="OTHER">其他</option>
+																			<option value="TAIPEI_OTHER">台北其他</option>
 																		</select>
 																	</div>
 																</div>
@@ -628,6 +646,9 @@
 																				<td>
 																					<button @click="openAmountModal(item.receiveItemId, item.totalAmount)" type="button" data-bs-toggle="tooltip" title="登錄使用數量" class="btn btn-link btn-primary">
 																						<i class="fas fa-edit fs-4"></i>
+																					</button>
+																					<button @click="openPlaceModal(item.receiveItemId, item.storePlaceLabel)" type="button" data-bs-toggle="tooltip" title="變更存放位置" class="btn btn-link btn-primary">
+																						<i class="fas fa-map-marker fs-4"></i>
 																					</button>
 																					<button @click="openDetailModal(item.id)" type="button" data-bs-toggle="tooltip" title="查看庫存食材細節" class="btn btn-link btn-info">
 																						<i class="fas fa-list fs-4"></i>
@@ -1179,6 +1200,43 @@
 						}
 				  	});
 				},
+				openPlaceModal(receiveItemId, storePlace) {
+					let _this = this;
+					Swal.fire({
+						title: '變更存放位置',
+						text: '目前存放在：' + storePlace,
+						input: 'select',
+						inputOptions: {
+							'': '請選擇',
+							'HUALIEN_REF_2F_LEFT': '花蓮2樓左側冰箱',
+							'HUALIEN_REF_2F_RIGHT': '花蓮2樓右側冰箱',
+							'HUALIEN_REF_1F_RIGHT': '花蓮1樓冰箱',
+							'HUALIEN_OTHER': '花蓮其他',
+							'TAIPEI_REF': '台北冰箱',
+							'TAIPEI_OTHER': '台北其他'
+						},
+						showCancelButton: true,
+						confirmButtonText: '確認',
+						cancelButtonText: '取消',
+						customClass: {
+							confirmButton: 'btn btn-success',
+							cancelButton: 'btn btn-danger'
+						},
+						preConfirm: (value) => {
+							if (value === '') {  // 如果沒選擇
+								Swal.showValidationMessage('尚未選擇存放位置');  // 顯示錯誤訊息
+								return false;  // 阻止確認提交
+							}
+							return value;  // 返回選擇的值
+						}
+					}).then((result) => {
+						if (result.isConfirmed) {
+							let choseStorePlace = result.value; // 選擇的存放位置
+							_this.targetEditId = receiveItemId;
+							_this.editStorePlaceInventory(choseStorePlace);
+						}
+					});
+				},
 				editAmountInventory(enteredAmount){
 					let _this = this;
 					let data = {};
@@ -1194,6 +1252,57 @@
 								Swal.fire({
 									title: '編輯成功！',
 									text: '請至清單頁查看剩餘數量是否正確',
+									icon: 'success',
+									confirmButtonText: '關閉',
+									customClass: {
+										confirmButton: 'btn btn-success'
+									}
+								}).then((result) => {
+									if (result.isConfirmed) {
+										_this.init();
+									}
+								});
+							} else {
+								Swal.fire({
+									title: '錯誤發生，請聯繫管理員！',
+									text: '',
+									icon: 'error',
+									confirmButtonText: '關閉',
+									customClass: {
+										confirmButton: 'btn btn-danger'
+									}
+								})
+							}
+						},
+						error: function(error) {
+							Swal.fire({
+								title: '系統錯誤，請聯繫管理員！',
+								text: '',
+								icon: 'error',
+								confirmButtonText: '關閉',
+								customClass: {
+									confirmButton: 'btn btn-danger'
+								}
+							})
+							console.error('Error:', error);
+						}
+				  	});
+				},
+				editStorePlaceInventory(choseStorePlace){
+					let _this = this;
+					let data = {};
+					data.receiveItemId = this.targetEditId;
+					data.newStorePlace = choseStorePlace;
+				    $.ajax({
+						url: "editStorePlaceInventory",
+						type: "post",
+						data: JSON.stringify(data),
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								Swal.fire({
+									title: '變更成功！',
+									text: '請至清單頁查看新存放位置是否正確',
 									icon: 'success',
 									confirmButtonText: '關閉',
 									customClass: {

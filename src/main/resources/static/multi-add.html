@@ -91,6 +91,12 @@
 								<p>食材模板</p>
 							</a>
 						</li>
+						<li class="nav-item">
+							<a href="shopping-list.html">
+								<i class="fas fa-shopping-basket"></i>
+								<p>回購清單</p>
+							</a>
+						</li>
 						<li class="nav-section">
 							<span class="sidebar-mini-icon">
 								<i class="fa fa-ellipsis-h"></i>
@@ -299,7 +305,7 @@
 													<label :for="'packageUnit-' + index" class="col-form-label">包裝方式 *</label>
 													<div class="row" style="--bs-gutter-x: 0;">
 														<div class="col-8">
-															<input x-model="item.packageQuantity" type="text" class="form-control" :id="'packageQuantity-' + index" :name="'productDTOList[' + index + '].packageQuantity'" placeholder="填入數量">
+															<input x-model="item.packageQuantity" type="number" class="form-control" :id="'packageQuantity-' + index" :name="'productDTOList[' + index + '].packageQuantity'" placeholder="填入數量">
 														</div>
 														<div class="col-4">
 															<select class="form-select form-control"
@@ -346,6 +352,39 @@
 															min="0"
 															max="365"
 															step="1">
+												</div>
+												<div class="form-group">
+													<div class="d-flex mb-3 align-items-center">
+														<div class="form-label me-2" :for="'addShoppingList-' + index">是否加入回購</div>
+														<div class="form-check form-switch">
+															<input class="form-check-input" type="checkbox" :id="'addShoppingList-' + index" :name="'productDTOList[' + index + '].addShoppingList'" x-model="item.addShoppingList" x-on:change="toggleInventoryAlert($event, index)">
+														</div>
+													</div>
+													<div x-show="item.addShoppingList">
+														<div class="d-flex flex-column align-items-start">
+															<label class="form-label d-block">當數量低於庫存警戒線，</label>
+															<div class="d-flex align-items-center">
+																<label class="form-label">系統自動把食材加入回購清單。</label>
+																<label class="mx-2" x-text="item.alertValue">0</label>
+																<template x-if="item.packageForm == 'COMPLETE'">
+																	<label x-text="packageUnitMap[item.packageUnit]"></label>
+																</template>
+																<template x-if="item.packageForm == 'BULK'">
+																	<label>份</label>
+																</template>
+															</div>
+														</div>
+														<input
+																:id="'inventoryAlert-' + index"
+																:name="'productDTOList[' + index + '].inventoryAlert'"
+																class="form-control"
+																type="number"
+																min="1"
+																max="365"
+																step="1"
+																placeholder="完整包裝填寫包裝數量，散裝直接填寫數量，系統會自動計算總數量"
+																x-model="item.alertValue">
+													</div>
 												</div>
 											</div>
 										</template>
@@ -454,7 +493,8 @@
 							if (response.code == "C000"){
 								_this.tempDetailList = response.data.map(item => ({
 									...item,
-									rangeValue: 0 // 初始值為 0
+									rangeValue: 0, // 初始值為 0
+									alertValue: 1
 								}));
 							}
 						},
@@ -508,6 +548,9 @@
 				setSelectedTab(index) {
 				    this.selectedTab = index;
 				},
+				toggleInventoryAlert(event, index) {
+					this.products[index].addShoppingList = event.target.checked;
+				},
 				loadProducts() {
 					this.products = [];
 
@@ -523,6 +566,8 @@
 						product.packageUnit = pane.find(`[name='productDTOList[${index}].packageUnit']`).val();
 						product.description = pane.find(`[name='productDTOList[${index}].description']`).val();
 						product.overdueNotice = pane.find(`[name='productDTOList[${index}].overdueNotice']`).val();
+						product.addShoppingList = pane.find(`[name='productDTOList[${index}].addShoppingList']`).is(':checked');
+						product.inventoryAlert = pane.find(`[name='productDTOList[${index}].inventoryAlert']`).val();
 						const fileInput = pane.find(`[name='productDTOList[${index}].multipartFile']`)[0];
 						if (fileInput.files.length > 0) {
 							product.multipartFile = fileInput.files[0];
@@ -553,7 +598,7 @@
 
 						// 包裝方式
 						if (product.packageForm === 'COMPLETE') {
-							if (product.packageQuantity.trim() === '' || product.packageQuantity.trim() == 0) {
+							if (product.packageQuantity.trim() === '' || product.packageQuantity.trim() == 0 || isNaN(product.packageQuantity)) {
 								$(`[name='productDTOList[${index}].packageQuantity']`).closest('.col-8').addClass('has-error');
 								hasError = true;
 								changeNavLinkCss(index);
@@ -561,6 +606,15 @@
 
 							if (product.packageUnit.trim() === '') {
 								$(`[name='productDTOList[${index}].packageUnit']`).closest('.col-4').addClass('has-error');
+								hasError = true;
+								changeNavLinkCss(index);
+							}
+						}
+
+						//回購
+						if (product.addShoppingList == true){
+							if (product.inventoryAlert.trim() === '' || product.inventoryAlert.trim() == 0 || isNaN(product.inventoryAlert)){
+								$(`[name='productDTOList[${index}].inventoryAlert']`).closest('div').addClass('has-error');
 								hasError = true;
 								changeNavLinkCss(index);
 							}
@@ -584,6 +638,10 @@
 						}
 						formData.append(`productDTOList[${index}].description`, product.description);
 						formData.append(`productDTOList[${index}].overdueNotice`, product.overdueNotice);
+						formData.append(`productDTOList[${index}].addShoppingList`, product.addShoppingList ? 'true' : 'false');
+						if (product.addShoppingList == true){
+							formData.append(`productDTOList[${index}].inventoryAlert`, product.inventoryAlert);
+						}
 
 						if (product.multipartFile) {
 							formData.append(`productDTOList[${index}].multipartFile`, product.multipartFile);

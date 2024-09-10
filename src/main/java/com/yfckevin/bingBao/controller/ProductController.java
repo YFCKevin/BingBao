@@ -99,7 +99,7 @@ public class ProductController {
             product.setCoverName(fileName);
         }
 
-//        product.setCreator(member.getName());
+        product.setCreator(member.getName());
         product.setName(dto.getName());
         product.setCreationDate(sdf.format(new Date()));
         product.setPackageForm(dto.getPackageForm());
@@ -114,6 +114,8 @@ public class ProductController {
         product.setPrice(dto.getPrice());
         product.setSerialNumber(SNUtil.generateSerialNumber());
         product.setPackageNumber(packageNumber);
+        product.setAddShoppingList(dto.isAddShoppingList());
+        product.setInventoryAlert(dto.getInventoryAlert());
 
         final Product savedProduct = productService.save(product);
 
@@ -156,9 +158,11 @@ public class ProductController {
             product.setMainCategory(dto.getMainCategory());
             product.setSubCategory(dto.getSubCategory());
             product.setModificationDate(sdf.format(new Date()));
-//            product.setModifier(member.getName());
+            product.setModifier(member.getName());
             product.setDescription(dto.getDescription());
             product.setPackageForm(dto.getPackageForm());
+            product.setAddShoppingList(dto.isAddShoppingList());
+            product.setInventoryAlert(dto.getInventoryAlert());
 
             final MultipartFile nameFile = dto.getMultipartFile();
             if (nameFile != null && !nameFile.isEmpty() && nameFile.getSize() != 0) {   //更新圖片
@@ -247,7 +251,7 @@ public class ProductController {
                 if (tempMaster != null) {
                     tempMaster.setCreationDate(sdf.format(new Date()));
                     tempMaster.setCoverName(fileName);
-//                tempMaster.setCreator(member.getName());
+                    tempMaster.setCreator(member.getName());
                     final TempMaster savedTempMaster = tempMasterService.save(tempMaster);
                     resultStatus.setCode("C000");
                     resultStatus.setMessage("成功");
@@ -316,7 +320,7 @@ public class ProductController {
                 product.setCoverName(fileName);
             }
 
-//            product.setCreator(member.getName());
+            product.setCreator(member.getName());
             product.setName(dto.getName());
             product.setCreationDate(sdf.format(new Date()));
             product.setPackageForm(dto.getPackageForm());
@@ -331,6 +335,8 @@ public class ProductController {
             product.setPrice(dto.getPrice());
             product.setSerialNumber(SNUtil.generateSerialNumber());
             product.setPackageNumber(packageNumber);
+            product.setAddShoppingList(dto.isAddShoppingList());
+            product.setInventoryAlert(dto.getInventoryAlert());
             productList.add(product);
         }
         List<Product> savedProductList = productService.saveAll(productList);
@@ -637,6 +643,8 @@ public class ProductController {
         dto.setId(product.getId());
         dto.setCoverPath(product.getCoverName() == null ? "images/fridge002.jpg" : configProperties.picShowPath + product.getCoverName());
         dto.setPackageNumber(product.getPackageNumber());
+        dto.setAddShoppingList(product.isAddShoppingList());
+        dto.setInventoryAlert(product.getInventoryAlert());
         return dto;
     }
 

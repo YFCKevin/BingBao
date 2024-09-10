@@ -21,6 +21,8 @@ public class Product {
     private String packageQuantity;     //包裝數量
     private String overdueNotice;   //通知過期天數
     private String packageNumber;   //批次建檔編號
+    private boolean addShoppingList;    //是否加入購物清單
+    private String inventoryAlert;  //通知購物的庫存量警報
     private String creationDate;
     private String modificationDate;
     private String deletionDate;
@@ -179,5 +181,21 @@ public class Product {
 
     public void setSubCategory(SubCategory subCategory) {
         this.subCategory = subCategory;
+    }
+
+    public boolean isAddShoppingList() {
+        return addShoppingList;
+    }
+
+    public void setAddShoppingList(boolean addShoppingList) {
+        this.addShoppingList = addShoppingList;
+    }
+
+    public String getInventoryAlert() {
+        return inventoryAlert;
+    }
+
+    public void setInventoryAlert(String inventoryAlert) {
+        this.inventoryAlert = inventoryAlert;
     }
 }

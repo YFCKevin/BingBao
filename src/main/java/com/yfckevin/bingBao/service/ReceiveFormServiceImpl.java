@@ -93,4 +93,9 @@ public class ReceiveFormServiceImpl implements ReceiveFormService{
         AggregationResults<ReceiveForm> results = mongoTemplate.aggregate(aggregation, "receive_form", ReceiveForm.class);
         return results.getMappedResults();
     }
+
+    @Override
+    public List<ReceiveForm> findByIdIn(List<String> receiveFormIds) {
+        return receiveFormRepository.findByIdIn(receiveFormIds);
+    }
 }

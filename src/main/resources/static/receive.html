@@ -80,6 +80,12 @@
 								<p>食材模板</p>
 							</a>
 						</li>
+						<li class="nav-item">
+							<a href="shopping-list.html">
+								<i class="fas fa-shopping-basket"></i>
+								<p>回購清單</p>
+							</a>
+						</li>
 						<li class="nav-section">
 							<span class="sidebar-mini-icon">
 								<i class="fa fa-ellipsis-h"></i>
@@ -646,12 +652,13 @@
 											</td>
 											<td>
 												<select class="form-select" x-on:input="updateStorePlace(index, $event.target.value)">
-													<option value="">請選擇</option>
+													<option value="">請選擇存放位置</option>
 													<option value="HUALIEN_REF_2F_LEFT">花蓮2樓左側冰箱</option>
 													<option value="HUALIEN_REF_2F_RIGHT">花蓮2樓右側冰箱</option>
 													<option value="HUALIEN_REF_1F_RIGHT">花蓮1樓冰箱</option>
+													<option value="HUALIEN_OTHER">花蓮其他</option>
 													<option value="TAIPEI_REF">台北冰箱</option>
-													<option value="OTHER">其他</option>
+													<option value="TAIPEI_OTHER">台北其他</option>
 												</select>
 											</td>
 										</tr>

@@ -41,7 +41,7 @@ public class OpenAiServiceImpl implements OpenAiService{
             "subCategory：食材次種類，如果主種類是MEAT，則再從BEEF,PORK,CHICKEN選定一種。如果主種類是SEAFOOD，則再從FISH,SHRIMP選定一種。如果不是NEAT和SEAFOOD，則沒有subCategory屬性\n" +
             "packageUnit：食材包裝形式，限定其中一種EACH,BOX,PACK,BOTTLE,BAG,BARREL,CASE,CAN,BUNDLE,STRIP,PORTION\n" +
             "description：食材的介紹與描述，字數落在100-120字\n" +
-            "packageQuantity：內容物數量，從食材清單分析內容物有多少，以字串表示數字\n" +
+            "packageQuantity：內容物數量，從食材清單分析內容物有多少，限定阿拉伯數字\n" +
             "2.每份食材清單可能包含多個食材資訊，必須分開成獨立的JSON物件。\n" +
             "3.確保只匯出json格式";
 

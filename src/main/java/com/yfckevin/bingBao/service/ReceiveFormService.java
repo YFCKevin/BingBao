@@ -14,4 +14,6 @@ public interface ReceiveFormService {
     List<ReceiveForm> findAllByDeletionDateIsNullOrderByCreationDateDesc();
 
     List<ReceiveForm> findReceiveFormByCondition(SearchDTO searchDTO);
+
+    List<ReceiveForm> findByIdIn(List<String> receiveFormIds);
 }

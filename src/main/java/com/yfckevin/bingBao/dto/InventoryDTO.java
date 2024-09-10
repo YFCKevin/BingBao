@@ -31,6 +31,7 @@ public class InventoryDTO {
     private String noticeDate;  //預計何時通知(包含實際通知的年月日)
     private String totalAmount; //食材庫存總數
     private String coverPath;    //食材圖路徑(前端呈現用)
+    private boolean addShoppingList;    //庫存是否放進回購清單，用來避免重複加入
     private String creationDate;
     private String modificationDate;
     private String deletionDate;
@@ -301,6 +302,14 @@ public class InventoryDTO {
         this.subCategoryLabel = subCategoryLabel;
     }
 
+    public boolean isAddShoppingList() {
+        return addShoppingList;
+    }
+
+    public void setAddShoppingList(boolean addShoppingList) {
+        this.addShoppingList = addShoppingList;
+    }
+
     @Override
     public String toString() {
         return "InventoryDTO{" +
@@ -332,6 +341,7 @@ public class InventoryDTO {
                 ", noticeDate='" + noticeDate + '\'' +
                 ", totalAmount='" + totalAmount + '\'' +
                 ", coverPath='" + coverPath + '\'' +
+                ", addShoppingList=" + addShoppingList +
                 ", creationDate='" + creationDate + '\'' +
                 ", modificationDate='" + modificationDate + '\'' +
                 ", deletionDate='" + deletionDate + '\'' +

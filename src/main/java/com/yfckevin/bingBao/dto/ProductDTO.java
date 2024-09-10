@@ -25,6 +25,8 @@ public class ProductDTO {
     private String shelfLife;   //保質天數
     private String overdueNotice;   //通知過期天數
     private String packageNumber;   //批次建檔編號
+    private boolean addShoppingList;    //是否加入購物清單
+    private String inventoryAlert;  //通知購物的庫存量警報
     private String creationDate;
     private String modificationDate;
     private String deletionDate;
@@ -230,6 +232,22 @@ public class ProductDTO {
         this.shelfLife = shelfLife;
     }
 
+    public boolean isAddShoppingList() {
+        return addShoppingList;
+    }
+
+    public void setAddShoppingList(boolean addShoppingList) {
+        this.addShoppingList = addShoppingList;
+    }
+
+    public String getInventoryAlert() {
+        return inventoryAlert;
+    }
+
+    public void setInventoryAlert(String inventoryAlert) {
+        this.inventoryAlert = inventoryAlert;
+    }
+
     @Override
     public String toString() {
         return "ProductDTO{" +
@@ -253,6 +271,8 @@ public class ProductDTO {
                 ", shelfLife='" + shelfLife + '\'' +
                 ", overdueNotice='" + overdueNotice + '\'' +
                 ", packageNumber='" + packageNumber + '\'' +
+                ", addShoppingList=" + addShoppingList +
+                ", inventoryAlert='" + inventoryAlert + '\'' +
                 ", creationDate='" + creationDate + '\'' +
                 ", modificationDate='" + modificationDate + '\'' +
                 ", deletionDate='" + deletionDate + '\'' +
