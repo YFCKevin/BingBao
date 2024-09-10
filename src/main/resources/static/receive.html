@@ -400,11 +400,11 @@
 																			<tr role="row" class="odd">
 																				<td>
 																					<div class="d-flex align-items-center">
-																						<div class="form-check form-switch">
-																							<input class="form-check-input" type="checkbox" id="toggleAll" x-model="item.allSelected" x-on:change="toggleSelectAll($event, index)">
+																						<div class="form-check form-switch" style="padding: 10px; font-size: 20px;">
+																							<input style="border: 2px solid #6861ce;" class="form-check-input" type="checkbox" id="toggleAll" x-model="item.allSelected" x-on:change="toggleSelectAll($event, index)">
 																						</div>
 																						<button @click="toggleCollapse(index)" type="button" data-bs-toggle="tooltip" title="查看細節" class="btn btn-link btn-primary">
-																							<i class="fas fa-angle-double-down"></i>
+																							<i class="fas fa-angle-double-down fs-4"></i>
 																						</button>
 																					</div>
 																				</td>
@@ -429,8 +429,8 @@
 																								<template x-for="product in item.products" :key="product.id">
 																									<tr role="row" class="odd">
 																										<td class="text-center">
-																											<div class="form-check form-switch d-inline-block">
-																												<input class="form-check-input" :value="product.id" type="checkbox" x-model="product.selected" x-on:change="update($event, index)">
+																											<div class="form-check form-switch d-inline-block" style="padding: 8px; font-size: 16px;">
+																												<input style="border: 2px solid #6861ce;" class="form-check-input" :value="product.id" type="checkbox" x-model="product.selected" x-on:change="update($event, index)">
 																											</div>
 																										</td>
 																										<td x-html="product.name"></td>
