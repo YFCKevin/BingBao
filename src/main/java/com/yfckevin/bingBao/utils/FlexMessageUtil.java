@@ -118,7 +118,7 @@ public class FlexMessageUtil {
             // Actions
             List<Map<String, Object>> actions = new ArrayList<>();
 
-            // 的action
+            // 前往冰箱清單的action
             Map<String, Object> viewDetailAction = new HashMap<>();
             viewDetailAction.put("type", "uri");
             viewDetailAction.put("label", "前往冰箱清單");
@@ -221,10 +221,38 @@ public class FlexMessageUtil {
         expiryDateText.put("wrap", true);
         mainBoxContents.add(expiryDateText);
 
-        // 分隔線
+        // 新增分隔線
+        Map<String, Object> dateSeparator = new HashMap<>();
+        dateSeparator.put("type", "separator");
+        dateSeparator.put("margin", "md");
+        mainBoxContents.add(dateSeparator);
+
+        // 品項和剩餘數量的標題
+        Map<String, Object> headerBox = new HashMap<>();
+        headerBox.put("type", "box");
+        headerBox.put("layout", "horizontal");
+
+        Map<String, Object> nameHeaderText = new HashMap<>();
+        nameHeaderText.put("type", "text");
+        nameHeaderText.put("text", "品項");
+        nameHeaderText.put("size", "sm");
+        nameHeaderText.put("color", "#111111");
+        nameHeaderText.put("flex", 0);
+
+        Map<String, Object> amountHeaderText = new HashMap<>();
+        amountHeaderText.put("type", "text");
+        amountHeaderText.put("text", "剩餘數量");
+        amountHeaderText.put("size", "sm");
+        amountHeaderText.put("color", "#111111");
+        amountHeaderText.put("align", "end");
+
+        headerBox.put("contents", Arrays.asList(nameHeaderText, amountHeaderText));
+        mainBoxContents.add(headerBox);
+
+        // 再新增一個分隔線
         Map<String, Object> separator = new HashMap<>();
         separator.put("type", "separator");
-        separator.put("margin", "xxl");
+        separator.put("margin", "md");
         mainBoxContents.add(separator);
 
         // 每個 "冰箱" 和食材的內容
@@ -236,6 +264,7 @@ public class FlexMessageUtil {
             Map<String, Object> fridgeTitleBox = new HashMap<>();
             fridgeTitleBox.put("type", "box");
             fridgeTitleBox.put("layout", "vertical");
+            fridgeTitleBox.put("margin", "md");
 
             Map<String, Object> fridgeTitleText = new HashMap<>();
             fridgeTitleText.put("type", "text");
@@ -247,28 +276,6 @@ public class FlexMessageUtil {
 
             fridgeTitleBox.put("contents", Collections.singletonList(fridgeTitleText));
             mainBoxContents.add(fridgeTitleBox);
-
-            // 名稱和剩餘數量的標題
-            Map<String, Object> headerBox = new HashMap<>();
-            headerBox.put("type", "box");
-            headerBox.put("layout", "horizontal");
-
-            Map<String, Object> nameHeaderText = new HashMap<>();
-            nameHeaderText.put("type", "text");
-            nameHeaderText.put("text", "名稱");
-            nameHeaderText.put("size", "sm");
-            nameHeaderText.put("color", "#111111");
-            nameHeaderText.put("flex", 0);
-
-            Map<String, Object> amountHeaderText = new HashMap<>();
-            amountHeaderText.put("type", "text");
-            amountHeaderText.put("text", "剩餘數量");
-            amountHeaderText.put("size", "sm");
-            amountHeaderText.put("color", "#111111");
-            amountHeaderText.put("align", "end");
-
-            headerBox.put("contents", Arrays.asList(nameHeaderText, amountHeaderText));
-            mainBoxContents.add(headerBox);
 
             // 食材資訊
             for (InventoryDTO inventoryDTO : finalInventoryList) {
