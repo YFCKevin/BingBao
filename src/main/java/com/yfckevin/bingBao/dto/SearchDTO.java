@@ -7,6 +7,7 @@ public class SearchDTO {
     private String supplierName;
     private String mainCategory;
     private String subCategory;
+    private String priority;
     private String type;    // today, soon, valid
     private String storePlace;
 
@@ -72,5 +73,13 @@ public class SearchDTO {
 
     public void setStorePlace(String storePlace) {
         this.storePlace = storePlace;
+    }
+
+    public String getPriority() {
+        return priority;
+    }
+
+    public void setPriority(String priority) {
+        this.priority = priority;
     }
 }

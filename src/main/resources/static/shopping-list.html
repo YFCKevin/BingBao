@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-TW" xmlns:x-on="http://www.w3.org/1999/xhtml">
+<html lang="zh-TW" xmlns:x-on="http://www.w3.org/1999/xhtml" xmlns:x-bind="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -194,7 +194,7 @@
                     <div class="card">
                         <div class="card-header">
                             <div class="d-flex align-items-center">
-                                <h4 class="card-title">食材模板</h4>
+                                <h4 class="card-title">回購清單</h4>
                             </div>
                         </div>
                         <div class="card-body">
@@ -203,9 +203,16 @@
                                     <div class="row">
                                         <div class="col-sm-12 col-md-6">
                                             <div id="select-product_filter_today" class="mb-3">
-                                                <input x-on:keydown.enter="productSearch()" id="productKeyword" type="search" class="form-control" placeholder="可搜尋食材名稱" aria-controls="add-row">
+                                                <input x-on:keydown.enter="shoppingListSearch()" id="shoppingListKeyword" type="search" class="form-control" placeholder="可搜尋食材名稱、供應商名稱" aria-controls="add-row">
                                             </div>
                                             <div class="d-flex flex-column flex-md-row align-items-start mb-3">
+                                                <select class="form-select form-control" x-model="priority" x-on:change="shoppingListSearch()">
+                                                    <option value="">請選擇優先級別</option>
+                                                    <option value="URGENT">緊急</option>
+                                                    <option value="NORMAL">普通</option>
+                                                </select>
+                                            </div>
+                                            <div class="d-flex flex-column flex-md-row align-items-start">
                                                 <select class="form-select form-control me-2 mb-2 mb-md-0" x-model="selectedCategory" x-on:change="categoryChange()">
                                                     <option value="">請選擇主分類</option>
                                                     <option value="MEAT">肉品</option>
@@ -226,12 +233,12 @@
                                                     <option value="HEALTH_FOOD">保健食品</option>
                                                 </select>
                                                 <template x-if="selectedCategory !== 'MEAT' && selectedCategory !== 'SEAFOOD'">
-                                                    <select class="form-select form-control" x-model="selectedSubCategory" disabled x-on:change="productSearch()">
+                                                    <select class="form-select form-control" x-model="selectedSubCategory" disabled x-on:change="shoppingListSearch()">
                                                         <option value="">-</option>
                                                     </select>
                                                 </template>
                                                 <template x-if="selectedCategory === 'MEAT'">
-                                                    <select class="form-select form-control" x-model="selectedSubCategory" x-on:change="productSearch()">
+                                                    <select class="form-select form-control" x-model="selectedSubCategory" x-on:change="shoppingListSearch()">
                                                         <option value="">請選擇副分類</option>
                                                         <option value="BEEF">牛肉</option>
                                                         <option value="PORK">豬肉</option>
@@ -240,7 +247,7 @@
                                                     </select>
                                                 </template>
                                                 <template x-if="selectedCategory === 'SEAFOOD'">
-                                                    <select class="form-select form-control" x-model="selectedSubCategory" x-on:change="productSearch()">
+                                                    <select class="form-select form-control" x-model="selectedSubCategory" x-on:change="shoppingListSearch()">
                                                         <option value="">請選擇副分類</option>
                                                         <option value="FISH">魚</option>
                                                         <option value="SHRIMP">蝦</option>
@@ -252,11 +259,22 @@
                                             <div class="d-flex flex-column align-items-end">
                                                 <div class="d-flex align-items-center mb-2">
                                                     <i class="fas fa-edit fs-5"></i>
-                                                    <span class="ms-2 text-muted">：編輯食材模板</span>
+                                                    <span class="ms-2 text-muted">：變更回購數量</span>
+                                                </div>
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <i class="fas fa-tags fs-5"></i>
+                                                    <span class="ms-2 text-muted">：變更優先級別</span>
+                                                </div>
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <i class="far fa-check-circle fs-5"></i>
+                                                    <span class="ms-2 text-muted">：是否完成購買</span>
+                                                </div>
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <i class="fas fa-trash-alt fs-5"></i>
+                                                    <span class="ms-2 text-muted">：刪除回購食材</span>
                                                 </div>
                                                 <div class="d-flex align-items-center">
-                                                    <i class="fas fa-trash-alt fs-5"></i>
-                                                    <span class="ms-2 text-muted">：丟棄食材模板</span>
+                                                    <span class="ms-2 text-muted">名稱字體加大和粗體表示為「緊急」</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -266,11 +284,11 @@
                                                 <tr role="row">
                                                     <th>照片</th>
                                                     <th>名稱</th>
+                                                    <th>採購總數</th>
+                                                    <th>供應商</th>
                                                     <th>包裝類型</th>
                                                     <th>包裝方式</th>
                                                     <th>食材分類</th>
-                                                    <th>距離<br>有效期限前<br>多久通知<br>(天)</th>
-                                                    <th>是否回購<br>(警戒庫存量)</th>
                                                     <th>建檔日期</th>
                                                     <th>動作</th>
                                                 </tr>
@@ -281,7 +299,15 @@
                                                         <td>
                                                             <img :src="item.coverPath" style="width: 75px; height: 75px; border-radius: 10%;">
                                                         </td>
-                                                        <td x-text="item.name"></td>
+                                                        <td x-show="item.priorityType == 'URGENT'" x-text="item.name" style="font-weight: bold; font-size: 1.2rem;"></td>
+                                                        <td x-show="item.priorityType == 'NORMAL'" x-text="item.name"></td>
+                                                        <td x-text="item.totalAmount"></td>
+                                                        <td x-show="item.supplier != null">
+                                                            <span x-text="item.supplierName"></span>
+                                                        </td>
+                                                        <td x-show="item.supplier == null" class="text-center">
+                                                            <span>-</span>
+                                                        </td>
                                                         <td x-text="item.packageFormLabel"></td>
                                                         <td x-show="item.packageForm == 'COMPLETE'">
                                                             <span>每</span>
@@ -305,31 +331,19 @@
                                                         <td x-show="item.mainCategory !== 'MEAT' && item.mainCategory !== 'SEAFOOD'">
                                                             <span x-text="item.mainCategoryLabel"></span>
                                                         </td>
-                                                        <td x-text="item.overdueNotice"></td>
-                                                        <td x-show="item.addShoppingList && item.packageForm == 'COMPLETE'">
-                                                            <i class="fas fa-check fs-6"></i>
-                                                            <span>(</span>
-                                                            <span x-text="item.inventoryAlert"></span>
-                                                            <span x-text="item.packageUnitLabel"></span>
-                                                            <span>)</span>
-                                                        </td>
-                                                        <td x-show="item.addShoppingList && item.packageForm == 'BULK'">
-                                                            <i class="fas fa-check fs-6"></i>
-                                                            <span>(</span>
-                                                            <span x-text="item.inventoryAlert"></span>
-                                                            <span>份</span>
-                                                            <span>)</span>
-                                                        </td>
-                                                        <td x-show="!item.addShoppingList">
-                                                            <i class="fas fa-times fs-6"></i>
-                                                        </td>
                                                         <td x-text="item.creationDate"></td>
                                                         <td>
                                                             <div class="form-button-action d-flex gap-2 flex-wrap">
-                                                                <button @click="openEditModal(item.id)" type="button" data-bs-toggle="tooltip" title="編輯食材模板" class="btn btn-link btn-primary">
+                                                                <button @click="openEditModal(item.id, item.totalAmount, item.purchaseQuantity, item.packageForm, item.packageQuantity, item.packageUnitLabel)" type="button" data-bs-toggle="tooltip" title="變更回購數量" class="btn btn-link btn-primary">
                                                                     <i class="fas fa-edit fs-4"></i>
                                                                 </button>
-                                                                <button @click="openDeleteModal(item.id)" type="button" data-bs-toggle="tooltip" title="丟棄食材模板" class="btn btn-link btn-danger">
+                                                                <button @click="openPriorityModal(item.id, item.priorityType, item.name)" type="button" data-bs-toggle="tooltip" title="變更優先級別" class="btn btn-link btn-warning">
+                                                                    <i class="fas fa-tags fs-4"></i>
+                                                                </button>
+                                                                <button @click="openPurchaseModal(item.id, item.name)" type="button" data-bs-toggle="tooltip" title="是否完成購買" class="btn btn-link btn-success">
+                                                                    <i class="far fa-check-circle fs-4"></i>
+                                                                </button>
+                                                                <button @click="openDeleteModal(item.id)" type="button" data-bs-toggle="tooltip" title="刪除回購食材" class="btn btn-link btn-danger">
                                                                     <i class="fas fa-trash-alt fs-4"></i>
                                                                 </button>
                                                             </div>
@@ -431,212 +445,6 @@
 
 </div>
 
-<!--editModal-->
-<div class="modal fade" id="editModal" tabindex="-1" data-bs-backdrop="static" aria-labelledby="editModal" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="model-title fs-4 fw-bold">編輯</div>
-            </div>
-            <div class="modal-body pb-0">
-                <div class="d-flex">
-                    <div class="flex-1 pt-1 ms-2">
-                        <div class="form-group">
-                            <label for="name">物品名稱 *</label>
-                            <div class="d-flex justify-content-center align-items-center">
-                                <input x-model="name" type="text" id="name" name="name" placeholder="物品名稱" class="form-control">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="image">照片</label>
-                            <div class="selectgroup selectgroup-secondary selectgroup-pills">
-                                <label class="selectgroup-item">
-                                    <input
-                                            type="file"
-                                            id="image"
-                                            class="selectgroup-input d-none"
-                                            accept="image/*"
-                                            name="multipartFile"
-                                            x-on:change="selectImage($event)">
-                                    <span :class="{'selectgroup-button selectgroup-button-icon': true, 'selected': hasImage}">
-                                        <i class="fas fa-image"></i>
-                                    </span>
-                                </label>
-                            </div>
-                            <div class="image-container mt-2">
-                                <img x-show="hasImage" :src="imageSrc" alt="照片呈現" style="width: 100px; height: 100px; object-fit: cover; border-radius: 10%;">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="mainCategory">食材分類 *</label>
-                            <div class="d-flex">
-                                <select class="form-select form-control me-2"
-                                        id="mainCategory"
-                                        name="mainCategory"
-                                        x-model="mainCategory">
-                                    <option value="">請選擇</option>
-                                    <option value="MEAT">肉品</option>
-                                    <option value="SEAFOOD">海鮮</option>
-                                    <option value="VEGETABLES">青菜</option>
-                                    <option value="FRUITS">水果</option>
-                                    <option value="GRAINS">穀物</option>
-                                    <option value="BEVERAGES">飲料</option>
-                                    <option value="CONDIMENTS">醬料</option>
-                                    <option value="SNACKS">零食</option>
-                                    <option value="BAKERY">烘焙食品</option>
-                                    <option value="MEDICINE">藥品</option>
-                                    <option value="CANNED_FOOD">罐頭食品</option>
-                                    <option value="SPICES">香料</option>
-                                    <option value="OILS">食用油</option>
-                                    <option value="SWEETS">甜品</option>
-                                    <option value="DRIED_FOOD">乾貨</option>
-                                    <option value="HEALTH_FOOD">保健食品</option>
-                                </select>
-                                <template x-if="mainCategory === 'MEAT'">
-                                    <select class="form-select form-control"
-                                            name="subCategory"
-                                            x-model="subCategory">
-                                        <option value="">請選擇</option>
-                                        <option value="BEEF">牛肉</option>
-                                        <option value="PORK">豬肉</option>
-                                        <option value="CHICKEN">雞肉</option>
-                                        <option value="EGG">雞蛋</option>
-                                    </select>
-                                </template>
-                                <template x-if="mainCategory === 'SEAFOOD'">
-                                    <select class="form-select form-control"
-                                            name="subCategory"
-                                            x-model="subCategory">
-                                        <option value="">請選擇</option>
-                                        <option value="FISH">魚</option>
-                                        <option value="SHRIMP">蝦</option>
-                                    </select>
-                                </template>
-                                <template x-if="mainCategory !== 'MEAT' && mainCategory !== 'SEAFOOD'">
-                                    <select class="form-select form-control"
-                                            name="subCategory"
-                                            x-model="subCategory">
-                                        <option value="">-</option>
-                                    </select>
-                                </template>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="packageForm">包裝類型 *</label>
-                            <div id="packageForm" class="d-flex">
-                                <div class="form-check me-2">
-                                    <input x-model="packageForm" class="form-check-input" type="radio" name="completePackage" value="COMPLETE" id="completePackage">
-                                    <label class="form-check-label" for="completePackage">
-                                        完整包裝
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input x-model="packageForm" class="form-check-input" type="radio" name="bulkPackage" value="BULK" id="bulkPackage">
-                                    <label class="form-check-label" for="bulkPackage">
-                                        散裝
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group" x-show="packageForm === 'COMPLETE'">
-                            <label for="packageUnit" class="col-form-label">包裝方式 *</label>
-                            <div class="row" style="--bs-gutter-x: 0;">
-                                <div class="col-8">
-                                    <input x-model="packageQuantity" type="number" class="form-control" id="packageQuantity" name="packageQuantity" placeholder="填入數量">
-                                </div>
-                                <div class="col-4">
-                                    <select class="form-select form-control"
-                                            id="packageUnit"
-                                            name="packageUnit"
-                                            x-model="packageUnit">
-                                        <option value="">請選擇</option>
-                                        <option value="EACH">個</option>
-                                        <option value="BOX">箱</option>
-                                        <option value="PACK">包</option>
-                                        <option value="BOTTLE">瓶</option>
-                                        <option value="BAG">袋</option>
-                                        <option value="BARREL">桶</option>
-                                        <option value="CASE">盒</option>
-                                        <option value="CAN">罐</option>
-                                        <option value="BUNDLE">捆</option>
-                                        <option value="STRIP">條</option>
-                                        <option value="PORTION">份</option>
-                                    </select>
-                                </div>
-                                <div class="mt-3">
-                                    <i class="far fa-hand-point-right me-2 ps-3"></i>
-                                    每<span class="fw-bold" x-text="packageUnitMap[packageUnit]"></span>有<span class="fw-bold" x-text="packageQuantity"></span>份
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="description">食材描述備註</label>
-                            <textarea x-model="description" name="description" class="form-control" id="description" rows="5"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label d-block">快過期了</label>
-                            <div class="d-flex align-items-center">
-                                <label class="form-label">臨近有效日期幾天，提醒您即將過期？</label>
-                                <label class="mx-2" x-text="rangeValue">0</label>
-                                <label>天</label>
-                            </div>
-                            <input
-                                    id="overdueNotice"
-                                    name="overdueNotice"
-                                    class="form-range"
-                                    type="range"
-                                    min="0"
-                                    max="365"
-                                    step="1"
-                                    x-model="rangeValue">
-                        </div>
-                        <div class="form-group">
-                            <div class="d-flex mb-3 align-items-center">
-                                <div class="form-label me-2" for="addShoppingList">是否加入回購</div>
-                                <div class="form-check form-switch" style="padding: 10px; font-size: 20px;">
-                                    <input style="border: 2px solid #6861ce;" class="form-check-input" type="checkbox" id="addShoppingList" x-model="addShoppingList" x-on:change="toggleInventoryAlert($event)">
-                                </div>
-                            </div>
-                            <div x-show="addShoppingList">
-                                <div class="d-flex flex-column align-items-start">
-                                    <label class="form-label d-block">當數量低於庫存警戒線，</label>
-                                    <div class="d-flex align-items-center">
-                                        <label class="form-label">系統自動把食材加入回購清單。</label>
-                                        <label class="mx-2" x-text="alertValue">0</label>
-                                        <template x-if="packageForm == 'COMPLETE'">
-                                            <label x-text="packageUnitMap[packageUnit]"></label>
-                                        </template>
-                                        <template x-if="packageForm == 'BULK'">
-                                            <label>份</label>
-                                        </template>
-                                    </div>
-                                </div>
-
-                                <input
-                                        id="inventoryAlert"
-                                        name="inventoryAlert"
-                                        class="form-control"
-                                        type="number"
-                                        min="1"
-                                        max="365"
-                                        step="1"
-                                        placeholder="完整包裝填寫包裝數量，散裝直接填寫數量，系統會自動計算總數量"
-                                        x-model="alertValue">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="separator-dashed"></div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button x-on:click="editProduct()" type="button" class="btn btn-success">儲存</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
 <!--   Core JS Files   -->
 <script src="js/jquery-3.7.1.min.js"></script>
 <script src="js/popper.min.js"></script>
@@ -670,30 +478,16 @@
 				pageNumber: 0,
 				size: 10,
 				total: "",
-				productList: [],
+				hasImage: false,
+				imageSrc: '',
+				shoppingList: [],
 				todayListLabel: [],
 				shoppingListLabel: [],
 				targetDeleteId: "",
 				targetEditId: "",
-				imageSrc: '',
-                hasImage: false,
                 selectedCategory: "",
 				selectedSubCategory: "",
-                //for edit product
-                name: '',
-                imageSrc: '',
-                hasImage: false,
-                mainCategory: '',
-                subCategory: '',
-                packageForm: '',
-                packageQuantity: '',
-                packageUnit: '',
-                description: '',
-                rangeValue: 0,
-                multipartFile: null,
-                alertValue: 1,
-                inventoryAlert: '',
-                addShoppingList: false,
+				priority: "",
 				packageUnitMap: {
 					"EACH": "個",
 					"BOX": "箱",
@@ -711,17 +505,13 @@
 				init(){
 					let _this = this;
 				    $.ajax({
-						url: "myProducts",
-						type: "get",
+						url: "shoppingItemSearch",
+						type: "post",
+						data: JSON.stringify({'keyword': ''}),
 						contentType: "application/json; charset=utf-8",
 						success: function (response) {
 							if (response.code == "C000"){
-								_this.productList = response.data;
-								_this.productList.forEach(item => {
-									if (item.coverPath.endsWith('/null')) {
-										item.coverPath = 'images/fridge002.jpg';
-									}
-								});
+								_this.shoppingList = response.data;
 							}
 						},
 						error: function(error) {
@@ -747,7 +537,7 @@
 							}
 						},
 				  	});
-				    $.ajax({
+                    $.ajax({
 						url: "getShoppingListSize",
 						type: "get",
 						contentType: "application/json; charset=utf-8",
@@ -758,11 +548,68 @@
 						},
 				  	});
 				},
-				openDeleteModal(id){
-					let _this = this;
+				openEditModal(id, totalAmount, purchaseQuantity, packageForm, packageQuantity, packageUnitLabel){
+				    let amountText;
+				    if (packageForm == 'COMPLETE'){
+				        amountText = purchaseQuantity + ' x ' + packageQuantity + packageUnitLabel + ' = ' + totalAmount + packageUnitLabel;
+				    } else {
+				        amountText = totalAmount + '份';
+				    }
+
+				    let _this = this;
+                    Swal.fire({
+						title: '下方欄位填寫要變更回購的「包裝數量」',
+						text: '回購總數量：' + amountText,
+						input: 'number',
+						inputAttributes: {
+							min: 1,          // 最小值
+							max: 999,     // 最大值
+							step: 1
+						},
+						showCancelButton: true,
+						confirmButtonText: '確認',
+						cancelButtonText: '取消',
+						customClass: {
+							confirmButton: 'btn btn-success',
+							cancelButton: 'btn btn-danger'
+						},
+					}).then((result) => {
+						if (result.isConfirmed) {
+							let enteredAmount = result.value;
+							_this.editPurchaseQuantity(id, enteredAmount);
+						}
+					});
+				},
+				openPriorityModal(id, priority, name){
+				    let _this = this;
+				    let priorityLabel;
+				    if (priority == 'URGENT'){
+				        priorityLabel = "普通"
+				    } else if (priority == 'NORMAL'){
+				        priorityLabel = "緊急"
+				    }
 					Swal.fire({
-						title: '確認要刪除？',
-						text: '點擊確認後該模板將被刪除',
+						title: `是否要把品項：<strong>${name}</strong> 變更為 <strong style="color: red;">${priorityLabel}</strong>`,
+						text: '',
+						icon: 'info',
+						showCancelButton: true,
+						confirmButtonText: '確認',
+						cancelButtonText: '取消',
+						customClass: {
+							confirmButton: 'btn btn-success',
+							cancelButton: 'btn btn-danger'
+						}
+					}).then((result) => {
+						if (result.isConfirmed) {
+							_this.changePriority(id);
+						}
+					});
+				},
+				openPurchaseModal(id, name){
+                    let _this = this;
+					Swal.fire({
+						title: '品項：' + name,
+						text: '點擊確認後該品項設定成「完成購買」',
 						icon: 'warning',
 						showCancelButton: true,
 						confirmButtonText: '確認',
@@ -773,15 +620,33 @@
 						}
 					}).then((result) => {
 						if (result.isConfirmed) {
-							_this.targetDeleteId = id;
-							_this.deleteProduct();
+							_this.changePurchase(id);
 						}
 					});
 				},
-				deleteProduct(){
+				openDeleteModal(id){
+					let _this = this;
+					Swal.fire({
+						title: '確認要刪除？',
+						text: '點擊確認後該回購品項將被刪除',
+						icon: 'warning',
+						showCancelButton: true,
+						confirmButtonText: '確認',
+						cancelButtonText: '取消',
+						customClass: {
+							confirmButton: 'btn btn-success',
+							cancelButton: 'btn btn-danger'
+						}
+					}).then((result) => {
+						if (result.isConfirmed) {
+							_this.deleteShoppingItem(id);
+						}
+					});
+				},
+				deleteShoppingItem(id){
 				    let _this = this;
 				    $.ajax({
-						url: "deleteProduct/" + this.targetDeleteId,
+						url: "deleteShoppingItem/" + id,
 						type: "delete",
 						contentType: "application/json; charset=utf-8",
 						success: function (response) {
@@ -835,34 +700,165 @@
 						}
 				  	});
 				},
-				openEditModal(id){
-					let _this = this;
-					this.targetEditId = id;
+				editPurchaseQuantity(id, amount){
+                    let _this = this;
+                    let data = {};
+					data.id = id;
+					data.amount = amount;
 				    $.ajax({
-						url: "productInfo/" + id,
+						url: "editPurchaseQuantity",
+						type: "post",
+						data: JSON.stringify(data),
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								Swal.fire({
+									title: '變更成功！',
+									text: '',
+									icon: 'success',
+									confirmButtonText: '關閉',
+									customClass: {
+										confirmButton: 'btn btn-success'
+									}
+								}).then((result) => {
+									if (result.isConfirmed) {
+										_this.init();
+									}
+								});
+							} else if (response.code == "C012"){
+								Swal.fire({
+									title: '查無回購項目，請聯繫管理員！',
+									text: '',
+									icon: 'error',
+									confirmButtonText: '關閉',
+									customClass: {
+										confirmButton: 'btn btn-danger'
+									}
+								})
+							} else {
+								Swal.fire({
+									title: '錯誤發生，請聯繫管理員！',
+									text: '',
+									icon: 'error',
+									confirmButtonText: '關閉',
+									customClass: {
+										confirmButton: 'btn btn-danger'
+									}
+								})
+							}
+						},
+						error: function(error) {
+							Swal.fire({
+								title: '系統錯誤，請聯繫管理員！',
+								text: '',
+								icon: 'error',
+								confirmButtonText: '關閉',
+								customClass: {
+									confirmButton: 'btn btn-danger'
+								}
+							})
+							console.error('Error:', error);
+						}
+				  	});
+				},
+				changePurchase(id){
+				    let _this = this;
+				    $.ajax({
+						url: "changePurchase/" + id,
 						type: "get",
 						contentType: "application/json; charset=utf-8",
 						success: function (response) {
 							if (response.code == "C000"){
-							    const data = response.data;
-                                _this.name = data.name;
-                                _this.mainCategory = data.mainCategory || '';
-                                _this.subCategory = data.subCategory || '';
-                                _this.packageForm = data.packageForm || '';
-                                _this.packageQuantity = data.packageQuantity || '';
-                                _this.packageUnit = data.packageUnit || '';
-                                _this.description = data.description;
-                                _this.rangeValue = data.overdueNotice || 0;
-                                _this.alertValue = data.inventoryAlert || 1;
-                                _this.addShoppingList = data.addShoppingList;
-                                if (!data.coverPath.endsWith('/null')) {
-                                    _this.imageSrc = data.coverPath;
-                                    _this.hasImage = true;
-                                } else {
-                                    _this.imageSrc = 'images/fridge002.jpg';
-                                    _this.hasImage = true;
-                                }
-                                $("#editModal").modal('show');
+								Swal.fire({
+									title: '您已回購該品項成功！',
+									text: '',
+									icon: 'success',
+									confirmButtonText: '關閉',
+									customClass: {
+										confirmButton: 'btn btn-success'
+									}
+								}).then((result) => {
+									if (result.isConfirmed) {
+										_this.init();
+									}
+								});
+							} else if (response.code == "C012"){
+								Swal.fire({
+									title: '查無回購項目，請聯繫管理員！',
+									text: '',
+									icon: 'error',
+									confirmButtonText: '關閉',
+									customClass: {
+										confirmButton: 'btn btn-danger'
+									}
+								})
+							} else {
+								Swal.fire({
+									title: '錯誤發生，請聯繫管理員！',
+									text: '',
+									icon: 'error',
+									confirmButtonText: '關閉',
+									customClass: {
+										confirmButton: 'btn btn-danger'
+									}
+								})
+							}
+						},
+						error: function(error) {
+							Swal.fire({
+								title: '系統錯誤，請聯繫管理員！',
+								text: '',
+								icon: 'error',
+								confirmButtonText: '關閉',
+								customClass: {
+									confirmButton: 'btn btn-danger'
+								}
+							})
+							console.error('Error:', error);
+						}
+				  	});
+				},
+				changePriority(id){
+                    let _this = this;
+				    $.ajax({
+						url: "changePriority/" + id,
+						type: "get",
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								Swal.fire({
+									title: '優先級別變更成功！',
+									text: '',
+									icon: 'success',
+									confirmButtonText: '關閉',
+									customClass: {
+										confirmButton: 'btn btn-success'
+									}
+								}).then((result) => {
+									if (result.isConfirmed) {
+										_this.init();
+									}
+								});
+							} else if (response.code == "C012"){
+								Swal.fire({
+									title: '查無回購項目，請聯繫管理員！',
+									text: '',
+									icon: 'error',
+									confirmButtonText: '關閉',
+									customClass: {
+										confirmButton: 'btn btn-danger'
+									}
+								})
+							} else {
+								Swal.fire({
+									title: '錯誤發生，請聯繫管理員！',
+									text: '',
+									icon: 'error',
+									confirmButtonText: '關閉',
+									customClass: {
+										confirmButton: 'btn btn-danger'
+									}
+								})
 							}
 						},
 						error: function(error) {
@@ -890,138 +886,26 @@
                         this.hasImage = false;
                     }
                 },
-				toggleInventoryAlert(event) {
-					this.addShoppingList = event.target.checked;
-				},
-                editProduct(){
-                    let _this = this;
-                    let hasError = false;
-					$('.has-error').removeClass('has-error');
-
-					// 食材名稱
-					if (this.name.trim() === ''){
-					    $(`[name='name']`).closest('.form-group').addClass('has-error');
-					    hasError = true;
-					}
-					// 食材主種類
-					if (this.mainCategory.trim() === ''){
-					    $(`[name='mainCategory']`).closest('.form-group').addClass('has-error');
-					    hasError = true;
-					}
-					// 包裝方式
-					if (this.packageForm === 'COMPLETE'){
-					    if (this.packageQuantity.trim() === '' || this.packageQuantity.trim() == 0 || isNaN(this.packageQuantity)) {
-					       	$(`[name='packageQuantity']`).closest('.col-8').addClass('has-error');
-                            hasError = true;
-					    }
-
-						if (this.packageUnit.trim() === '') {
-							$(`[name='packageUnit']`).closest('.col-4').addClass('has-error');
-							hasError = true;
-						}
-					}
-
-					//回購
-					if (this.addShoppingList == true){
-						if (this.alertValue.trim() === '' || this.alertValue.trim() == 0 || isNaN(this.alertValue)){
-							$("#inventoryAlert").closest('div').addClass('has-error');
-							hasError = true;
-						}
-					}
-
-
-					if (hasError) {
-						$('#errorModal').modal('show');
-						return;
-					}
-
-					const formData = new FormData();
-					formData.append("id", this.targetEditId);
-					formData.append("name", this.name);
-					formData.append("mainCategory", this.mainCategory);
-                    formData.append("subCategory", this.subCategory);
-					formData.append("packageForm", this.packageForm);
-					if (this.packageForm == 'COMPLETE'){
-						formData.append("packageQuantity", this.packageQuantity);
-						formData.append("packageUnit", this.packageUnit);
-					}
-					formData.append("description", this.description);
-					formData.append("overdueNotice", this.rangeValue);
-					formData.append("addShoppingList", this.addShoppingList);
-					if (this.addShoppingList == true){
-						formData.append("inventoryAlert", this.alertValue);
-					}
-
-					if (this.multipartFile) {
-						formData.append("multipartFile", this.multipartFile);
-					}
-
-					$.ajax({
-						url: 'editProduct',
-						type: 'POST',
-						data: formData,
-						processData: false,
-						contentType: false,
-						success: function(response) {
-							if (response.code === "C000") {
-								$("#editModal").modal('hide');
-                                Swal.fire({
-									title: '更新成功！',
-									text: '',
-									icon: 'success',
-									confirmButtonText: '關閉',
-									customClass: {
-										confirmButton: 'btn btn-success'
-									}
-								}).then((result) => {
-									if (result.isConfirmed) {
-										_this.init();
-									}
-								});
-							} else {
-								Swal.fire({
-									title: '錯誤發生，請稍後再試！',
-									text: '',
-									icon: 'error',
-									confirmButtonText: '關閉',
-									customClass: {
-										confirmButton: 'btn btn-danger'
-									}
-								});
-							}
-						},
-						error: function(error) {
-							Swal.fire({
-								title: '錯誤發生，請稍後再試！',
-								text: '',
-								icon: 'error',
-								confirmButtonText: '關閉',
-								customClass: {
-									confirmButton: 'btn btn-danger'
-								}
-							});
-						}
-					});
-                },
                 categoryChange() {
 					this.selectedSubCategory = '';
-					this.productSearch();
+					this.shoppingListSearch();
 				},
-				productSearch(){
+				shoppingListSearch(){
 					let _this = this;
 					let data = {};
-					data.keyword = $("#productKeyword").val();
+					data.keyword = $("#shoppingListKeyword").val();
 					data.mainCategory = this.selectedCategory;
 					data.subCategory = this.selectedSubCategory;
+					data.priority = this.priority;
 
 				    $.ajax({
-						url: "searchProductTemplate",
+						url: "shoppingItemSearch",
 						type: "post",
 						data: JSON.stringify(data),
 						contentType: "application/json; charset=utf-8",
 						success: function (response) {
 							if (response.code == "C000"){
-								_this.productList = response.data;
+								_this.shoppingList = response.data;
 							}
 						},
 						error: function(error) {
@@ -1041,8 +925,8 @@
 				getData(){
 					const start = this.pageNumber * this.size,
 						  end = start + this.size;
-					this.total = this.productList.length;
-					return this.productList.slice(start, end);
+					this.total = this.shoppingList.length;
+					return this.shoppingList.slice(start, end);
 				},
 				pages() {
 					return Array.from({

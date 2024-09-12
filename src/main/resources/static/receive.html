@@ -71,7 +71,7 @@
 							<a href="dashboard.html">
 								<i class="fas fa-desktop"></i>
 								<p>冰箱清單</p>
-								<span class="badge badge-success" x-text="todayListLabel"></span>
+								<span class="badge badge-primary" x-text="todayListLabel"></span>
 							</a>
 						</li>
 						<li class="nav-item">
@@ -84,6 +84,7 @@
 							<a href="shopping-list.html">
 								<i class="fas fa-shopping-basket"></i>
 								<p>回購清單</p>
+								<span class="badge badge-secondary" x-text="shoppingListLabel"></span>
 							</a>
 						</li>
 						<li class="nav-section">
@@ -728,6 +729,7 @@
 				selectedCategory: "",	//動態增減次種類選單
 				selectedSubCategory: "",	//搜尋食材用
 				todayListLabel: [],
+				shoppingListLabel: [],
 
 				init(){
 					let _this = this;
@@ -793,6 +795,16 @@
 						success: function (response) {
 							if (response.code == "C000"){
 								_this.todayListLabel = response.data;
+							}
+						},
+				  	});
+				    $.ajax({
+						url: "getShoppingListSize",
+						type: "get",
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.shoppingListLabel = response.data;
 							}
 						},
 				  	});
