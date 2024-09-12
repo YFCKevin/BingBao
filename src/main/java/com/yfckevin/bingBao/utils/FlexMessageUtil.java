@@ -197,7 +197,7 @@ public class FlexMessageUtil {
         // 標題 "最後通知"
         Map<String, Object> lastNoticeText = new HashMap<>();
         lastNoticeText.put("type", "text");
-        lastNoticeText.put("text", "最後通知");
+        lastNoticeText.put("text", "最後1週通知");
         lastNoticeText.put("weight", "bold");
         lastNoticeText.put("color", "#1DB446");
         lastNoticeText.put("size", "sm");
