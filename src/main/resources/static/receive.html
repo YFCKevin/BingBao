@@ -1011,7 +1011,7 @@
 							data: JSON.stringify(data),
 							success: function(response) {
 								if (response.code === "C000") {
-									localStorage.remove('selectedProductList');
+									localStorage.removeItem('selectedProductList');
 									$('#selectedProductModal').modal('hide');
 									const data = response.data;
 									$("#receiveNumber").val(data.receiveNumber);
