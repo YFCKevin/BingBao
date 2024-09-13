@@ -674,7 +674,7 @@
 					<button type="button" x-on:click="refrigerate()" class="btn btn-primary">
 						食材放進冰箱
 					</button>
-					<button type="button" class="btn btn-danger" data-bs-dismiss="modal" x-on:click="clearSupplier()">
+					<button type="button" class="btn btn-danger" data-bs-dismiss="modal" x-on:click="saveSelectedProduct()">
 						關閉
 					</button>
 				</div>
@@ -722,6 +722,7 @@
 				supplierList: [],
 				selectedSupplierId: "",
 				selectedSupplierName: '',
+				selectedStorePlace: '',	//等待食材的選定存放位置
 				productList: [],
 				openCollapseIndex: 0, // 追蹤是哪個 collapse 被打開
 				selectedProductIds: [],
@@ -888,6 +889,22 @@
 						success: function (response) {
 							if (response.code == "C000"){
 								_this.selectedProductList = response.data;
+
+								let storedData = localStorage.getItem('selectedProductList');
+								console.log(storedData)
+								if (storedData) {
+									storedData = JSON.parse(storedData);
+									_this.selectedProductList.forEach(product => {
+										let storedProduct = storedData.find(p => p.id === product.id);
+										if (storedProduct) {
+											product.expiryDate = storedProduct.expiryDate;
+											product.quantity = storedProduct.quantity;
+											product.total = storedProduct.total;
+											product.storePlace = storedProduct.storePlace;
+										}
+									});
+								}
+
 								$("#selectedProductModal").modal('show');
 							}
 						},
@@ -969,6 +986,9 @@
 						}
 				  	});
 				},
+				saveSelectedProduct(){
+					localStorage.setItem('selectedProductList', JSON.stringify(this.selectedProductList));
+				},
                 refrigerate(){
                 	let _this = this;
 					let data = {};
@@ -991,6 +1011,7 @@
 							data: JSON.stringify(data),
 							success: function(response) {
 								if (response.code === "C000") {
+									localStorage.remove('selectedProductList');
 									$('#selectedProductModal').modal('hide');
 									const data = response.data;
 									$("#receiveNumber").val(data.receiveNumber);

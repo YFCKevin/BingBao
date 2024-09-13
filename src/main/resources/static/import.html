@@ -545,6 +545,9 @@
 							data: JSON.stringify({ image: base64Img }),
 							success: function(response) {
 								Swal.close();
+								//清除拍照input的照片與顏色
+								fileInput.val('');
+								takePhotoBtn.removeClass('btn-success').addClass('btn-primary');
 								if (response.code == 'C000') {
 									Swal.fire({
 										title: '食材資訊匯入成功！',

@@ -33,17 +33,36 @@ public class OpenAiServiceImpl implements OpenAiService{
         this.tempMasterService = tempMasterService;
     }
 
-    public final String prompt = "0.文字內容跟食材無相關，直接回傳「資料不符合食材」7個字就好\n" +
-            "1.食材清單如上，我要把資訊整理出JSON檔，欄位包括：\n" +
-            "name：食材名稱\n" +
-            "price：價格，以數字表示，沒有標示則為0\n" +
-            "mainCategory：食材主種類，限定其中一種MEAT,SEAFOOD,VEGETABLES,FRUITS,GRAINS,BEVERAGES,CONDIMENTS,SNACKS,BAKERY,MEDICINE,HEALTH_FOOD,CANNED_FOOD,SPICES,OILS,SWEETS,DRIED_FOOD\n" +
-            "subCategory：食材次種類，如果主種類是MEAT，則再從BEEF,PORK,CHICKEN選定一種。如果主種類是SEAFOOD，則再從FISH,SHRIMP選定一種。如果不是NEAT和SEAFOOD，則沒有subCategory屬性\n" +
-            "packageUnit：食材包裝形式，限定其中一種EACH,BOX,PACK,BOTTLE,BAG,BARREL,CASE,CAN,BUNDLE,STRIP,PORTION\n" +
-            "description：食材的介紹與描述，字數落在100-120字\n" +
-            "packageQuantity：內容物數量，從食材清單分析內容物有多少，限定阿拉伯數字\n" +
-            "2.每份食材清單可能包含多個食材資訊，必須分開成獨立的JSON物件。\n" +
-            "3.確保只匯出json格式";
+    public final String prompt = "0. 如果文字內容與食材、健康保健食品、藥品無關，直接回傳「資料不符合食材」七個字。\n" +
+            "1. 僅提取主要食材資訊，忽略配方中的成分、營養標示、使用方法、過敏原信息及保存方法。將資訊整理為 JSON 格式，並包含以下欄位：\n" +
+            "   - name：食材名稱，請排除成分、營養標示及附加資訊，只保留食材名稱。\n" +
+            "   - price：價格，若無標示價格，則以數字 0 表示。\n" +
+            "   - mainCategory：食材主分類，僅接受以下值之一：\n" +
+            "     - MEAT, SEAFOOD, VEGETABLES, FRUITS, GRAINS, BEVERAGES, CONDIMENTS, SNACKS, BAKERY, MEDICINE, HEALTH_FOOD, CANNED_FOOD, SPICES, OILS, SWEETS, DRIED_FOOD\n" +
+            "   - subCategory：食材次分類，若主分類為 MEAT，則次分類需從以下值中選取：BEEF, PORK, CHICKEN。若主分類為 SEAFOOD，則次分類需從 FISH, SHRIMP 中選取。若無適用的次分類或次分類為空，請設為 null。\n" +
+            "   - packageUnit：食材包裝形式，僅接受以下值之一：\n" +
+            "     - EACH, BOX, PACK, BOTTLE, BAG, BARREL, CASE, CAN, BUNDLE, STRIP, PORTION\n" +
+            "   - description：食材的描述與介紹，字數限制在 100-120 字之間。\n" +
+            "   - packageQuantity：內容物數量，根據食材清單分析並填寫，僅接受阿拉伯數字。\n" +
+            "2. 將每個食材分成獨立的 JSON 物件，忽略其他不相關資訊。\n" +
+            "3. 確保最終輸出的格式為有效的 JSON。\n" +
+            "\n" +
+            "範例：\n" +
+            "輸入：\n" +
+            "產品特色每100公克300大卡，成分：分離大豆蛋白、大豆水解蛋白、大豆粉、葉酸、維生素B12等，適合所有族群。\n" +
+            "輸出：\n" +
+            "[\n" +
+            "  {\n" +
+            "    \"name\": \"大豆胜肽\",\n" +
+            "    \"price\": 0,\n" +
+            "    \"mainCategory\": \"HEALTH_FOOD\",\n" +
+            "    \"subCategory\": null,\n" +
+            "    \"packageUnit\": \"BOX\",\n" +
+            "    \"description\": \"大豆胜肽是由高品質大豆製成，具有豐富的蛋白質，適合作為日常健康補給品。\",\n" +
+            "    \"packageQuantity\": 1\n" +
+            "  }\n" +
+            "]";
+
 
     @Override
     public ResultStatus<TempMaster> completion(String rawText) throws JsonProcessingException {
