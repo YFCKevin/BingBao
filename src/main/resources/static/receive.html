@@ -891,7 +891,6 @@
 								_this.selectedProductList = response.data;
 
 								let storedData = localStorage.getItem('selectedProductList');
-								console.log(storedData)
 								if (storedData) {
 									storedData = JSON.parse(storedData);
 									_this.selectedProductList.forEach(product => {
