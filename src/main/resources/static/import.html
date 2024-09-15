@@ -547,6 +547,7 @@
 								Swal.close();
 								//清除拍照input的照片與顏色
 								fileInput.val('');
+								const takePhotoBtn = $('#takePhotoBtn');
 								takePhotoBtn.removeClass('btn-success').addClass('btn-primary');
 								if (response.code == 'C000') {
 									Swal.fire({

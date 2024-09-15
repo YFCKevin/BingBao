@@ -483,6 +483,7 @@
 																		<tr role="row">
 																			<th>食材照片</th>
 																			<th>食材名稱</th>
+																			<th>存放位置</th>
 																			<th>剩餘數量</th>
 																			<th>有效期限</th>
 																			<th>再過多久過期</th>
@@ -497,6 +498,7 @@
 																					<img :src="item.coverPath" style="width: 100px; height: 100px; border-radius: 10%;">
 																				</td>
 																				<td x-text="item.name"></td>
+																				<td x-text="item.storePlaceLabel"></td>
 																				<td x-text="item.totalAmount"></td>
 																				<td x-text="item.expiryDate"></td>
 																				<td x-text="item.expiryTime === '0天' ? '今天到期' : item.expiryTime"></td>
@@ -687,6 +689,7 @@
 																		<tr role="row">
 																			<th>食材照片</th>
 																			<th>食材名稱</th>
+																			<th>存放位置</th>
 																			<th>剩餘數量</th>
 																			<th>有效期限</th>
 																			<th>再過多久過期</th>
@@ -702,6 +705,7 @@
 																					<img :src="item.coverPath" style="width: 100px; height: 100px; border-radius: 10%;">
 																				</td>
 																				<td x-text="item.name"></td>
+																				<td x-text="item.storePlaceLabel"></td>
 																				<td x-text="item.totalAmount"></td>
 																				<td x-text="item.expiryDate"></td>
 																				<td x-text="item.expiryTime === '0天' ? '今天到期' : item.expiryTime"></td>
