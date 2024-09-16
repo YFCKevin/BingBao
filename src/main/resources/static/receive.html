@@ -11,7 +11,33 @@
 	<meta property="og:type" content="website">
 	<meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
 	<link rel="icon" href="images/favicon.ico" type="image/x-icon"/>
+	<style>
+		.image-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+			overflow: hidden;
+		}
 
+		.overlay {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 100%;
+			height: 100%;
+			opacity: 0;
+			transition: opacity 0.3s ease;
+		}
+
+		.image-container:hover .overlay {
+			opacity: 1;
+		}
+	</style>
 	<!-- Fonts and icons -->
 	<script src="js/webfont.min.js"></script>
 	<script>
@@ -421,6 +447,7 @@
 																								<thead>
 																								<tr role="row">
 																									<th class="bg-primary text-white">選擇</th>
+																									<th class="bg-primary text-white">圖片</th>
 																									<th class="bg-primary text-white">名稱</th>
 																									<th class="bg-primary text-white">包裝類型</th>
 																									<th class="bg-primary text-white">包裝方式</th>
@@ -432,6 +459,15 @@
 																										<td class="text-center">
 																											<div class="form-check form-switch d-inline-block" style="padding: 8px; font-size: 16px;">
 																												<input style="border: 2px solid #6861ce;" class="form-check-input" :value="product.id" type="checkbox" x-model="product.selected" x-on:change="update($event, index)">
+																											</div>
+																										</td>
+																										<td class="image-container">
+																											<img
+																													:src="product.coverPath"
+																													alt="cover image"
+																													style="width: 75px; height: 75px; border-radius: 10%; object-fit: cover; transition: background-color 0.3s ease, opacity 0.3s ease;">
+																											<div class="overlay">
+																												<i class="fas fa-search-plus text-secondary fa-2x" @click="showImagePreview(product.coverPath)"></i>
 																											</div>
 																										</td>
 																										<td x-html="product.name"></td>
@@ -764,7 +800,12 @@
 							if (response.code == "C000"){
 								_this.productList = Object.entries(response.data).map(([key, value]) => ({
 									groupName: key,
-									products: value,
+									products: value.map(item => {
+										if (item.coverPath && item.coverPath.endsWith('/null')) {
+											item.coverPath = 'images/fridge002.jpg';
+										}
+										return item;
+									}),
 									allSelected: false
 								}));
 
@@ -814,6 +855,15 @@
 					const today = new Date();
               		this.receiveDate = today.toISOString().split("T")[0];
 
+				},
+				showImagePreview(imageSrc) {
+					Swal.fire({
+						title: '圖片預覽',
+						html: `<img src="${imageSrc}" alt="lightbox image" style="width: 100%; height: auto; border-radius: 10px;">`,
+						icon: '',
+						showCloseButton: true,  // 顯示關閉按鈕
+						showConfirmButton: false, // 不顯示確認按鈕
+					});
 				},
 				getSupplierData(){
 					const start = this.pageNumber * this.size,

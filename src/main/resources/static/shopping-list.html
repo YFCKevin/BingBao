@@ -13,6 +13,31 @@
     <link rel="icon" href="images/favicon.ico" type="image/x-icon"/>
 
     <style>
+		.image-container {
+            position: relative;
+			overflow: hidden;
+			background-color: #fff;
+		}
+
+		.overlay {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 100%;
+			height: 100%;
+			opacity: 0;
+			transition: opacity 0.3s ease;
+		}
+
+		.image-container:hover .overlay {
+			opacity: 1;
+		}
+
+
         .description-container {
             position: relative;
             max-height: 3em;
@@ -296,8 +321,14 @@
                                                 <tbody>
                                                 <template x-for="(item,index) in getData()" :key="index">
                                                     <tr role="row" class="odd">
-                                                        <td>
-                                                            <img :src="item.coverPath" style="width: 75px; height: 75px; border-radius: 10%;">
+                                                        <td class="image-container">
+                                                            <img
+                                                                    :src="item.coverPath"
+                                                                    alt="cover image"
+                                                                    style="width: 75px; height: 75px; border-radius: 10%; object-fit: cover; transition: background-color 0.3s ease, opacity 0.3s ease;">
+                                                            <div class="overlay">
+                                                                <i class="fas fa-search-plus text-secondary fa-2x" @click="showImagePreview(item.coverPath)"></i>
+                                                            </div>
                                                         </td>
                                                         <td x-show="item.priorityType == 'URGENT'" x-text="item.name" style="font-weight: bold; font-size: 1.2rem;"></td>
                                                         <td x-show="item.priorityType == 'NORMAL'" x-text="item.name"></td>
@@ -547,6 +578,15 @@
 							}
 						},
 				  	});
+				},
+				showImagePreview(imageSrc) {
+					Swal.fire({
+						title: '圖片預覽',
+						html: `<img src="${imageSrc}" alt="lightbox image" style="width: 100%; height: auto; border-radius: 10px;">`,
+						icon: '',
+						showCloseButton: true,  // 顯示關閉按鈕
+						showConfirmButton: false, // 不顯示確認按鈕
+					});
 				},
 				openEditModal(id, totalAmount, purchaseQuantity, packageForm, packageQuantity, packageUnitLabel){
 				    let amountText;
