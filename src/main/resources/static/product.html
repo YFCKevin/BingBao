@@ -1066,7 +1066,7 @@
 								_this.productList = response.data.map(item => {
                                     return {
                                         ...item,
-                                        creationDate: new Date(item.creationDate).toLocaleDateString('en-CA');
+                                        creationDate: new Date(item.creationDate).toLocaleDateString('en-CA')
                                     };
                                 });
 							}
