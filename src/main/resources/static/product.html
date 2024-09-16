@@ -752,6 +752,7 @@
 									if (item.coverPath.endsWith('/null')) {
 										item.coverPath = 'images/fridge002.jpg';
 									}
+									item.creationDate = new Date(item.creationDate).toLocaleDateString('en-CA');
 								});
 							}
 						},
@@ -1062,7 +1063,12 @@
 						success: function (response) {
 							if (response.code == "C000"){
 							    _this.pageNumber = 0;
-								_this.productList = response.data;
+								_this.productList = response.data.map(item => {
+                                    return {
+                                        ...item,
+                                        creationDate: new Date(item.creationDate).toLocaleDateString('en-CA');
+                                    };
+                                });
 							}
 						},
 						error: function(error) {

@@ -497,6 +497,7 @@
 									if (item.coverPath.endsWith('/null')) {
 										item.coverPath = 'images/fridge002.jpg';
 									}
+									item.creationDate = new Date(item.creationDate).toLocaleDateString('en-CA');
 								});
 							}
 						},
