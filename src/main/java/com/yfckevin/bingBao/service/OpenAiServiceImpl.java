@@ -34,17 +34,17 @@ public class OpenAiServiceImpl implements OpenAiService{
     }
 
     public final String prompt = "0. 如果文字內容與食材、健康保健食品、藥品無關，直接回傳「資料不符合食材」七個字。\n" +
-            "1. 僅提取主要食材資訊，忽略配方中的成分、營養標示、使用方法、過敏原信息及保存方法。將資訊整理為 JSON 格式，並包含以下欄位：\n" +
-            "   - name：食材名稱，請排除成分、營養標示及附加資訊，只保留食材名稱。\n" +
+            "1. 僅提取主要產品資訊，忽略成分、配方、營養標示、使用方法、過敏原信息及保存方法。將資訊整理為 JSON 格式，並包含以下欄位：\n" +
+            "   - name：主要產品名稱，如「養生茶」，僅保留產品名稱，不包括成分或其他附加資訊。\n" +
             "   - price：價格，若無標示價格，則以數字 0 表示。\n" +
-            "   - mainCategory：食材主分類，僅接受以下值之一：\n" +
+            "   - mainCategory：產品主分類，僅接受以下值之一：\n" +
             "     - MEAT, SEAFOOD, VEGETABLES, FRUITS, GRAINS, BEVERAGES, CONDIMENTS, SNACKS, BAKERY, MEDICINE, HEALTH_FOOD, CANNED_FOOD, SPICES, OILS, SWEETS, DRIED_FOOD\n" +
-            "   - subCategory：食材次分類，若主分類為 MEAT，則次分類需從以下值中選取：BEEF, PORK, CHICKEN。若主分類為 SEAFOOD，則次分類需從 FISH, SHRIMP 中選取。若無適用的次分類或次分類為空，請設為 null。\n" +
-            "   - packageUnit：食材包裝形式，僅接受以下值之一：\n" +
+            "   - subCategory：產品次分類。若主分類為 MEAT，次分類需從以下值中選取：BEEF, PORK, CHICKEN。若主分類為 SEAFOOD，次分類需從 FISH, SHRIMP 中選取。若無適用的次分類或次分類為空，請設為 null。\n" +
+            "   - packageUnit：產品包裝形式，僅接受以下值之一：\n" +
             "     - EACH, BOX, PACK, BOTTLE, BAG, BARREL, CASE, CAN, BUNDLE, STRIP, PORTION\n" +
-            "   - description：食材的描述與介紹，字數限制在 100-120 字之間。\n" +
-            "   - packageQuantity：內容物數量，根據食材清單分析並填寫，僅接受阿拉伯數字。\n" +
-            "2. 將每個食材分成獨立的 JSON 物件，忽略其他不相關資訊。\n" +
+            "   - description：產品的簡短描述與介紹，字數限制在 100-120 字之間。\n" +
+            "   - packageQuantity：內容物數量，根據產品清單分析並填寫，僅接受阿拉伯數字。\n" +
+            "2. 將每個產品整理為獨立的 JSON 物件，忽略其他不相關資訊。\n" +
             "3. 確保最終輸出的格式為有效的 JSON。\n" +
             "\n" +
             "範例：\n" +
