@@ -1019,6 +1019,14 @@
 									allSelected: false,
 								}));
 								_this.productList = newProductList;
+
+								// 根據creationDate做遞減排序
+								_this.productList.sort((a, b) => {
+									const dateA = a.products.length > 0 ? new Date(a.products[0].creationDate) : new Date(0);
+									const dateB = b.products.length > 0 ? new Date(b.products[0].creationDate) : new Date(0);
+									return dateB - dateA;
+								});
+
 								_this.pageNumber_product = 0;
 							}
 						},
