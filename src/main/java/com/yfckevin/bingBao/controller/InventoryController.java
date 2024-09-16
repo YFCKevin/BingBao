@@ -72,6 +72,8 @@ public class InventoryController {
         int amountToUse = dto.getUsedAmount();
         for (Inventory inventory : inventoryList) {
             inventory.setUsedDate(sdf.format(new Date()));
+            inventory.setModifier(member.getName());
+            inventory.setModificationDate(sdf.format(new Date()));
             inventoriesToUpdate.add(inventory);
             amountToUse--;
 
