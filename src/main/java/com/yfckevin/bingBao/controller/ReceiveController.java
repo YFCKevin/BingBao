@@ -120,6 +120,7 @@ public class ReceiveController {
                     for (int i = 0; i < amount; i++) {
                         Inventory inventory = new Inventory();
                         inventory.setCreationDate(sdf.format(new Date()));
+                        inventory.setCreator(member.getName());
                         inventory.setReceiveFormId(savedReceiveForm.getId());
                         inventory.setReceiveItemId(receiveItem.getId());
                         inventory.setStoreDate(sdf.format(new Date()));
