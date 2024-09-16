@@ -1130,6 +1130,7 @@
 						contentType: "application/json; charset=utf-8",
 						success: function (response) {
 							if (response.code == "C000"){
+								_this.pageNumber_today = 0;
 								_this.todayList = response.data;
 							}
 						},
@@ -1163,6 +1164,7 @@
 						contentType: "application/json; charset=utf-8",
 						success: function (response) {
 							if (response.code == "C000"){
+								_this.pageNumber_soon = 0;
 								_this.expiringSoonList = response.data;
 							}
 						},
@@ -1196,6 +1198,7 @@
 						contentType: "application/json; charset=utf-8",
 						success: function (response) {
 							if (response.code == "C000"){
+								_this.pageNumber_valid = 0;
 								_this.validList = response.data;
 							}
 						},

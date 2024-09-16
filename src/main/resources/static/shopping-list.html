@@ -945,6 +945,7 @@
 						contentType: "application/json; charset=utf-8",
 						success: function (response) {
 							if (response.code == "C000"){
+							    _this.pageNumber = 0;
 								_this.shoppingList = response.data;
 							}
 						},
