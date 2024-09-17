@@ -434,6 +434,7 @@
                 name: '',
                 imageSrc: '',
                 hasImage: false,
+                copyCoverName: null,
                 mainCategory: '',
                 subCategory: '',
                 packageForm: 'COMPLETE',
@@ -477,6 +478,33 @@
 						success: function (response) {
 							if (response.code == "C000"){
 								_this.shoppingListLabel = response.data;
+							}
+						},
+				  	});
+
+				  	const urlParams = new URLSearchParams(window.location.search);
+				  	const productId = urlParams.get('id');
+				    $.ajax({
+						url: "productInfo/" + productId,
+						type: "get",
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								const data = response.data;
+								console.log(data)
+								_this.name = data.name;
+								_this.imageSrc = data.coverPath;
+								_this.copyCoverName = data.coverPath.split('/').pop();
+								_this.hasImage = true;
+								_this.mainCategory = data.mainCategory;
+								if (data.subCategory != null){
+									_this.subCategory = data.subCategory;
+								}
+								_this.packageForm = data.packageForm;
+								_this.packageQuantity = data.packageQuantity;
+								_this.packageUnit = data.packageUnit;
+								_this.description = data.description;
+								_this.rangeValue = data.overdueNotice;
 							}
 						},
 				  	});
@@ -555,6 +583,8 @@
 
 					if (this.multipartFile) {
 						formData.append("multipartFile", this.multipartFile);
+					} else if (this.copyCoverName != null){
+						formData.append("copyCoverName", this.copyCoverName);
 					}
 
 					$.ajax({

@@ -48,6 +48,29 @@ public class FileUtils {
     }
 
 
+    public static String copyAndRenameFile(String originalFileName, String sourceDir, String destinationDir) throws IOException {
+
+        Path sourcePath = Paths.get(sourceDir, originalFileName);
+
+        String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
+        String baseName = originalFileName.substring(0, originalFileName.lastIndexOf("."));
+
+        String newFileName = baseName + "_copy" + extension;
+        Path destinationPath = Paths.get(destinationDir, newFileName);
+
+        int copyNumber = 1;
+        while (Files.exists(destinationPath)) {
+            newFileName = baseName + "_copy" + copyNumber + extension;
+            destinationPath = Paths.get(destinationDir, newFileName);
+            copyNumber++;
+        }
+
+        Files.copy(sourcePath, destinationPath);
+
+        return newFileName;
+    }
+
+
     public static void constructExcel(List<InventoryDTO> inventoryDTOList, String type, HttpServletResponse response, MemberDTO memberDTO) throws Exception {
         System.out.println("exportExcel.......");
 

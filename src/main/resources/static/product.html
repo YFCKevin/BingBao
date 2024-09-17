@@ -279,6 +279,10 @@
                                                     <i class="fas fa-edit fs-5"></i>
                                                     <span class="ms-2 text-muted">：編輯食材模板</span>
                                                 </div>
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <i class="far fa-copy fs-5"></i>
+                                                    <span class="ms-2 text-muted">：複製食材模板</span>
+                                                </div>
                                                 <div class="d-flex align-items-center">
                                                     <i class="fas fa-trash-alt fs-5"></i>
                                                     <span class="ms-2 text-muted">：丟棄食材模板</span>
@@ -360,6 +364,9 @@
                                                                 <button @click="openEditModal(item.id)" type="button" data-bs-toggle="tooltip" title="編輯食材模板" class="btn btn-link btn-primary">
                                                                     <i class="fas fa-edit fs-4"></i>
                                                                 </button>
+                                                                <a :href="'add.html?id=' + item.id" type="button" data-bs-toggle="tooltip" title="複製食材模板" class="btn btn-link btn-secondary">
+                                                                    <i class="far fa-copy fs-4"></i>
+                                                                </a>
                                                                 <button @click="openDeleteModal(item.id)" type="button" data-bs-toggle="tooltip" title="丟棄食材模板" class="btn btn-link btn-danger">
                                                                     <i class="fas fa-trash-alt fs-4"></i>
                                                                 </button>

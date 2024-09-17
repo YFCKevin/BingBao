@@ -65,7 +65,7 @@ public class ProductController {
      * @return
      */
     @PostMapping("/saveProduct")
-    public ResponseEntity<?> saveProduct(@ModelAttribute ProductDTO dto, HttpSession session) {
+    public ResponseEntity<?> saveProduct(@ModelAttribute ProductDTO dto, HttpSession session) throws IOException {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
@@ -81,9 +81,10 @@ public class ProductController {
 
         final MultipartFile nameFile = dto.getMultipartFile();
 
+        String fileName = null;
         if (nameFile != null && !nameFile.isEmpty() && nameFile.getSize() != 0) {
             final String extension = FilenameUtils.getExtension(nameFile.getOriginalFilename());
-            String fileName = String.format("%d", System.currentTimeMillis()) + "." + extension;
+            fileName = String.format("%d", System.currentTimeMillis()) + "." + extension;
             System.out.println("fileName: " + fileName);
 
             try {
@@ -96,9 +97,12 @@ public class ProductController {
                 resultStatus.setMessage("圖片上傳失敗");
                 return ResponseEntity.ok(resultStatus);
             }
-            product.setCoverName(fileName);
+
+        } else if (!"fridge002.jpg".equals(dto.getCopyCoverName())) {
+            fileName = FileUtils.copyAndRenameFile(dto.getCopyCoverName(), configProperties.getPicSavePath(), configProperties.getPicSavePath());
         }
 
+        product.setCoverName(fileName);
         product.setCreator(member.getName());
         product.setName(dto.getName());
         product.setCreationDate(sdf.format(new Date()));

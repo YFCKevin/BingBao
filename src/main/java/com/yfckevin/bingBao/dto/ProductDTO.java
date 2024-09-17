@@ -10,6 +10,7 @@ public class ProductDTO {
     private String name;    //名稱
     private String description; //食材描述
     private MultipartFile multipartFile;    //圖片檔案
+    private String copyCoverName;
     private String coverPath;    //圖路徑(前端呈現用)
     private int price;
     private MainCategory mainCategory;  //食材種類 (水果、青菜、海鮮、藥品等等)
@@ -248,6 +249,14 @@ public class ProductDTO {
         this.inventoryAlert = inventoryAlert;
     }
 
+    public String getCopyCoverName() {
+        return copyCoverName;
+    }
+
+    public void setCopyCoverName(String copyCoverName) {
+        this.copyCoverName = copyCoverName;
+    }
+
     @Override
     public String toString() {
         return "ProductDTO{" +
@@ -256,6 +265,7 @@ public class ProductDTO {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", multipartFile=" + multipartFile +
+                ", copyCoverName='" + copyCoverName + '\'' +
                 ", coverPath='" + coverPath + '\'' +
                 ", price=" + price +
                 ", mainCategory=" + mainCategory +
