@@ -111,7 +111,7 @@ public class InventoryController {
         }
         ResultStatus resultStatus = new ResultStatus();
 
-        List<Inventory> inventoryList = inventoryService.findByReceiveItemId(dto.getReceiveItemId());
+        List<Inventory> inventoryList = inventoryService.findByReceiveItemIdAndUsedDateIsNull(dto.getReceiveItemId());
         if (inventoryList.size() == 0) {
             resultStatus.setCode("C006");
             resultStatus.setMessage("無庫存");
@@ -142,7 +142,7 @@ public class InventoryController {
         }
         ResultStatus resultStatus = new ResultStatus();
 
-        final List<Inventory> inventoryList = inventoryService.findByReceiveItemId(id);
+        final List<Inventory> inventoryList = inventoryService.findByReceiveItemIdAndUsedDateIsNull(id);
         final List<Inventory> inventoriesToDelete = inventoryList.stream().peek(i -> i.setDeletionDate(sdf.format(new Date()))).toList();
         inventoryService.saveAll(inventoriesToDelete);
 
