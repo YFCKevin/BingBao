@@ -57,7 +57,7 @@ public class InventoryController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[useInventoryProduct]");
+            logger.info("[" + member.getName() + "]" + "[useInventoryProduct]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -107,7 +107,7 @@ public class InventoryController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[editStorePlaceInventory]");
+            logger.info("[" + member.getName() + "]" + "[editStorePlaceInventory]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -138,7 +138,7 @@ public class InventoryController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[deleteInventory]");
+            logger.info("[" + member.getName() + "]" + "[deleteInventory]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -163,7 +163,7 @@ public class InventoryController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[deleteInventory]");
+            logger.info("[" + member.getName() + "]" + "[deleteInventory]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -195,7 +195,7 @@ public class InventoryController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[dashboard]");
+            logger.info("[" + member.getName() + "]" + "[dashboard]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -309,7 +309,7 @@ public class InventoryController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[todayProductSearch]");
+            logger.info("[" + member.getName() + "]" + "[todayProductSearch]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -398,7 +398,7 @@ public class InventoryController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[getTodaySize]");
+            logger.info("[" + member.getName() + "]" + "[getTodaySize]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -417,7 +417,7 @@ public class InventoryController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[exportExcel]");
+            logger.info("[" + member.getName() + "]" + "[exportExcel]");
         }
         FileUtils.constructExcel(inventoryDTOList, type, response, member);
     }

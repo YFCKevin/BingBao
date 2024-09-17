@@ -60,7 +60,7 @@ public class ReceiveController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[receive]");
+            logger.info("[" + member.getName() + "]" + "[receive]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -164,7 +164,7 @@ public class ReceiveController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[allReceiveForms]");
+            logger.info("[" + member.getName() + "]" + "[allReceiveForms]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -187,7 +187,7 @@ public class ReceiveController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[receiveFormInfo]");
+            logger.info("[" + member.getName() + "]" + "[receiveFormInfo]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -218,7 +218,7 @@ public class ReceiveController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[receiveSearch]");
+            logger.info("[" + member.getName() + "]" + "[receiveSearch]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -236,7 +236,7 @@ public class ReceiveController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[getGroupProducts]");
+            logger.info("[" + member.getName() + "]" + "[getGroupProducts]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -266,7 +266,7 @@ public class ReceiveController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[getSelectedProduct]");
+            logger.info("[" + member.getName() + "]" + "[getSelectedProduct]");
         }
         ResultStatus resultStatus = new ResultStatus();
 

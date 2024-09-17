@@ -137,7 +137,7 @@ public class ShoppingListController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[shoppingItemSearch]");
+            logger.info("[" + member.getName() + "]" + "[shoppingItemSearch]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -210,7 +210,7 @@ public class ShoppingListController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[deleteShoppingItem]");
+            logger.info("[" + member.getName() + "]" + "[deleteShoppingItem]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -240,7 +240,7 @@ public class ShoppingListController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[changePurchase]");
+            logger.info("[" + member.getName() + "]" + "[changePurchase]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -270,7 +270,7 @@ public class ShoppingListController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[editPurchaseQuantity]");
+            logger.info("[" + member.getName() + "]" + "[editPurchaseQuantity]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -301,7 +301,7 @@ public class ShoppingListController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[changePriority]");
+            logger.info("[" + member.getName() + "]" + "[changePriority]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -335,7 +335,7 @@ public class ShoppingListController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[getShoppingListSize]");
+            logger.info("[" + member.getName() + "]" + "[getShoppingListSize]");
         }
         ResultStatus resultStatus = new ResultStatus();
 

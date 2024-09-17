@@ -69,7 +69,7 @@ public class ProductController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[saveProduct]");
+            logger.info("[" + member.getName() + "]" + "[saveProduct]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -136,7 +136,7 @@ public class ProductController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[editProduct]");
+            logger.info("[" + member.getName() + "]" + "[editProduct]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -208,7 +208,7 @@ public class ProductController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[convertDataByPhoto]");
+            logger.info("[" + member.getName() + "]" + "[convertDataByPhoto]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -287,7 +287,7 @@ public class ProductController {
     public ResponseEntity<?> importIntoDB(@ModelAttribute ProductDTOListWrapperDTO productDTOListWrapperDTO, HttpSession session) {
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[importIntoDB]");
+            logger.info("[" + member.getName() + "]" + "[importIntoDB]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -357,7 +357,7 @@ public class ProductController {
     public ResponseEntity<?> allTempMasters(HttpSession session) {
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[allTempMasters]");
+            logger.info("[" + member.getName() + "]" + "[allTempMasters]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -380,7 +380,7 @@ public class ProductController {
     public ResponseEntity<?> getTempMasterInfo(@PathVariable String id, HttpSession session) {
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[getTempMasterInfo]");
+            logger.info("[" + member.getName() + "]" + "[getTempMasterInfo]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -412,7 +412,7 @@ public class ProductController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[myProducts]");
+            logger.info("[" + member.getName() + "]" + "[myProducts]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -442,7 +442,7 @@ public class ProductController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[deleteProduct]");
+            logger.info("[" + member.getName() + "]" + "[deleteProduct]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -484,7 +484,7 @@ public class ProductController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[productInfo]");
+            logger.info("[" + member.getName() + "]" + "[productInfo]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -516,7 +516,7 @@ public class ProductController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[productSearch]");
+            logger.info("[" + member.getName() + "]" + "[productSearch]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -569,7 +569,7 @@ public class ProductController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[productSearch]");
+            logger.info("[" + member.getName() + "]" + "[productSearch]");
         }
         ResultStatus resultStatus = new ResultStatus();
 

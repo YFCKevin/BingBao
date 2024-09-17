@@ -43,7 +43,7 @@ public class SupplierController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[saveSupplier]");
+            logger.info("[" + member.getName() + "]" + "[saveSupplier]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -94,7 +94,7 @@ public class SupplierController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[allSuppliers]");
+            logger.info("[" + member.getName() + "]" + "[allSuppliers]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -117,7 +117,7 @@ public class SupplierController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[supplierInfo]");
+            logger.info("[" + member.getName() + "]" + "[supplierInfo]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -148,7 +148,7 @@ public class SupplierController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[deleteSupplier]");
+            logger.info("[" + member.getName() + "]" + "[deleteSupplier]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -181,7 +181,7 @@ public class SupplierController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[supplierSearch]");
+            logger.info("[" + member.getName() + "]" + "[supplierSearch]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
