@@ -48,4 +48,6 @@ public interface InventoryService {
     List<Inventory> findInventoryWithExpiryDateInSevenDays();
 
     Map<String, Map<Long, List<Inventory>>> findAllAndDeletionDateIsNull();
+
+    List<Inventory> findByReceiveItemIdAndUsedDateIsNull(String receiveItemId);
 }

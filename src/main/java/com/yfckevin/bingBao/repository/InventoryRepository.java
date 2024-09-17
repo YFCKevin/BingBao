@@ -9,4 +9,6 @@ public interface InventoryRepository extends MongoRepository<Inventory, String> 
     List<Inventory> findByIdIn(List<String> receiveItemIds);
 
     List<Inventory> findByReceiveItemId(String receiveItemId);
+
+    List<Inventory> findByReceiveItemIdAndUsedDateIsNull(String receiveItemId);
 }

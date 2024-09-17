@@ -1371,4 +1371,9 @@ public class InventoryServiceImpl implements InventoryService {
                         )
                 ));
     }
+
+    @Override
+    public List<Inventory> findByReceiveItemIdAndUsedDateIsNull(String receiveItemId) {
+        return inventoryRepository.findByReceiveItemIdAndUsedDateIsNull(receiveItemId);
+    }
 }
