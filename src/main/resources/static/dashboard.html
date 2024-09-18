@@ -258,7 +258,7 @@
 																			</select>
 																		</template>
 																	</div>
-																	<div class="d-flex flex-column flex-md-row align-items-start">
+																	<div class="d-flex flex-column flex-md-row align-items-start gap-2">
 																		<select class="form-select form-control" x-model="todayStorePlace" x-on:change="todayProductSearch()">
 																			<option value="">請選擇存放位置</option>
 																			<option value="HUALIEN_ALL">花蓮全部</option>
@@ -269,6 +269,14 @@
 																			<option value="TAIPEI_REF">台北冰箱</option>
 																			<option value="TAIPEI_OTHER">台北其他</option>
 																		</select>
+
+																		<input class="form-control" type="text" list="typelist_today" placeholder="請選擇或搜尋供應商" x-model="todaySupplierName" x-on:input="updateTodaySupplierId()">
+																		<datalist id="typelist_today">
+																			<template x-for="supplier in suppliers" :key="supplier.id">
+																				<option :value="supplier.name" :data-id="supplier.id" x-text="supplier.name"></option>
+																			</template>
+																		</datalist>
+
 																	</div>
 																</div>
 																<div class="col-sm-12 col-md-6 d-flex flex-column align-items-end mt-md-0 mt-2">
@@ -468,7 +476,7 @@
 																			</select>
 																		</template>
 																	</div>
-																	<div class="d-flex flex-column flex-md-row align-items-start">
+																	<div class="d-flex flex-column flex-md-row align-items-start gap-2">
 																		<select class="form-select form-control" x-model="soonStorePlace" x-on:change="soonProductSearch()">
 																			<option value="">請選擇存放位置</option>
 																			<option value="HUALIEN_ALL">花蓮全部</option>
@@ -479,6 +487,14 @@
 																			<option value="TAIPEI_REF">台北冰箱</option>
 																			<option value="TAIPEI_OTHER">台北其他</option>
 																		</select>
+
+																		<input class="form-control" type="text" list="typelist_soon" placeholder="請選擇或搜尋供應商" x-model="soonSupplierName" x-on:input="updateSoonSupplierId()">
+																		<datalist id="typelist_soon">
+																			<template x-for="supplier in suppliers" :key="supplier.id">
+																				<option :value="supplier.name" :data-id="supplier.id" x-text="supplier.name"></option>
+																			</template>
+																		</datalist>
+
 																	</div>
 																</div>
 																<div class="col-sm-12 col-md-6 d-flex flex-column align-items-end mt-md-0 mt-2">
@@ -680,7 +696,7 @@
 																			</select>
 																		</template>
 																	</div>
-																	<div class="d-flex flex-column flex-md-row align-items-start">
+																	<div class="d-flex flex-column flex-md-row align-items-start gap-2">
 																		<select class="form-select form-control" x-model="validStorePlace" x-on:change="validProductSearch()">
 																			<option value="">請選擇存放位置</option>
 																			<option value="HUALIEN_ALL">花蓮全部</option>
@@ -691,6 +707,14 @@
 																			<option value="TAIPEI_REF">台北冰箱</option>
 																			<option value="TAIPEI_OTHER">台北其他</option>
 																		</select>
+
+																		<input class="form-control" type="text" list="typelist_valid" placeholder="請選擇或搜尋供應商" x-model="validSupplierName" x-on:input="updateValidSupplierId()">
+																		<datalist id="typelist_valid">
+																			<template x-for="supplier in suppliers" :key="supplier.id">
+																				<option :value="supplier.name" :data-id="supplier.id" x-text="supplier.name"></option>
+																			</template>
+																		</datalist>
+
 																	</div>
 																</div>
 																<div class="col-sm-12 col-md-6 d-flex flex-column align-items-end mt-md-0 mt-2">
@@ -1004,6 +1028,13 @@
 				targetDeleteId: "",
 				targetEditId: "",
 				inventoryDetail: {},	//放庫存食材細節資訊，開啟modal時呈現
+				suppliers: [],			//選擇查詢的供應商
+				todaySupplierName: '',
+        		todaySupplierId: '',
+				soonSupplierName: '',
+        		soonSupplierId: '',
+				validSupplierName: '',
+        		validSupplierId: '',
 
 				init(){
 					let _this = this;
@@ -1071,6 +1102,17 @@
 							}
 						},
 				  	});
+
+				    $.ajax({
+						url: "allSuppliers",
+						type: "get",
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.suppliers = response.data;
+							}
+						},
+				  	});
 				},
 				showImagePreview(imageSrc) {
 					Swal.fire({
@@ -1126,6 +1168,42 @@
 					this.validSelectedSubCategory = '';
 					this.validProductSearch();
 				},
+				updateTodaySupplierId() {
+					const selectedName = this.todaySupplierName;
+					const selectedOption = $('#typelist_today option').filter(function() {
+						return $(this).text() === selectedName;
+					});
+					if (selectedOption.length) {
+						this.todaySupplierId = selectedOption.data('id');
+					} else {
+						this.todaySupplierId = '';
+					}
+					this.todayProductSearch();
+				},
+				updateSoonSupplierId() {
+					const selectedName = this.soonSupplierName;
+					const selectedOption = $('#typelist_soon option').filter(function() {
+						return $(this).text() === selectedName;
+					});
+					if (selectedOption.length) {
+						this.soonSupplierId = selectedOption.data('id');
+					} else {
+						this.soonSupplierId = '';
+					}
+					this.soonProductSearch();
+				},
+				updateValidSupplierId() {
+					const selectedName = this.validSupplierName;
+					const selectedOption = $('#typelist_valid option').filter(function() {
+						return $(this).text() === selectedName;
+					});
+					if (selectedOption.length) {
+						this.validSupplierId = selectedOption.data('id');
+					} else {
+						this.validSupplierId = '';
+					}
+					this.validProductSearch();
+				},
 				todayProductSearch(){
 					let _this = this;
 					let data = {};
@@ -1133,6 +1211,7 @@
 					data.mainCategory = this.todaySelectedCategory;
 					data.subCategory = this.todaySelectedSubCategory;
 					data.storePlace = this.todayStorePlace;
+					data.supplierId = this.todaySupplierId;
 					data.type = "today";
 
 				    $.ajax({
@@ -1167,6 +1246,7 @@
 					data.mainCategory = this.soonSelectedCategory;
 					data.subCategory = this.soonSelectedSubCategory;
 					data.storePlace = this.soonStorePlace;
+					data.supplierId = this.soonSupplierId;
 					data.type = "soon";
 
 				    $.ajax({
@@ -1201,6 +1281,7 @@
 					data.mainCategory = this.validSelectedCategory;
 					data.subCategory = this.validSelectedSubCategory;
 					data.storePlace = this.validStorePlace;
+					data.supplierId = this.validSupplierId;
 					data.type = "valid";
 
 				    $.ajax({

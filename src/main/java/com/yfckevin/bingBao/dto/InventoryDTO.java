@@ -32,6 +32,7 @@ public class InventoryDTO {
     private String totalAmount; //食材庫存總數
     private String coverPath;    //食材圖路徑(前端呈現用)
     private boolean addShoppingList;    //庫存是否放進回購清單，用來避免重複加入
+    private SupplierDTO supplier;
     private String creationDate;
     private String modificationDate;
     private String deletionDate;
@@ -310,6 +311,14 @@ public class InventoryDTO {
         this.addShoppingList = addShoppingList;
     }
 
+    public SupplierDTO getSupplier() {
+        return supplier;
+    }
+
+    public void setSupplier(SupplierDTO supplier) {
+        this.supplier = supplier;
+    }
+
     @Override
     public String toString() {
         return "InventoryDTO{" +
@@ -342,6 +351,7 @@ public class InventoryDTO {
                 ", totalAmount='" + totalAmount + '\'' +
                 ", coverPath='" + coverPath + '\'' +
                 ", addShoppingList=" + addShoppingList +
+                ", supplier=" + supplier +
                 ", creationDate='" + creationDate + '\'' +
                 ", modificationDate='" + modificationDate + '\'' +
                 ", deletionDate='" + deletionDate + '\'' +

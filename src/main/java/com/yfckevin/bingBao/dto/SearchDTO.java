@@ -5,6 +5,7 @@ public class SearchDTO {
     private String startDate;
     private String endDate;
     private String supplierName;
+    private String supplierId;
     private String mainCategory;
     private String subCategory;
     private String priority;
@@ -59,12 +60,12 @@ public class SearchDTO {
         this.endDate = endDate;
     }
 
-    public String getSupplierName() {
-        return supplierName;
+    public String getSupplierId() {
+        return supplierId;
     }
 
-    public void setSupplierName(String supplierName) {
-        this.supplierName = supplierName;
+    public void setSupplierId(String supplierId) {
+        this.supplierId = supplierId;
     }
 
     public String getStorePlace() {
@@ -81,5 +82,13 @@ public class SearchDTO {
 
     public void setPriority(String priority) {
         this.priority = priority;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
     }
 }

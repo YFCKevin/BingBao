@@ -50,4 +50,28 @@ public interface InventoryService {
     Map<String, Map<Long, List<Inventory>>> findAllAndDeletionDateIsNull();
 
     List<Inventory> findByReceiveItemIdAndUsedDateIsNull(String receiveItemId);
+
+    Map<String, Map<Long, List<Inventory>>> searchByNameAndSupplierId(String keyword, String supplierId, String type);
+
+    Map<String, Map<Long, List<Inventory>>> searchByNameAndMainCategoryAndSupplierId(String keyword, String mainCategory, String supplierId, String type);
+
+    Map<String, Map<Long, List<Inventory>>> searchByMainCategoryAndSupplierId(String mainCategory, String supplierId, String type);
+
+    Map<String, Map<Long, List<Inventory>>> searchByNameAndMainCategoryAndSubCategoryAndSupplierId(String keyword, String mainCategory, String subCategory, String supplierId, String type);
+
+    Map<String, Map<Long, List<Inventory>>> searchByMainCategoryAndSubCategoryAndSupplierId(String mainCategory, String subCategory, String supplierId, String type);
+
+    Map<String, Map<Long, List<Inventory>>> searchByNameAndStorePlaceAndSupplierId(String keyword, String storePlace, String supplierId, String type);
+
+    Map<String, Map<Long, List<Inventory>>> searchByNameAndMainCategoryAndStorePlaceAndSupplierId(String keyword, String mainCategory, String storePlace, String supplierId, String type);
+
+    Map<String, Map<Long, List<Inventory>>> searchByMainCategoryAndStorePlaceAndSupplierId(String mainCategory, String storePlace, String supplierId, String type);
+
+    Map<String, Map<Long, List<Inventory>>> searchByNameAndMainCategoryAndSubCategoryAndStorePlaceAndSupplierId(String keyword, String mainCategory, String subCategory, String storePlace, String supplierId, String type);
+
+    Map<String, Map<Long, List<Inventory>>> searchByMainCategoryAndSubCategoryAndStorePlaceAndSupplierId(String mainCategory, String subCategory, String storePlace, String supplierId, String type);
+
+    Map<String, Map<Long, List<Inventory>>> searchByStorePlaceAndSupplierId(String storePlace, String supplierId, String type);
+
+    Map<String, Map<Long, List<Inventory>>> searchBySupplierId(String supplierId, String type);
 }

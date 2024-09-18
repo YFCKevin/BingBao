@@ -318,41 +318,78 @@ public class InventoryController {
         final String subCategory = searchDTO.getSubCategory();
         final String type = searchDTO.getType();
         final String storePlace = searchDTO.getStorePlace();
-        System.out.println(keyword + " / " + mainCategory + " / " + subCategory + " / " + storePlace);
+        final String supplierId = searchDTO.getSupplierId();
+        System.out.println(keyword + " / " + mainCategory + " / " + subCategory + " / " + storePlace + " / " + supplierId);
         Map<String, Map<Long, List<Inventory>>> itemIdAmountInventoryMap = new HashMap<>();
-        if (StringUtils.isNotBlank(keyword) && StringUtils.isBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isBlank(storePlace)) {
+        if (StringUtils.isNotBlank(keyword) && StringUtils.isBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isBlank(storePlace) && StringUtils.isBlank(supplierId)) {
             // 只有輸入名稱
             itemIdAmountInventoryMap = inventoryService.searchByName(keyword, type);
-        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isBlank(storePlace)) {
+        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isBlank(storePlace) && StringUtils.isBlank(supplierId)) {
             // 有輸入名稱 + 只有主種類
             itemIdAmountInventoryMap = inventoryService.searchByNameAndMainCategory(keyword, mainCategory, type);
-        } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isBlank(storePlace)) {
+        } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isBlank(storePlace) && StringUtils.isBlank(supplierId)) {
             // 只有主種類
             itemIdAmountInventoryMap = inventoryService.searchByMainCategory(mainCategory, type);
-        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory) && StringUtils.isBlank(storePlace)) {
+        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory) && StringUtils.isBlank(storePlace) && StringUtils.isBlank(supplierId)) {
             // 有輸入名稱 + 有主種類 + 有副種類
             itemIdAmountInventoryMap = inventoryService.searchByNameAndMainCategoryAndSubCategory(keyword, mainCategory, subCategory, type);
-        } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory) && StringUtils.isBlank(storePlace)) {
+        } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory) && StringUtils.isBlank(storePlace) && StringUtils.isBlank(supplierId)) {
             // 有主種類 + 有副種類
             itemIdAmountInventoryMap = inventoryService.searchByMainCategoryAndSubCategory(mainCategory, subCategory, type);
-        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isNotBlank(storePlace)) {
+        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isNotBlank(storePlace) && StringUtils.isBlank(supplierId)) {
             // 輸入名稱 + 存放位置
             itemIdAmountInventoryMap = inventoryService.searchByNameAndStorePlace(keyword, type, storePlace);
-        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isNotBlank(storePlace)) {
+        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isNotBlank(storePlace) && StringUtils.isBlank(supplierId)) {
             // 有輸入名稱 + 只有主種類 + 存放位置
             itemIdAmountInventoryMap = inventoryService.searchByNameAndMainCategoryAndStorePlace(keyword, mainCategory, type, storePlace);
-        } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isNotBlank(storePlace)) {
+        } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isNotBlank(storePlace) && StringUtils.isBlank(supplierId)) {
             // 主種類 + 存放位置
             itemIdAmountInventoryMap = inventoryService.searchByMainCategoryAndStorePlace(mainCategory, type, storePlace);
-        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory) && StringUtils.isNotBlank(storePlace)) {
+        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory) && StringUtils.isNotBlank(storePlace) && StringUtils.isBlank(supplierId)) {
             // 有輸入名稱 + 有主種類 + 有副種類 + 存放位置
             itemIdAmountInventoryMap = inventoryService.searchByNameAndMainCategoryAndSubCategoryAndStorePlace(keyword, mainCategory, subCategory, type, storePlace);
-        } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory) && StringUtils.isNotBlank(storePlace)) {
+        } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory) && StringUtils.isNotBlank(storePlace) && StringUtils.isBlank(supplierId)) {
             // 有主種類 + 有副種類 + 存放位置
             itemIdAmountInventoryMap = inventoryService.searchByMainCategoryAndSubCategoryAndStorePlace(mainCategory, subCategory, type, storePlace);
-        } else if (StringUtils.isBlank(keyword) && StringUtils.isBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isNotBlank(storePlace)) {
+        } else if (StringUtils.isBlank(keyword) && StringUtils.isBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isNotBlank(storePlace) && StringUtils.isBlank(supplierId)) {
             // 只有存放位置
             itemIdAmountInventoryMap = inventoryService.searchByStorePlace(type, storePlace);
+        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isBlank(storePlace) && StringUtils.isNotBlank(supplierId)) {
+            // 只有輸入名稱 + 供應商名
+            itemIdAmountInventoryMap = inventoryService.searchByNameAndSupplierId(keyword, supplierId, type);
+        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isBlank(storePlace) && StringUtils.isNotBlank(supplierId)) {
+            // 有輸入名稱 + 只有主種類 + 應商名
+            itemIdAmountInventoryMap = inventoryService.searchByNameAndMainCategoryAndSupplierId(keyword, mainCategory, supplierId, type);
+        } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isBlank(storePlace) && StringUtils.isNotBlank(supplierId)) {
+            // 只有主種類 + 供應商名
+            itemIdAmountInventoryMap = inventoryService.searchByMainCategoryAndSupplierId(mainCategory, supplierId, type);
+        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory) && StringUtils.isBlank(storePlace) && StringUtils.isNotBlank(supplierId)) {
+            // 有輸入名稱 + 有主種類 + 有副種類 + 供應商名
+            itemIdAmountInventoryMap = inventoryService.searchByNameAndMainCategoryAndSubCategoryAndSupplierId(keyword, mainCategory, subCategory, supplierId, type);
+        } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory) && StringUtils.isBlank(storePlace) && StringUtils.isNotBlank(supplierId)) {
+            // 有主種類 + 有副種類 + 供應商名
+            itemIdAmountInventoryMap = inventoryService.searchByMainCategoryAndSubCategoryAndSupplierId(mainCategory, subCategory, supplierId, type);
+        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isNotBlank(storePlace) && StringUtils.isNotBlank(supplierId)) {
+            // 輸入名稱 + 存放位置 + 供應商名
+            itemIdAmountInventoryMap = inventoryService.searchByNameAndStorePlaceAndSupplierId(keyword, storePlace, supplierId, type);
+        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isNotBlank(storePlace) && StringUtils.isNotBlank(supplierId)) {
+            // 有輸入名稱 + 只有主種類 + 存放位置 + 供應商名
+            itemIdAmountInventoryMap = inventoryService.searchByNameAndMainCategoryAndStorePlaceAndSupplierId(keyword, mainCategory, storePlace, supplierId, type);
+        } else if (StringUtils.isBlank(keyword) && StringUtils.isBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isNotBlank(storePlace) && StringUtils.isNotBlank(supplierId)) {
+            // 主種類 + 存放位置 + 供應商名
+            itemIdAmountInventoryMap = inventoryService.searchByMainCategoryAndStorePlaceAndSupplierId(mainCategory, storePlace, supplierId, type);
+        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory) && StringUtils.isNotBlank(storePlace) && StringUtils.isNotBlank(supplierId)) {
+            // 有輸入名稱 + 有主種類 + 有副種類 + 存放位置 + 供應商名
+            itemIdAmountInventoryMap = inventoryService.searchByNameAndMainCategoryAndSubCategoryAndStorePlaceAndSupplierId(keyword, mainCategory, subCategory, storePlace, supplierId, type);
+        } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory) && StringUtils.isNotBlank(storePlace) && StringUtils.isNotBlank(supplierId)) {
+            // 有主種類 + 有副種類 + 存放位置 + 供應商名
+            itemIdAmountInventoryMap = inventoryService.searchByMainCategoryAndSubCategoryAndStorePlaceAndSupplierId(mainCategory, subCategory, storePlace, supplierId, type);
+        } else if (StringUtils.isBlank(keyword) && StringUtils.isBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isNotBlank(storePlace) && StringUtils.isNotBlank(supplierId)) {
+            // 只有存放位置 + 供應商名
+            itemIdAmountInventoryMap = inventoryService.searchByStorePlaceAndSupplierId(storePlace, supplierId, type);
+        } else if (StringUtils.isBlank(keyword) && StringUtils.isBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isBlank(storePlace) && StringUtils.isNotBlank(supplierId)) {
+            // 只有供應商名
+            itemIdAmountInventoryMap = inventoryService.searchBySupplierId(supplierId, type);
         } else {
             // 全空白搜尋全部
             itemIdAmountInventoryMap = inventoryService.searchByName("", type);

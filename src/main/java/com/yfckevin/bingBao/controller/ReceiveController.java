@@ -127,6 +127,7 @@ public class ReceiveController {
                         inventory.setReceiveFormNumber(savedReceiveForm.getReceiveNumber());
                         inventory.setStoreNumber(storeNumber);
                         inventory.setExpiryDate(expiryDate);
+                        inventory.setSupplierId(dto.getSupplierId());
                         //計算今日到有效期限的天數差 => 保鮮期
 //                        LocalDate now = LocalDate.now();
 //                        LocalDate parsedExpiryDate = LocalDate.parse(expiryDate);
