@@ -1346,22 +1346,40 @@ public class InventoryServiceImpl implements InventoryService {
         Map<String, Long> itemCountMap = inventoriesFromMongo.stream()
                 .collect(Collectors.groupingBy(Inventory::getReceiveItemId, Collectors.counting()));
 
+        List<String> productIds = inventoriesFromMongo.stream()
+                .map(Inventory::getProductId)
+                .collect(Collectors.toList());
+
+        Map<String, Product> productMapFromDB = productService.findByIdIn(productIds)
+                .stream()
+                .collect(Collectors.toMap(Product::getId, product -> product));
+
+        Map<String, Optional<Product>> productMap = inventoriesFromMongo.stream()
+                .collect(Collectors.toMap(
+                        Inventory::getProductId,
+                        inventory -> Optional.ofNullable(productMapFromDB.get(inventory.getProductId())),
+                        (existing, replacement) -> existing
+                ));
+
         return inventoriesFromMongo.stream()
                 .filter(inventory -> {
-                    return productService.findById(inventory.getProductId())
-                            .map(product -> {
-                                if (StringUtils.isBlank(product.getInventoryAlert())) {
-                                    return false;
-                                }
-                                BigDecimal inventoryAlert = new BigDecimal(product.getInventoryAlert());
-                                BigDecimal totalAmount = new BigDecimal(itemCountMap.get(inventory.getReceiveItemId()));
-                                BigDecimal totalInventoryAlert = PackageForm.COMPLETE.equals(product.getPackageForm())
-                                        ? inventoryAlert.multiply(new BigDecimal(product.getPackageQuantity()))
-                                        : inventoryAlert;
-                                // 只保留 totalAmount 小於等於 inventoryAlert 的Inventory
-                                return totalInventoryAlert.compareTo(totalAmount) >= 0;
-                            })
-                            .orElse(false);  // 如果找不到產品，回傳 false
+                    Optional<Product> productOpt = productMap.get(inventory.getProductId());
+
+                    // 如果產品存在且 inventoryAlert 不為空
+                    return productOpt.map(product -> {
+                        if (StringUtils.isBlank(product.getInventoryAlert())) {
+                            return false;
+                        }
+
+                        BigDecimal inventoryAlert = new BigDecimal(product.getInventoryAlert());
+                        BigDecimal totalAmount = new BigDecimal(itemCountMap.get(inventory.getReceiveItemId()));
+                        BigDecimal totalInventoryAlert = PackageForm.COMPLETE.equals(product.getPackageForm())
+                                ? inventoryAlert.multiply(new BigDecimal(product.getPackageQuantity()))
+                                : inventoryAlert;
+
+                        // 只保留 totalAmount 小於等於 inventoryAlert 的 Inventory
+                        return totalInventoryAlert.compareTo(totalAmount) >= 0;
+                    }).orElse(false);  // 如果找不到產品，返回 false
                 })
                 .collect(Collectors.groupingBy(
                         Inventory::getReceiveItemId,
