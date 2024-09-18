@@ -138,6 +138,7 @@
                         <a href="product.html">
                             <i class="fas fa-fish"></i>
                             <p>食材模板</p>
+                            <span class="badge" x-text="productListLabel" style="background-color: gray; color: white;"></span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -514,6 +515,7 @@
 				shoppingList: [],
 				todayListLabel: [],
 				shoppingListLabel: [],
+				productListLabel: [],
 				targetDeleteId: "",
 				targetEditId: "",
                 selectedCategory: "",
@@ -575,6 +577,16 @@
 						success: function (response) {
 							if (response.code == "C000"){
 								_this.shoppingListLabel = response.data;
+							}
+						},
+				  	});
+				    $.ajax({
+						url: "getProductSize",
+						type: "get",
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.productListLabel = response.data;
 							}
 						},
 				  	});
