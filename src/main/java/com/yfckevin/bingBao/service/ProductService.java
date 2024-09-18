@@ -28,4 +28,6 @@ public interface ProductService {
     List<Product> searchProductByNameAndMainCategoryAndSubCategory(String keyword, String mainCategory, String subCategory);
 
     List<Product> searchProductByMainCategoryAndSubCategory(String mainCategory, String subCategory);
+
+    long countByDeletionDateIsNull();
 }

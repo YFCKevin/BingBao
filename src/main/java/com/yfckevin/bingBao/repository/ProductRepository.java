@@ -12,4 +12,6 @@ public interface ProductRepository extends MongoRepository<Product, String> {
     List<Product> searchProductByName(String keyword);
 
     List<Product> findByIdIn(List<String> productIds);
+
+    long countByDeletionDateIsNull();
 }

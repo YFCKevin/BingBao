@@ -622,6 +622,29 @@ public class ProductController {
     }
 
 
+    /**
+     * 取得總食材數量
+     * @param session
+     * @return
+     */
+    @GetMapping("/getProductSize")
+    public ResponseEntity<?> getProductSize (HttpSession session){
+
+        final MemberDTO member = (MemberDTO) session.getAttribute("member");
+        if (member != null) {
+            logger.info("[" + member.getName() + "]" + "[getShoppingListSize]");
+        }
+        ResultStatus resultStatus = new ResultStatus();
+
+        long size = productService.countByDeletionDateIsNull();
+        resultStatus.setCode("C000");
+        resultStatus.setMessage("成功");
+        resultStatus.setData(size);
+        return ResponseEntity.ok(resultStatus);
+    }
+
+
+
     public ProductDTO constructProductDTO(Product product) {
         ProductDTO dto = new ProductDTO();
         dto.setName(product.getName());

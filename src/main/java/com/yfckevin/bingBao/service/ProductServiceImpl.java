@@ -146,4 +146,9 @@ public class ProductServiceImpl implements ProductService{
         Query query = new Query(criteria);
         return mongoTemplate.find(query, Product.class);
     }
+
+    @Override
+    public long countByDeletionDateIsNull() {
+        return productRepository.countByDeletionDateIsNull();
+    }
 }
