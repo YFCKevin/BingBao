@@ -47,13 +47,13 @@ public class ShoppingListController {
         this.receiveFormService = receiveFormService;
     }
 
-    //    @GetMapping("/addToShoppingList")
+//    @GetMapping("/addToShoppingList")
     /**
      * 每1小時執行一次，低於庫存水平線的食材加入購物清單
      * @return
      */
     @Scheduled(cron = "0 0 */1 * * *")
-    public ResponseEntity<?> addToShoppingList (){
+    public ResponseEntity<?> addToShoppingList() {
         logger.info("低於庫存水平線的食材加入購物清單");
         ResultStatus resultStatus = new ResultStatus();
         Map<String, Map<Long, List<Inventory>>> itemIdAmountInventoryMap = inventoryService.findAllAndDeletionDateIsNull();
@@ -62,22 +62,30 @@ public class ShoppingListController {
                         Map.Entry::getKey,
                         entry -> entry.getValue().values().stream().flatMap(List::stream).count()
                 ));
+        //改用groupingBy避免相同receiveItemId被壓縮成一筆Inventory，因為後續要用inventoryList變更addShoppingList屬性
         final List<Inventory> inventoryList = itemIdAmountInventoryMap.values().stream()
                 .flatMap(innerMap -> innerMap.values().stream())
                 .flatMap(List::stream)
-                .collect(Collectors.toMap(
-                        Inventory::getReceiveItemId,
-                        Function.identity(),
-                        (existing, replacement) -> existing
+                .filter(inventory -> !inventory.isAddShoppingList())  // 只保留尚未放進回購清單的庫存食材
+                .collect(Collectors.groupingBy(
+                        Inventory::getReceiveItemId
                 ))
                 .values()
                 .stream()
-                .filter(inventory -> !inventory.isAddShoppingList())  //只保留尚未放進回購清單的庫存食材
+                .flatMap(List::stream)
                 .toList();
         final List<String> productIds = inventoryList.stream().map(Inventory::getProductId).toList();
         final Map<String, Product> tempProductMap = productService.findByIdIn(productIds).stream()
                 .collect(Collectors.toMap(Product::getId, Function.identity()));
         List<InventoryDTO> finalInventory = inventoryList.stream()
+                //相同productId的Inventory只取第一個，因為後續要用finalInventory儲存shoppingList，避免相同食材儲存多筆
+                .collect(Collectors.toMap(
+                        Inventory::getProductId,
+                        Function.identity(),
+                        (existing, replacement) -> existing
+                        ))
+                .values()
+                .stream()
                 .map(inventory -> {
                     final Long totalAmount = receiveItemIdInventoryAmountMap.get(inventory.getReceiveItemId());
                     final Product product = tempProductMap.get(inventory.getProductId());
@@ -128,12 +136,13 @@ public class ShoppingListController {
 
     /**
      * 模糊查詢回購品項
+     *
      * @param searchDTO
      * @param session
      * @return
      */
     @PostMapping("/shoppingItemSearch")
-    public ResponseEntity<?> shoppingItemSearch (@RequestBody SearchDTO searchDTO, HttpSession session){
+    public ResponseEntity<?> shoppingItemSearch(@RequestBody SearchDTO searchDTO, HttpSession session) {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
@@ -151,34 +160,34 @@ public class ShoppingListController {
         if (StringUtils.isNotBlank(keyword) && StringUtils.isBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isBlank(priority)) {
             // 只有輸入名稱
             shoppingItemList = shoppingService.searchByName(keyword);
-        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isBlank(priority)){
+        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isBlank(priority)) {
             // 有輸入名稱 + 只有主種類
             shoppingItemList = shoppingService.searchByNameAndMainCategory(keyword, mainCategory);
-        } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isBlank(priority)){
+        } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isBlank(priority)) {
             // 只有主種類
             shoppingItemList = shoppingService.searchByMainCategory(mainCategory);
-        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory) && StringUtils.isBlank(priority)){
+        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory) && StringUtils.isBlank(priority)) {
             // 有輸入名稱 + 有主種類 + 有副種類
             shoppingItemList = shoppingService.searchByNameAndMainCategoryAndSubCategory(keyword, mainCategory, subCategory);
-        } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory) && StringUtils.isBlank(priority)){
+        } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory) && StringUtils.isBlank(priority)) {
             // 有主種類 + 有副種類
             shoppingItemList = shoppingService.searchByMainCategoryAndSubCategory(mainCategory, subCategory);
         } else if (StringUtils.isNotBlank(keyword) && StringUtils.isBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isNotBlank(priority)) {
             // 只有輸入名稱 + 優先級
             shoppingItemList = shoppingService.searchByNameAndPriority(keyword, priority);
-        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isNotBlank(priority)){
+        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isNotBlank(priority)) {
             // 有輸入名稱 + 只有主種類 + 優先級
             shoppingItemList = shoppingService.searchByNameAndMainCategoryAndPriority(keyword, mainCategory, priority);
-        } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isNotBlank(priority)){
+        } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isNotBlank(priority)) {
             // 只有主種類 + 優先級
             shoppingItemList = shoppingService.searchByMainCategoryAndPriority(mainCategory, priority);
-        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory) && StringUtils.isNotBlank(priority)){
+        } else if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory) && StringUtils.isNotBlank(priority)) {
             // 有輸入名稱 + 有主種類 + 有副種類 + 優先級
             shoppingItemList = shoppingService.searchByNameAndMainCategoryAndSubCategoryAndPriority(keyword, mainCategory, subCategory, priority);
-        } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory) && StringUtils.isNotBlank(priority)){
+        } else if (StringUtils.isBlank(keyword) && StringUtils.isNotBlank(mainCategory) && StringUtils.isNotBlank(subCategory) && StringUtils.isNotBlank(priority)) {
             // 有主種類 + 有副種類 + 優先級
-            shoppingItemList = shoppingService.searchByMainCategoryAndSubCategoryAndPriority(mainCategory, subCategory,priority);
-        } else if (StringUtils.isBlank(keyword) && StringUtils.isBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isNotBlank(priority)){
+            shoppingItemList = shoppingService.searchByMainCategoryAndSubCategoryAndPriority(mainCategory, subCategory, priority);
+        } else if (StringUtils.isBlank(keyword) && StringUtils.isBlank(mainCategory) && StringUtils.isBlank(subCategory) && StringUtils.isNotBlank(priority)) {
             // 只有優先級
             shoppingItemList = shoppingService.searchByPriority(priority);
         } else {
@@ -189,7 +198,7 @@ public class ShoppingListController {
         final List<ShoppingItemDTO> shoppingItemDTOList = shoppingItemList.stream()
                 .filter(s -> Boolean.FALSE.equals(s.isPurchased())) // 只保留尚未回購的品項
                 .sorted(Comparator.comparing(ShoppingItem::getPriorityType)
-                .thenComparing(Comparator.comparing(ShoppingItem::getCreationDate).reversed()))
+                        .thenComparing(Comparator.comparing(ShoppingItem::getCreationDate).reversed()))
                 .map(this::constructShoppingDTO)
                 .toList();
 
@@ -201,12 +210,13 @@ public class ShoppingListController {
 
     /**
      * 刪除回購品項
+     *
      * @param id
      * @param session
      * @return
      */
     @DeleteMapping("/deleteShoppingItem/{id}")
-    public ResponseEntity<?> deleteShoppingItem (@PathVariable String id, HttpSession session){
+    public ResponseEntity<?> deleteShoppingItem(@PathVariable String id, HttpSession session) {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
@@ -231,12 +241,13 @@ public class ShoppingListController {
 
     /**
      * 變更購買狀態
+     *
      * @param id
      * @param session
      * @return
      */
     @GetMapping("/changePurchase/{id}")
-    public ResponseEntity<?> changePurchase (@PathVariable String id, HttpSession session){
+    public ResponseEntity<?> changePurchase(@PathVariable String id, HttpSession session) {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
@@ -261,12 +272,13 @@ public class ShoppingListController {
 
     /**
      * 變更回購品項的數量
+     *
      * @param dto
      * @param session
      * @return
      */
     @PostMapping("/editPurchaseQuantity")
-    public ResponseEntity<?> editPurchaseQuantity (@RequestBody PurchaseRequestDTO dto, HttpSession session){
+    public ResponseEntity<?> editPurchaseQuantity(@RequestBody PurchaseRequestDTO dto, HttpSession session) {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
@@ -292,12 +304,13 @@ public class ShoppingListController {
 
     /**
      * 變更優先級別
+     *
      * @param id
      * @param session
      * @return
      */
     @GetMapping("/changePriority/{id}")
-    public ResponseEntity<?> changePriority (@PathVariable String id, HttpSession session){
+    public ResponseEntity<?> changePriority(@PathVariable String id, HttpSession session) {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
@@ -311,9 +324,9 @@ public class ShoppingListController {
             resultStatus.setMessage("查無回購物品");
         } else {
             final ShoppingItem shoppingItem = opt.get();
-            if (PriorityType.URGENT.equals(shoppingItem.getPriorityType())){
+            if (PriorityType.URGENT.equals(shoppingItem.getPriorityType())) {
                 shoppingItem.setPriorityType(PriorityType.NORMAL);
-            } else if (PriorityType.NORMAL.equals(shoppingItem.getPriorityType())){
+            } else if (PriorityType.NORMAL.equals(shoppingItem.getPriorityType())) {
                 shoppingItem.setPriorityType(PriorityType.URGENT);
             }
             final ShoppingItem savedShoppingItem = shoppingService.save(shoppingItem);
@@ -327,11 +340,12 @@ public class ShoppingListController {
 
     /**
      * 取得本日新增回購品項的數量
+     *
      * @param session
      * @return
      */
     @GetMapping("/getShoppingListSize")
-    public ResponseEntity<?> getShoppingListSize (HttpSession session){
+    public ResponseEntity<?> getShoppingListSize(HttpSession session) {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
@@ -345,7 +359,6 @@ public class ShoppingListController {
         resultStatus.setData(size);
         return ResponseEntity.ok(resultStatus);
     }
-
 
 
     public ShoppingItemDTO constructShoppingDTO(ShoppingItem shoppingItem) {
@@ -387,8 +400,6 @@ public class ShoppingListController {
 
         return dto;
     }
-
-
 
 
     private InventoryDTO constructInventoryDTO(Inventory inventory, Product product, String totalAmount) {
