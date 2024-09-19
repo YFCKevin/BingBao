@@ -544,7 +544,10 @@
 						contentType: "application/json; charset=utf-8",
 						success: function (response) {
 							if (response.code == "C000"){
-								_this.shoppingList = response.data;
+							    _this.shoppingList = response.data;
+							    _this.shoppingList.forEach(item => {
+							        item.creationDate = new Date(item.creationDate).toLocaleDateString('en-CA');
+							    })
 							}
 						},
 						error: function(error) {
@@ -608,10 +611,19 @@
 				        amountText = totalAmount + '份';
 				    }
 
+                    let newTotalAmount = totalAmount * packageQuantity;
+                    let newAmountText;
+
+                    if (packageForm === 'COMPLETE') {
+                        newAmountText = totalAmount + ' x ' + packageQuantity + packageUnitLabel + ' = ' + newTotalAmount + packageUnitLabel;
+                    } else {
+                        newAmountText = newTotalAmount + '份';
+                    }
+
 				    let _this = this;
                     Swal.fire({
-						title: '下方欄位填寫要變更回購的「包裝數量」',
-						text: '回購總數量：' + amountText,
+						title: '填寫要變更回購的「包裝數量」',
+						html: `原本回購總數量：${amountText}<br><br>修改回購總數量為：${newAmountText}`,
 						input: 'number',
 						inputAttributes: {
 							min: 1,          // 最小值
@@ -625,6 +637,24 @@
 							confirmButton: 'btn btn-success',
 							cancelButton: 'btn btn-danger'
 						},
+						inputValue: totalAmount,
+                        didOpen: () => {
+                            const inputElement = Swal.getInput();
+                            inputElement.addEventListener('input', () => {
+                                const enteredAmount = inputElement.value;
+                                newTotalAmount = enteredAmount * packageQuantity;
+
+                                if (packageForm === 'COMPLETE') {
+                                    newAmountText = enteredAmount + ' x ' + packageQuantity + packageUnitLabel + ' = ' + newTotalAmount + packageUnitLabel;
+                                } else {
+                                    newAmountText = newTotalAmount + '份';
+                                }
+
+                                Swal.update({
+                                    html: `原本回購總數量：${amountText}<br><br>修改回購總數量為：${newAmountText}` // 更新顯示
+                                });
+                            });
+                        },
 					}).then((result) => {
 						if (result.isConfirmed) {
 							let enteredAmount = result.value;
@@ -958,7 +988,10 @@
 						success: function (response) {
 							if (response.code == "C000"){
 							    _this.pageNumber = 0;
-								_this.shoppingList = response.data;
+                                _this.shoppingList = response.data;
+							    _this.shoppingList.forEach(item => {
+							        item.creationDate = new Date(item.creationDate).toLocaleDateString('en-CA');
+							    })
 							}
 						},
 						error: function(error) {
