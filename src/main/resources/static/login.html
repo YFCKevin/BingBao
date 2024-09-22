@@ -99,7 +99,8 @@
 			contentType: "application/json; charset=utf-8",
 			success: function (response) {
 			    if (response.code == "C000"){
-					location.href = "dashboard.html";
+			        const url = response.data;
+					location.href = url;
 				} else {
                     Swal.fire({
 					    title: '帳號或密碼錯誤！',

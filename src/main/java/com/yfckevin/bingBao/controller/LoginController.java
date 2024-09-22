@@ -53,6 +53,7 @@ public class LoginController {
             session.setAttribute("member", dto);
             resultStatus.setCode("C000");
             resultStatus.setMessage("成功");
+            resultStatus.setData(configProperties.getGlobalDomain() + "dashboard.html");
         }
         return ResponseEntity.ok(resultStatus);
     }
