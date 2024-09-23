@@ -98,6 +98,8 @@ public class ProductController {
                 return ResponseEntity.ok(resultStatus);
             }
 
+        } else if (StringUtils.isBlank(dto.getCopyCoverName())) {
+            fileName = null;
         } else if (!"fridge002.jpg".equals(dto.getCopyCoverName())) {
             fileName = FileUtils.copyAndRenameFile(dto.getCopyCoverName(), configProperties.getPicSavePath(), configProperties.getPicSavePath());
         }

@@ -76,6 +76,7 @@ public class FlexMessageUtil {
         final List<InventoryDTO> finalInventoryDTOList = groupedByStorePlace.values().stream()
                 .flatMap(inventoryDTOS -> inventoryDTOS.stream()
                         .sorted(Comparator.comparing(InventoryDTO::getExpiryDate)))
+                .filter(inventoryDTO -> !"0".equals(inventoryDTO.getOverdueNotice()))   //去掉沒有設定「通知過期天數」的品項
                 .toList();
 
         if (finalInventoryDTOList.size() == 0) {
