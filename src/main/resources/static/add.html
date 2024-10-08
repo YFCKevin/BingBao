@@ -565,7 +565,8 @@
 
 					//回購
 					if (this.addShoppingList == true){
-						if (this.alertValue.trim() === '' || this.alertValue.trim() == 0 || isNaN(this.alertValue)){
+						const alertValueStr = String(this.alertValue).trim();
+						if (alertValueStr === '' || Number(alertValueStr) === 0 || isNaN(alertValueStr)){
 							$("#inventoryAlert").closest('div').addClass('has-error');
 							hasError = true;
 						}
