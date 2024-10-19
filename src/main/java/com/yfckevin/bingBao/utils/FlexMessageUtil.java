@@ -113,7 +113,7 @@ public class FlexMessageUtil {
             Map<String, String> defaultAction = new HashMap<>();
             defaultAction.put("type", "uri");
             defaultAction.put("label", "前往首頁");
-            defaultAction.put("uri", "https://www.gurula.cc/bingBao/dashboard.html");
+            defaultAction.put("uri", "https://gurula.cc/bingBao/dashboard.html");
             column.put("defaultAction", defaultAction);
 
             // Actions
@@ -123,7 +123,7 @@ public class FlexMessageUtil {
             Map<String, Object> viewDetailAction = new HashMap<>();
             viewDetailAction.put("type", "uri");
             viewDetailAction.put("label", "前往冰箱清單");
-            viewDetailAction.put("uri", "https://www.gurula.cc/bingBao/dashboard.html");
+            viewDetailAction.put("uri", "https://gurula.cc/bingBao/dashboard.html");
             actions.add(viewDetailAction);
 
 //            // 前往報名的action
