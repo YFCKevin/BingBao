@@ -7,7 +7,7 @@
  - [致謝](#致謝)
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Language-Java-orange.svg" alt="">  <img src="https://img.shields.io/badge/Language-Javascript-yellow.svg" alt="">  <img src="https://img.shields.io/badge/Language-python-blue.svg" alt="">
+  <img src="https://img.shields.io/badge/Language-Java-orange.svg" alt="">  <img src="https://img.shields.io/badge/Language-Javascript-yellow.svg" alt="">
 </p>
 
 <p>創建食材：</p>
@@ -23,7 +23,7 @@
   <img src="https://github.com/YFCKevin/BingBao/blob/main/bingBao%20-%20shopping.gif" width="100%" alt="描述">
 </p>
 
-[冰寶登入首頁](https://www.gurula.cc/bingBaoTest/login.html)<br><br>
+[冰寶登入首頁](https://gurula.cc/bingBaoTest/login.html)<br><br>
 <p align="left">
   <img src="https://github.com/YFCKevin/BingBao/blob/main/bingBao-line-screenshot-1.png" alt="Line截圖1" width="400" height="520">       <img src="https://github.com/YFCKevin/BingBao/blob/main/bingBao-line-screenshot-2.png" alt="Line截圖2" width="400" height="520">
 </p>
