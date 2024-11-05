@@ -44,8 +44,9 @@ public class ProductController {
     private final ReceiveItemService receiveItemService;
     private final OpenAiService openAiService;
     private final ConfigProperties configProperties;
+    private final DataProcessService dataProcessService;
 
-    public ProductController(@Qualifier("sdf") SimpleDateFormat sdf, @Qualifier("picSuffix") SimpleDateFormat picSuffix, ProductService productService, GoogleVisionService googleVisionService, TempMasterService tempMasterService, ReceiveItemService receiveItemService, OpenAiService openAiService, ConfigProperties configProperties) {
+    public ProductController(@Qualifier("sdf") SimpleDateFormat sdf, @Qualifier("picSuffix") SimpleDateFormat picSuffix, ProductService productService, GoogleVisionService googleVisionService, TempMasterService tempMasterService, ReceiveItemService receiveItemService, OpenAiService openAiService, ConfigProperties configProperties, DataProcessService dataProcessService) {
         this.sdf = sdf;
         this.picSuffix = picSuffix;
         this.productService = productService;
@@ -54,6 +55,7 @@ public class ProductController {
         this.receiveItemService = receiveItemService;
         this.openAiService = openAiService;
         this.configProperties = configProperties;
+        this.dataProcessService = dataProcessService;
     }
 
 
@@ -128,6 +130,9 @@ public class ProductController {
         resultStatus.setCode("C000");
         resultStatus.setMessage("成功");
         resultStatus.setData(constructProductDTO(savedProduct));
+
+        dataProcessService.productDataProcess(savedProduct);
+
         return ResponseEntity.ok(resultStatus);
     }
 
@@ -197,6 +202,8 @@ public class ProductController {
             resultStatus.setCode("C000");
             resultStatus.setMessage("成功");
             resultStatus.setData(savedProduct);
+
+            dataProcessService.productDataProcess(savedProduct);
         }
         return ResponseEntity.ok(resultStatus);
     }
@@ -351,6 +358,9 @@ public class ProductController {
         resultStatus.setCode("C000");
         resultStatus.setMessage("成功");
         resultStatus.setData(productDTOS);
+
+        dataProcessService.productDataProcessBatch(savedProductList);
+
         return ResponseEntity.ok(resultStatus);
     }
 
@@ -464,6 +474,7 @@ public class ProductController {
                         productService.deleteById(id);
                         resultStatus.setCode("C000");
                         resultStatus.setMessage("成功");
+                        dataProcessService.productDataProcessToDelete(p);
                     } else {
                         resultStatus.setCode("C011");
                         resultStatus.setMessage("該模板已使用");

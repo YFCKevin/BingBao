@@ -29,6 +29,12 @@ public class ConfigProperties {
     public String aiPicShowPath;
     @Value("${config.channelAccessToken}")
     public String channelAccessToken;
+    @Value("${spring.redis.host}")
+    private String redisDomain;
+    @Value("${spring.redis.password}")
+    private String redisPassword;
+    @Value("${spring.redis.port}")
+    private int redisPort;
 
     public String getApiKey() {
         return apiKey;
@@ -76,5 +82,17 @@ public class ConfigProperties {
 
     public String getChannelAccessToken() {
         return channelAccessToken;
+    }
+
+    public String getRedisDomain() {
+        return redisDomain;
+    }
+
+    public String getRedisPassword() {
+        return redisPassword;
+    }
+
+    public int getRedisPort() {
+        return redisPort;
     }
 }

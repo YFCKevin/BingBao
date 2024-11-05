@@ -4,13 +4,9 @@ import com.yfckevin.bingBao.ConfigProperties;
 import com.yfckevin.bingBao.dto.*;
 import com.yfckevin.bingBao.entity.Inventory;
 import com.yfckevin.bingBao.entity.Product;
-import com.yfckevin.bingBao.entity.ReceiveItem;
 import com.yfckevin.bingBao.enums.StorePlace;
 import com.yfckevin.bingBao.exception.ResultStatus;
-import com.yfckevin.bingBao.service.InventoryService;
-import com.yfckevin.bingBao.service.ProductService;
-import com.yfckevin.bingBao.service.ReceiveFormService;
-import com.yfckevin.bingBao.service.ReceiveItemService;
+import com.yfckevin.bingBao.service.*;
 import com.yfckevin.bingBao.utils.FileUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -22,8 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -38,12 +32,14 @@ public class InventoryController {
     private final ConfigProperties configProperties;
     private final InventoryService inventoryService;
     private final ProductService productService;
+    private final DataProcessService dataProcessService;
 
-    public InventoryController(@Qualifier("sdf") SimpleDateFormat sdf, ConfigProperties configProperties, InventoryService inventoryService, ProductService productService) {
+    public InventoryController(@Qualifier("sdf") SimpleDateFormat sdf, ConfigProperties configProperties, InventoryService inventoryService, ProductService productService, DataProcessService dataProcessService) {
         this.sdf = sdf;
         this.configProperties = configProperties;
         this.inventoryService = inventoryService;
         this.productService = productService;
+        this.dataProcessService = dataProcessService;
     }
 
     /**
@@ -92,6 +88,9 @@ public class InventoryController {
             resultStatus.setCode("C000");
             resultStatus.setMessage("成功");
         }
+
+        dataProcessService.inventoryDataProcess(inventoriesToUpdate);
+
         return ResponseEntity.ok(resultStatus);
     }
 
@@ -129,6 +128,9 @@ public class InventoryController {
             resultStatus.setCode("C000");
             resultStatus.setMessage("成功");
         }
+
+        dataProcessService.inventoryDataProcess(inventoriesToUpdate);
+
         return ResponseEntity.ok(resultStatus);
     }
 
@@ -145,6 +147,8 @@ public class InventoryController {
         final List<Inventory> inventoryList = inventoryService.findByReceiveItemIdAndUsedDateIsNull(id);
         final List<Inventory> inventoriesToDelete = inventoryList.stream().peek(i -> i.setDeletionDate(sdf.format(new Date()))).toList();
         inventoryService.saveAll(inventoriesToDelete);
+
+        dataProcessService.inventoryDataProcess(inventoriesToDelete);
 
         resultStatus.setCode("C000");
         resultStatus.setMessage("成功");
