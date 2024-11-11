@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 
 public interface InventoryRepository extends MongoRepository<Inventory, String> {
-    List<Inventory> findByIdIn(List<String> receiveItemIds);
+    List<Inventory> findByReceiveItemIdIn(List<String> receiveItemIds);
 
     List<Inventory> findByReceiveItemId(String receiveItemId);
 

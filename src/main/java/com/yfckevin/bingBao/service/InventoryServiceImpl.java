@@ -46,7 +46,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public List<Inventory> findByIdIn(List<String> receiveItemIds) {
-        return inventoryRepository.findByIdIn(receiveItemIds);
+        return inventoryRepository.findByReceiveItemIdIn(receiveItemIds);
     }
 
     @Override

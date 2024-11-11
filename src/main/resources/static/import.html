@@ -11,6 +11,8 @@
 	<meta property="og:type" content="website">
 	<meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
 	<link rel="icon" href="images/favicon.ico" type="image/x-icon"/>
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"/>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway|Ubuntu&display=swap">
 	<style>
 		.image-container {
             position: relative;
@@ -37,6 +39,30 @@
 
 		.image-container:hover .overlay {
 			opacity: 1;
+		}
+
+
+		.loading-dots::after {
+			content: ' ';
+			display: inline-block;
+			width: 1em;
+			text-align: left;
+			animation: dots 1s steps(5, end) infinite;
+		}
+
+		@keyframes dots {
+			0%, 20% {
+				content: '';
+			}
+			40% {
+				content: '.';
+			}
+			60% {
+				content: '..';
+			}
+			80%, 100% {
+				content: '...';
+			}
 		}
 	</style>
 	<!-- Fonts and icons -->
@@ -336,6 +362,46 @@
 			</footer>
 		</div>
 
+		<div x-data="loadData_chatroom()" x-init="init_chatroom()">
+			<div class="position-fixed bottom-0 end-0 mb-4 me-4">
+				<button x-on:click="connect($event)" id="open-chat" class="btn btn-dark rounded-circle d-flex align-items-center justify-content-center p-3" style="width: 60px; height: 60px;">
+					<i class="fas fa-comments text-white fa-lg"></i>
+				</button>
+			</div>
+			<div id="chat-container" class="d-none position-fixed bottom-0 end-0 me-4" style="width: 24rem; margin-bottom:6rem">
+				<div class="card shadow-lg">
+					<div class="card-header bg-dark d-flex justify-content-between align-items-center">
+						<h6 class="mb-2 mt-2" style="color: white;">冰寶小助手</h6>
+						<button x-on:click="disconnect()" id="close-chat" class="btn-close btn-close-white" aria-label="Close"></button>
+					</div>
+					<template x-if="memberId != undefined">
+						<div id="chatbox" class="card-body overflow-auto" style="height: 20rem;">
+							<!-- Chat messages will be displayed here -->
+							<template x-for="(chat, index) in chatData" :key="index">
+								<div :class="index % 2 === 0 ? 'text-end' : 'text-start'" class="mb-2">
+									<p x-html="chat.text"
+									   :class="index % 2 === 0 ? 'bg-primary text-white' : 'text-black'"
+									   class="rounded-3 py-2 px-3 d-inline-block"
+									   :style="index % 2 !== 0 ? 'background-color: var(--bs-gray-300); margin-bottom: 0rem;' : 'margin-bottom: 0rem;'">
+									</p>
+								</div>
+							</template>
+
+							<template x-if="isLoading">
+								<div class="text-start mb-2">
+									<p class="loading-dots bg-light text-secondary rounded-3 py-2 px-3 d-inline-block"></p>
+								</div>
+							</template>
+						</div>
+						<div class="card-footer d-flex">
+							<textarea id="userText" x-model="userText" placeholder="請輸入訊息" class="form-control me-2"></textarea>
+							<button id="sendBtn" x-on:click="sendMessage($event)" class="btn btn-dark"><i class="far fa-paper-plane"></i></button>
+						</div>
+					</template>
+				</div>
+			</div>
+		</div>
+
 	</div>
 
 
@@ -473,6 +539,12 @@
 	<!-- Kaiadmin JS -->
 	<script src="js/kaiadmin.min.js"></script>
 	<script src="js/alpine.2.8.2.min.js"></script>
+	<!--  聊天室-->
+	<script src="js/bootstrap.bundle.min.js"></script>
+	<script src="js/marked.min.js"></script>
+	<script src="js/sockjs.min.js"></script>
+	<script src="js/stomp.min.js"></script>
+	<script src="js/chatroom.js"></script>
 	<script>
 
 		function loadData() {
