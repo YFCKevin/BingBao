@@ -225,7 +225,6 @@ public class InventoryController {
                 new ParameterizedTypeReference<>() {}
         );
         if ("C000".equals(todayResponse.getBody().getCode())) {
-            System.out.println(123);
             inventoryMap.put("today", todayResponse.getBody().getData());
         }
 

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.swing.text.html.Option;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -86,7 +87,7 @@ public class ReceiveController {
                     receiveItem.setAmount(product.getQuantity());
                     receiveItem.setTotalAmount(product.getTotalQuantity());
                     receiveItem.setProductId(product.getProductId());
-                    receiveItem.setExpiryDate(product.getExpiryDate());
+                    receiveItem.setExpiryDate(LocalDate.now().plusDays(Long.parseLong(product.getExpiryDate())).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
                     receiveItem.setStorePlace(StorePlace.valueOf(product.getStorePlace())); //前端要加這個
                     return receiveItemService.save(receiveItem);
                 }).toList();

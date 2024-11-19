@@ -752,7 +752,25 @@
 												<input type="number" disabled x-model="item.total">
 											</td>
 											<td>
-												<input type="date" x-model="item.expiryDate" x-on:input="updateExpiryDate(index, $event.target.value)">
+												<select x-model="item.expiryDate" class="form-control" x-on:change="updateExpiryDate(index, $event.target.value)">
+													<option value="">請選擇有效期限</option>
+													<template x-if="item.customExpiryDate !== '' && item.customExpiryDate !== undefined">
+														<option :value="item.expiryDate" x-text="`${item.customExpiryDate}`"></option>
+													</template>
+													<option value="30">1個月</option>
+													<option value="60">2個月</option>
+													<option value="90">3個月</option>
+													<option value="180">6個月</option>
+													<option value="270">9個月</option>
+													<option value="365">1年</option>
+													<option value="455">1年3個月</option>
+													<option value="545">1年6個月</option>
+													<option value="730">2年</option>
+													<option value="910">2年6個月</option>
+													<option value="1095">3年</option>
+													<option value="customExpiryDate">自訂有效日期</option>
+												</select>
+<!--												<input type="date" x-model="item.expiryDate" x-on:input="updateExpiryDate(index, $event.target.value)">-->
 											</td>
 											<td>
 												<select class="form-select" x-on:input="updateStorePlace(index, $event.target.value)">
@@ -955,14 +973,27 @@
 					this.total = this.supplierList.length;
 					return this.supplierList.slice(start, end);
 				},
-				getSelectedProductData(){
-					return this.selectedProductList.map(item => ({
-						...item,
-						quantity: item.quantity || '',
-						total: item.total || '',
-						expiryDate: item.expiryDate || '',
-						storePlace: item.storePlace || ''
-					}));
+				getSelectedProductData() {
+					return this.selectedProductList.map(item => {
+						let expiryDate = item.expiryDate || '';  // 預設為空，若無自訂有效日期
+						if (item.customExpiryDate !== '' && item.customExpiryDate !== undefined) {
+							// 計算天數差
+							const customExpiryDate = new Date(item.customExpiryDate);  // 自訂有效日期
+							const currentDate = new Date();  // 當前日期
+							customExpiryDate.setHours(0, 0, 0, 0);
+							currentDate.setHours(0, 0, 0, 0);
+							const timeDifference = customExpiryDate - currentDate;  // 毫秒差
+							expiryDate = Math.floor(timeDifference / (1000 * 3600 * 24)) + '';  // 轉換為天數
+						}
+
+						return {
+							...item,
+							quantity: item.quantity || '',
+							total: item.total || '',
+							expiryDate: expiryDate,
+							storePlace: item.storePlace || ''
+						};
+					});
 				},
 				getProductData(){
 					const start = this.pageNumber_product * this.size_product,
@@ -1064,9 +1095,61 @@
 				},
 				updateExpiryDate(index, expiryDate) {
 					let item = this.selectedProductList[index];
-					if (item) {
+					if (expiryDate === 'customExpiryDate') {
+						this.showCustomExpiryDateInput(index);
+					} else {
 						item.expiryDate = expiryDate;
+						item.customExpiryDate = '';  // 清空自訂日期
 					}
+				},
+				showCustomExpiryDateInput(index) {
+					let item = this.selectedProductList[index];
+					Swal.fire({
+						title: '請選擇有效期限',
+						input: 'date',
+						inputValue: item.customExpiryDate,  // 已選定的日期
+						inputAttributes: {
+							min: new Date().toISOString().split("T")[0], // 限制不能選擇今天之前的日期
+						},
+						showDenyButton: true,
+						confirmButtonText: '確認',
+						denyButtonText: '清空',
+						customClass: {
+							confirmButton: 'btn btn-success',
+							denyButton: 'btn btn-danger',
+						},
+						inputValidator: (value) => {
+							if (!value) {
+								return '請選擇有效期限！';
+							}
+						}
+					}).then((result) => {
+						if (result.isConfirmed) {
+							// 使用者輸入的日期
+							let userInputDate = result.value;
+							// 轉換為 Date
+							let inputDate = new Date(userInputDate);
+							// 當前日期
+							let currentDate = new Date();
+							// 將時間部分設定為 00:00:00，這樣比較只會考慮日期部分
+							inputDate.setHours(0, 0, 0, 0);
+							currentDate.setHours(0, 0, 0, 0);
+							// 計算兩個日期之間的天數差
+							let timeDifference = inputDate - currentDate;  // 毫秒差
+							let daysDifference = Math.floor(timeDifference / (1000 * 3600 * 24));  // 轉換為天數
+							// 更新有效期限(天數)
+							item.customExpiryDate = userInputDate;
+							item.expiryDate = daysDifference + '';
+						} else if (result.isDenied) {
+							// 點擊清空
+							item.customExpiryDate = '';  // 清空自訂日期
+							item.expiryDate = '';  		// 清空天數差
+						}
+						//同步data，使得自訂的有效期限與select綁定
+						this.$nextTick(() => {
+							this.selectedProductList = [...this.selectedProductList];
+						});
+					});
 				},
 				updateStorePlace(index, storePlace) {
 					let item = this.selectedProductList[index];
@@ -1139,7 +1222,8 @@
 						quantity: item.quantity,
 						totalQuantity: item.total,
 						storePlace: item.storePlace,
-						expiryDate: item.expiryDate
+						expiryDate: item.expiryDate,
+						customExpiryDate: item.customExpiryDate,
 					}));
 					data.receiveDate = this.receiveDate;
 					data.supplierId = this.selectedSupplierId;

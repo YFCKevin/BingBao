@@ -6,6 +6,15 @@ public class ReceiveProductDTO {
     private int totalQuantity;  //數量 * 包裝單位 = 總數量
     private int quantity;      //數量
     private String storePlace;  //存放位置
+    private String customExpiryDate;
+
+    public String getCustomExpiryDate() {
+        return customExpiryDate;
+    }
+
+    public void setCustomExpiryDate(String customExpiryDate) {
+        this.customExpiryDate = customExpiryDate;
+    }
 
     public String getStorePlace() {
         return storePlace;
