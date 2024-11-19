@@ -12,6 +12,16 @@ public class SearchDTO {
     private String type;    // today, soon, valid
     private String storePlace;
 
+    public SearchDTO() {}
+    public SearchDTO(String type) {
+        this.keyword = "";
+        this.mainCategory = "";
+        this.subCategory = "";
+        this.supplierId = "";
+        this.storePlace = "";
+        this.type = type;
+    }
+
     public String getType() {
         return type;
     }
@@ -90,5 +100,21 @@ public class SearchDTO {
 
     public void setSupplierName(String supplierName) {
         this.supplierName = supplierName;
+    }
+
+    @Override
+    public String toString() {
+        return "SearchDTO{" +
+                "keyword='" + keyword + '\'' +
+                ", startDate='" + startDate + '\'' +
+                ", endDate='" + endDate + '\'' +
+                ", supplierName='" + supplierName + '\'' +
+                ", supplierId='" + supplierId + '\'' +
+                ", mainCategory='" + mainCategory + '\'' +
+                ", subCategory='" + subCategory + '\'' +
+                ", priority='" + priority + '\'' +
+                ", type='" + type + '\'' +
+                ", storePlace='" + storePlace + '\'' +
+                '}';
     }
 }

@@ -14,8 +14,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -33,13 +35,15 @@ public class InventoryController {
     private final InventoryService inventoryService;
     private final ProductService productService;
     private final DataProcessService dataProcessService;
+    private final RestTemplate restTemplate;
 
-    public InventoryController(@Qualifier("sdf") SimpleDateFormat sdf, ConfigProperties configProperties, InventoryService inventoryService, ProductService productService, DataProcessService dataProcessService) {
+    public InventoryController(@Qualifier("sdf") SimpleDateFormat sdf, ConfigProperties configProperties, InventoryService inventoryService, ProductService productService, DataProcessService dataProcessService, RestTemplate restTemplate) {
         this.sdf = sdf;
         this.configProperties = configProperties;
         this.inventoryService = inventoryService;
         this.productService = productService;
         this.dataProcessService = dataProcessService;
+        this.restTemplate = restTemplate;
     }
 
     /**
@@ -194,8 +198,8 @@ public class InventoryController {
 
 
 
-    @GetMapping("/dashboard")
-    public ResponseEntity<?> dashboard(HttpSession session) {
+    @PostMapping("/dashboard")
+    public ResponseEntity<?> dashboard(@RequestBody List<SearchDTO> searchCondition, HttpSession session) {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
@@ -205,101 +209,55 @@ public class InventoryController {
 
         Map<String, List<InventoryDTO>> inventoryMap = new HashMap<>();
 
+        String url = configProperties.getGlobalDomain() + "inventorySearch";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Internal-Request", "true");
+
         //今日放進冰箱的
-        final Map<String, Map<Long, List<Inventory>>> todayItemIdAmountInventoryMap = inventoryService.findByStoreDateIsTodayAndNoUsedAndNoDeleteAndInValidPeriod();
-        final Map<String, Long> todayReceiveItemIdInventoryAmountMap = todayItemIdAmountInventoryMap.entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> entry.getValue().values().stream().flatMap(List::stream).count()
-                ));
-        final List<Inventory> inventoryTodayList = todayItemIdAmountInventoryMap.values().stream()
-                .flatMap(innerMap -> innerMap.values().stream())
-                .flatMap(List::stream)
-                .collect(Collectors.toMap(
-                        Inventory::getReceiveItemId,
-                        Function.identity(),
-                        (existing, replacement) -> existing
-                ))
-                .values()
-                .stream()
-                .toList();
-        final List<String> todayProductIds = inventoryTodayList.stream().map(Inventory::getProductId).toList();
-        final Map<String, Product> tempTodayProductMap = productService.findByIdIn(todayProductIds).stream()
-                .collect(Collectors.toMap(Product::getId, Function.identity()));
-        List<InventoryDTO> finalTodayInventory = inventoryTodayList.stream()
-                .map(inventory -> {
-                    final Long totalAmount = todayReceiveItemIdInventoryAmountMap.get(inventory.getReceiveItemId());
-                    final Product product = tempTodayProductMap.get(inventory.getProductId());
-                    return constructInventoryDTO(inventory, product, String.valueOf(totalAmount));
-                })
-                .sorted(Comparator.comparing(InventoryDTO::getExpiryDate))
-                .toList();
+        final SearchDTO todaySearchDTO = searchCondition.stream()
+                .filter(searchDTO -> "today".equals(searchDTO.getType())).findFirst().orElse(new SearchDTO("today"));
+        HttpEntity<SearchDTO> todayEntity = new HttpEntity<>(todaySearchDTO, headers);
+        ResponseEntity<ResultStatus<List<InventoryDTO>>> todayResponse = restTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                todayEntity,
+                new ParameterizedTypeReference<>() {}
+        );
+        if ("C000".equals(todayResponse.getBody().getCode())) {
+            System.out.println(123);
+            inventoryMap.put("today", todayResponse.getBody().getData());
+        }
 
 
         //快過期的且沒用完
-        final Map<String, Map<Long, List<Inventory>>> soonItemIdAmountInventoryMap = inventoryService.findInventoryExpiringSoonAndNoUsedAndNoDeleteAndInValidPeriod();
-        final Map<String, Long> soonReceiveItemIdInventoryAmountMap = soonItemIdAmountInventoryMap.entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> entry.getValue().values().stream().flatMap(List::stream).count()
-                ));
-        final List<Inventory> inventorySoonList = soonItemIdAmountInventoryMap.values().stream()
-                .flatMap(innerMap -> innerMap.values().stream())
-                .flatMap(List::stream)
-                .collect(Collectors.toMap(
-                        Inventory::getReceiveItemId,
-                        Function.identity(),
-                        (existing, replacement) -> existing
-                ))
-                .values()
-                .stream()
-                .toList();
-        final List<String> soonProductIds = inventorySoonList.stream().map(Inventory::getProductId).toList();
-        final Map<String, Product> tempSoonProductMap = productService.findByIdIn(soonProductIds).stream()
-                .collect(Collectors.toMap(Product::getId, Function.identity()));
-        List<InventoryDTO> finalExpiringSoonInventory = inventorySoonList.stream()
-                .map(inventory -> {
-                    final Long totalAmount = soonReceiveItemIdInventoryAmountMap.get(inventory.getReceiveItemId());
-                    final Product product = tempSoonProductMap.get(inventory.getProductId());
-                    return constructInventoryDTO(inventory, product, String.valueOf(totalAmount));
-                })
-                .sorted(Comparator.comparing(InventoryDTO::getExpiryDate))
-                .toList();
+        final SearchDTO soonSearchDTO = searchCondition.stream()
+                .filter(searchDTO -> "soon".equals(searchDTO.getType())).findFirst().orElse(new SearchDTO("soon"));
+        HttpEntity<SearchDTO> soonEntity = new HttpEntity<>(soonSearchDTO, headers);
+        ResponseEntity<ResultStatus<List<InventoryDTO>>> soonResponse = restTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                soonEntity,
+                new ParameterizedTypeReference<>() {}
+        );
+        if ("C000".equals(soonResponse.getBody().getCode())) {
+            inventoryMap.put("expiringSoon", soonResponse.getBody().getData());
+        }
 
 
         //在有效期限內且沒用完
-        final Map<String, Map<Long, List<Inventory>>> validItemIdAmountInventoryMap = inventoryService.findInventoryWithinValidityPeriodAndNoUsedAndNoDelete();
-        final Map<String, Long> validReceiveItemIdInventoryAmountMap = validItemIdAmountInventoryMap.entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> entry.getValue().values().stream().flatMap(List::stream).count()
-                ));
-        final List<Inventory> inventoryValidList = validItemIdAmountInventoryMap.values().stream()
-                .flatMap(innerMap -> innerMap.values().stream())
-                .flatMap(List::stream)
-                .collect(Collectors.toMap(
-                        Inventory::getReceiveItemId,
-                        Function.identity(),
-                        (existing, replacement) -> existing
-                ))
-                .values()
-                .stream()
-                .toList();
-        final List<String> validProductIds = inventoryValidList.stream().map(Inventory::getProductId).toList();
-        final Map<String, Product> tempValidProductMap = productService.findByIdIn(validProductIds).stream()
-                .collect(Collectors.toMap(Product::getId, Function.identity()));
-        List<InventoryDTO> finalValidInventory = inventoryValidList.stream()
-                .map(inventory -> {
-                    final Long totalAmount = validReceiveItemIdInventoryAmountMap.get(inventory.getReceiveItemId());
-                    final Product product = tempValidProductMap.get(inventory.getProductId());
-                    return constructInventoryDTO(inventory, product, String.valueOf(totalAmount));
-                })
-                .sorted(Comparator.comparing(InventoryDTO::getExpiryDate))
-                .toList();
-
-        inventoryMap.put("today", finalTodayInventory);
-        inventoryMap.put("expiringSoon", finalExpiringSoonInventory);
-        inventoryMap.put("valid", finalValidInventory);
+        final SearchDTO validSearchDTO = searchCondition.stream()
+                .filter(searchDTO -> "valid".equals(searchDTO.getType())).findFirst().orElse(new SearchDTO("valid"));
+        HttpEntity<SearchDTO> validEntity = new HttpEntity<>(validSearchDTO, headers);
+        ResponseEntity<ResultStatus<List<InventoryDTO>>> validResponse = restTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                validEntity,
+                new ParameterizedTypeReference<>() {}
+        );
+        if ("C000".equals(validResponse.getBody().getCode())) {
+            inventoryMap.put("valid", validResponse.getBody().getData());
+        }
 
         resultStatus.setCode("C000");
         resultStatus.setMessage("成功");
@@ -313,7 +271,7 @@ public class InventoryController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[" + member.getName() + "]" + "[todayProductSearch]");
+            logger.info("[" + member.getName() + "]" + "[inventorySearch]");
         }
         ResultStatus resultStatus = new ResultStatus();
 

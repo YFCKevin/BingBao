@@ -22,6 +22,11 @@ public class LoginInterceptor implements HandlerInterceptor{
         String method = request.getMethod();
 //        logger.info("Request URL: " + requestURI + ", Method: " + method);
 
+        String internalHeader = request.getHeader("Internal-Request");
+        if ("true".equals(internalHeader)) {
+            return true;
+        }
+
         final HttpSession session = request.getSession();
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member == null) {

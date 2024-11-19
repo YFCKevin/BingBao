@@ -1110,9 +1110,15 @@
 
 				init(){
 					let _this = this;
+					let todaySearchCondition = JSON.parse(localStorage.getItem('todaySearchCondition')) || {};
+					let soonSearchCondition = JSON.parse(localStorage.getItem('soonSearchCondition')) || {};
+					let validSearchCondition = JSON.parse(localStorage.getItem('validSearchCondition')) || {};
+					let searchCondition = [todaySearchCondition, soonSearchCondition, validSearchCondition];
+
 				    $.ajax({
 						url: "dashboard",
-						type: "get",
+						type: "post",
+						data: JSON.stringify(searchCondition),
 						contentType: "application/json; charset=utf-8",
 						success: function (response) {
 							if (response.code == "C000"){
@@ -1128,6 +1134,28 @@
 								_this.validList = valid.map(item => ({
 									...item,
 								}))
+
+								//將查詢條件附值到欄位
+								$("#todayProductKeyword").val(todaySearchCondition.keyword);
+								_this.todaySelectedCategory = todaySearchCondition.mainCategory;
+								_this.todaySelectedSubCategory = todaySearchCondition.subCategory;
+								_this.todayStorePlace = todaySearchCondition.storePlace;
+								_this.todaySupplierId = todaySearchCondition.supplierId;
+								_this.todaySupplierName = todaySearchCondition && todaySearchCondition.supplierName ? todaySearchCondition.supplierName : "";
+
+								$("#soonProductKeyword").val(soonSearchCondition.keyword);
+								_this.soonSelectedCategory = soonSearchCondition.mainCategory;
+								_this.soonSelectedSubCategory = soonSearchCondition.subCategory;
+								_this.soonStorePlace = soonSearchCondition.storePlace;
+								_this.soonSupplierId = soonSearchCondition.supplierId;
+								_this.soonSupplierName = soonSearchCondition && soonSearchCondition.supplierName ? soonSearchCondition.supplierName : "";
+
+								$("#validProductKeyword").val(validSearchCondition.keyword);
+								_this.validSelectedCategory = validSearchCondition.mainCategory;
+								_this.validSelectedSubCategory = validSearchCondition.subCategory;
+								_this.validStorePlace = validSearchCondition.storePlace;
+								_this.validSupplierId = validSearchCondition.supplierId;
+								_this.validSupplierName = validSearchCondition && validSearchCondition.supplierName ? validSearchCondition.supplierName : "";
 							}
 						},
 						error: function(error) {
@@ -1284,6 +1312,7 @@
 					data.subCategory = this.todaySelectedSubCategory;
 					data.storePlace = this.todayStorePlace;
 					data.supplierId = this.todaySupplierId;
+					data.supplierName = this.todaySupplierName;
 					data.type = "today";
 
 				    $.ajax({
@@ -1295,6 +1324,9 @@
 							if (response.code == "C000"){
 								_this.pageNumber_today = 0;
 								_this.todayList = response.data;
+
+								//將查詢條件存在 localStorage
+								localStorage.setItem('todaySearchCondition', JSON.stringify(data));
 							}
 						},
 						error: function(error) {
@@ -1319,6 +1351,7 @@
 					data.subCategory = this.soonSelectedSubCategory;
 					data.storePlace = this.soonStorePlace;
 					data.supplierId = this.soonSupplierId;
+					data.supplierName = this.soonSupplierName;
 					data.type = "soon";
 
 				    $.ajax({
@@ -1330,6 +1363,9 @@
 							if (response.code == "C000"){
 								_this.pageNumber_soon = 0;
 								_this.expiringSoonList = response.data;
+
+								//將查詢條件存在 localStorage
+								localStorage.setItem('soonSearchCondition', JSON.stringify(data));
 							}
 						},
 						error: function(error) {
@@ -1354,6 +1390,7 @@
 					data.subCategory = this.validSelectedSubCategory;
 					data.storePlace = this.validStorePlace;
 					data.supplierId = this.validSupplierId;
+					data.supplierName = this.validSupplierName;
 					data.type = "valid";
 
 				    $.ajax({
@@ -1365,6 +1402,9 @@
 							if (response.code == "C000"){
 								_this.pageNumber_valid = 0;
 								_this.validList = response.data;
+
+								//將查詢條件存在 localStorage
+								localStorage.setItem('validSearchCondition', JSON.stringify(data));
 							}
 						},
 						error: function(error) {
@@ -1612,7 +1652,7 @@
 									}
 								}).then((result) => {
 									if (result.isConfirmed) {
-										console.log('變更完成存放位置')
+										console.log('變更完成存放位置');
 										_this.init();
 									}
 								});
