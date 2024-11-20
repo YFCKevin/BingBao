@@ -319,6 +319,14 @@
 																			<span class="ms-2 text-muted">：登錄使用數量</span>
 																		</div>
 																		<div class="d-flex align-items-center mb-2">
+																			<i class="far fa-calendar fs-5"></i>
+																			<span class="ms-2 text-muted">：變更有效期限</span>
+																		</div>
+																		<div class="d-flex align-items-center mb-2">
+																			<i class="fas fa-cart-arrow-down fs-5"></i>
+																			<span class="ms-2 text-muted">：增加庫存數量</span>
+																		</div>
+																		<div class="d-flex align-items-center mb-2">
 																			<i class="fas fa-map-marker fs-5"></i>
 																			<span class="ms-2 text-muted">：變更存放位置</span>
 																		</div>
@@ -367,6 +375,12 @@
 																				<td>
 																					<button @click="openAmountModal(item.receiveItemId, item.totalAmount)" type="button" data-bs-toggle="tooltip" title="登錄使用數量" class="btn btn-link btn-primary">
 																						<i class="fas fa-edit fs-4"></i>
+																					</button>
+																					<button @click="openExpiryDateModal(item.receiveItemId, item.expiryDate)" type="button" data-bs-toggle="tooltip" title="變更有效期限" class="btn btn-link btn-primary">
+																						<i class="far fa-calendar fs-4"></i>
+																					</button>
+																					<button @click="openCloneModal(item.id, item.totalAmount, item.packageForm, item.packageQuantity, item.packageUnitLabel)" type="button" data-bs-toggle="tooltip" title="增加庫存數量" class="btn btn-link btn-warning">
+																						<i class="fas fa-cart-arrow-down fs-4"></i>
 																					</button>
 																					<button @click="openPlaceModal(item.receiveItemId, item.storePlaceLabel)" type="button" data-bs-toggle="tooltip" title="變更存放位置" class="btn btn-link btn-primary">
 																						<i class="fas fa-map-marker fs-4"></i>
@@ -537,6 +551,14 @@
 																			<span class="ms-2 text-muted">：登錄使用數量</span>
 																		</div>
 																		<div class="d-flex align-items-center mb-2">
+																			<i class="far fa-calendar fs-5"></i>
+																			<span class="ms-2 text-muted">：變更有效期限</span>
+																		</div>
+																		<div class="d-flex align-items-center mb-2">
+																			<i class="fas fa-cart-arrow-down fs-5"></i>
+																			<span class="ms-2 text-muted">：增加庫存數量</span>
+																		</div>
+																		<div class="d-flex align-items-center mb-2">
 																			<i class="fas fa-map-marker fs-5"></i>
 																			<span class="ms-2 text-muted">：變更存放位置</span>
 																		</div>
@@ -587,6 +609,12 @@
 																				<td>
 																					<button @click="openAmountModal(item.receiveItemId, item.totalAmount)" type="button" data-bs-toggle="tooltip" title="登錄使用數量" class="btn btn-link btn-primary">
 																						<i class="fas fa-edit fs-4"></i>
+																					</button>
+																					<button @click="openExpiryDateModal(item.receiveItemId, item.expiryDate)" type="button" data-bs-toggle="tooltip" title="變更有效期限" class="btn btn-link btn-primary">
+																						<i class="far fa-calendar fs-4"></i>
+																					</button>
+																					<button @click="openCloneModal(item.id, item.totalAmount, item.packageForm, item.packageQuantity, item.packageUnitLabel)" type="button" data-bs-toggle="tooltip" title="增加庫存數量" class="btn btn-link btn-warning">
+																						<i class="fas fa-cart-arrow-down fs-4"></i>
 																					</button>
 																					<button @click="openPlaceModal(item.receiveItemId, item.storePlaceLabel)" type="button" data-bs-toggle="tooltip" title="變更存放位置" class="btn btn-link btn-primary">
 																						<i class="fas fa-map-marker fs-4"></i>
@@ -757,6 +785,14 @@
 																			<span class="ms-2 text-muted">：登錄使用數量</span>
 																		</div>
 																		<div class="d-flex align-items-center mb-2">
+																			<i class="far fa-calendar fs-5"></i>
+																			<span class="ms-2 text-muted">：變更有效期限</span>
+																		</div>
+																		<div class="d-flex align-items-center mb-2">
+																			<i class="fas fa-cart-arrow-down fs-5"></i>
+																			<span class="ms-2 text-muted">：增加庫存數量</span>
+																		</div>
+																		<div class="d-flex align-items-center mb-2">
 																			<i class="fas fa-map-marker fs-5"></i>
 																			<span class="ms-2 text-muted">：變更存放位置</span>
 																		</div>
@@ -809,6 +845,12 @@
 																				<td>
 																					<button @click="openAmountModal(item.receiveItemId, item.totalAmount)" type="button" data-bs-toggle="tooltip" title="登錄使用數量" class="btn btn-link btn-primary">
 																						<i class="fas fa-edit fs-4"></i>
+																					</button>
+																					<button @click="openExpiryDateModal(item.receiveItemId, item.expiryDate)" type="button" data-bs-toggle="tooltip" title="變更有效期限" class="btn btn-link btn-primary">
+																						<i class="far fa-calendar fs-4"></i>
+																					</button>
+																					<button @click="openCloneModal(item.id, item.totalAmount, item.packageForm, item.packageQuantity, item.packageUnitLabel)" type="button" data-bs-toggle="tooltip" title="增加庫存數量" class="btn btn-link btn-warning">
+																						<i class="fas fa-cart-arrow-down fs-4"></i>
 																					</button>
 																					<button @click="openPlaceModal(item.receiveItemId, item.storePlaceLabel)" type="button" data-bs-toggle="tooltip" title="變更存放位置" class="btn btn-link btn-primary">
 																						<i class="fas fa-map-marker fs-4"></i>
@@ -1739,6 +1781,190 @@
 						});
 						console.error('Error:', error);
 					});
+				},
+				openExpiryDateModal(receiveItemId, expiryDate) {
+					let _this = this;
+					Swal.fire({
+						title: '變更有效期限',
+						text: '目前有效期限：' + expiryDate,
+						input: 'date',
+						inputValue: expiryDate,  // 當前日期
+						showCancelButton: true,
+						confirmButtonText: '確認',
+						cancelButtonText: '關閉',
+						customClass: {
+							confirmButton: 'btn btn-success'
+						},
+						preConfirm: (value) => {
+							if (value === '') {  // 如果沒選擇
+								Swal.showValidationMessage('尚未填寫有效期限');  // 顯示錯誤訊息
+								return false;  // 阻止確認提交
+							} else if (value === expiryDate) {
+								Swal.showValidationMessage('請填入新的有效期限');
+							}
+							return value;  // 返回選擇的值
+						}
+					}).then((result) => {
+						if (result.isConfirmed) {
+							let choseExpiryDate = result.value; // 新的有效日期
+							_this.targetEditId = receiveItemId;
+							_this.editExpiryDate(choseExpiryDate);
+						}
+					});
+				},
+				editExpiryDate (expiryDate){
+					let _this = this;
+				    $.ajax({
+						url: "editExpiryDate/" + this.targetEditId + "/" + expiryDate,
+						type: "get",
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								Swal.fire({
+									title: '變更成功！',
+									text: '請至清單頁查看新的有效期限是否正確',
+									icon: 'success',
+									confirmButtonText: '關閉',
+									customClass: {
+										confirmButton: 'btn btn-success'
+									}
+								}).then((result) => {
+									if (result.isConfirmed) {
+										console.log('變更完成有效期限');
+										_this.init();
+									}
+								});
+							} else {
+								Swal.fire({
+									title: '錯誤發生，請聯繫管理員！',
+									text: '',
+									icon: 'error',
+									confirmButtonText: '關閉',
+									customClass: {
+										confirmButton: 'btn btn-danger'
+									}
+								})
+							}
+						},
+						error: function(error) {
+							Swal.fire({
+								title: '系統錯誤，請聯繫管理員！',
+								text: '',
+								icon: 'error',
+								confirmButtonText: '關閉',
+								customClass: {
+									confirmButton: 'btn btn-danger'
+								}
+							})
+							console.error('Error:', error);
+						}
+				  	});
+				},
+				openCloneModal(inventoryId, totalAmount, packageForm, packageQuantity, packageUnitLabel) {
+				    let amountText = totalAmount + '個';	//原本總數量
+
+				    let _this = this;
+                    Swal.fire({
+						title: '填寫要增加的「包裝數量」',
+						html: `當前總數量：${amountText}`,
+						input: 'number',
+						inputAttributes: {
+							min: 1,    			// 最小值
+							max: 99999,     	// 最大值
+							step: 1
+						},
+						showCancelButton: true,
+						confirmButtonText: '確認',
+						cancelButtonText: '取消',
+						customClass: {
+							confirmButton: 'btn btn-success',
+							cancelButton: 'btn btn-danger'
+						},
+                        didOpen: () => {
+                            const inputElement = Swal.getInput();
+                            inputElement.addEventListener('input', () => {
+                                const enteredAmount = inputElement.value;
+                                newTotalAmount = enteredAmount * packageQuantity;
+
+                                if (packageForm === 'COMPLETE') {
+                                    newAmountText = enteredAmount + ' x ' + packageQuantity + packageUnitLabel + ' = ' + newTotalAmount + packageUnitLabel;
+                                } else {
+                                    newAmountText = enteredAmount + '個';
+                                }
+
+                                let finalAmountText;
+                                if (packageForm === 'COMPLETE') {
+                                    finalAmountText = enteredAmount + ' x ' + packageQuantity + packageUnitLabel + ' = ' + (+newTotalAmount + +totalAmount) + '個';
+                                } else {
+                                    finalAmountText = (+enteredAmount + +totalAmount) + '個';
+                                }
+
+                                Swal.update({
+                                    html: `當前總數量：${amountText}<br><br>要增加的數量：${newAmountText}<br><br>預計總數量：${finalAmountText}` // 更新顯示
+                                });
+                            });
+                        },
+						preConfirm: () => {
+							const inputElement = Swal.getInput();
+							if (isNaN(inputElement.value) || inputElement.value.trim() === '') {
+								Swal.showValidationMessage('請輸入數字！');
+								return false; // 阻止確認
+							}
+							return inputElement.value; // 傳遞數字
+						}
+					}).then((result) => {
+						if (result.isConfirmed) {
+							let cloneAmount = result.value;
+							_this.cloneInventory(inventoryId, cloneAmount);
+						}
+					});
+				},
+				cloneInventory (inventoryId, cloneAmount){
+					let _this = this;
+				    $.ajax({
+						url: "cloneInventory/" + inventoryId + "/" + cloneAmount,
+						type: "get",
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								Swal.fire({
+									title: '食材庫存增加成功！',
+									icon: 'success',
+									confirmButtonText: '關閉',
+									customClass: {
+										confirmButton: 'btn btn-success'
+									}
+								}).then((result) => {
+									if (result.isConfirmed) {
+										console.log('食材庫存增加成功');
+										_this.init();
+									}
+								});
+							} else {
+								Swal.fire({
+									title: '錯誤發生，請聯繫管理員！',
+									text: '',
+									icon: 'error',
+									confirmButtonText: '關閉',
+									customClass: {
+										confirmButton: 'btn btn-danger'
+									}
+								})
+							}
+						},
+						error: function(error) {
+							Swal.fire({
+								title: '系統錯誤，請聯繫管理員！',
+								text: '',
+								icon: 'error',
+								confirmButtonText: '關閉',
+								customClass: {
+									confirmButton: 'btn btn-danger'
+								}
+							})
+							console.error('Error:', error);
+						}
+				  	});
 				},
 				pages_today() {
 					return Array.from({

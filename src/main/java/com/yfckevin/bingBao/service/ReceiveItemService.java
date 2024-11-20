@@ -11,4 +11,6 @@ public interface ReceiveItemService {
     ReceiveItem save(ReceiveItem receiveItem);
 
     Optional<ReceiveItem> findFirstByProductId(String id);
+
+    Optional<ReceiveItem> findById(String receiveItemId);
 }

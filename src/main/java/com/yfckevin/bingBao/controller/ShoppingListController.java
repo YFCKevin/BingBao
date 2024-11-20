@@ -49,10 +49,10 @@ public class ShoppingListController {
 
 //    @GetMapping("/addToShoppingList")
     /**
-     * 每1小時執行一次，低於庫存水平線的食材加入購物清單
+     * 每天24點執行一次，低於庫存水平線的食材加入購物清單
      * @return
      */
-    @Scheduled(cron = "0 0 */1 * * *")
+    @Scheduled(cron = "0 0 0 * * *")
     public ResponseEntity<?> addToShoppingList() {
         logger.info("低於庫存水平線的食材加入購物清單");
         ResultStatus resultStatus = new ResultStatus();

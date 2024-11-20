@@ -10,7 +10,7 @@ public class ReceiveItem {
     @Id
     private String id;
     private String productId;
-    private int amount; //收貨食材數量
+    private int amount; //收貨食材的包裝數量
     private int totalAmount;    //收貨食材總數量(數量 * 包裝單位)
     private String expiryDate;  //食材有效期限日期
     private StorePlace storePlace;  //存放位置
@@ -116,5 +116,23 @@ public class ReceiveItem {
 
     public void setTotalAmount(int totalAmount) {
         this.totalAmount = totalAmount;
+    }
+
+    @Override
+    public String toString() {
+        return "ReceiveItem{" +
+                "id='" + id + '\'' +
+                ", productId='" + productId + '\'' +
+                ", amount=" + amount +
+                ", totalAmount=" + totalAmount +
+                ", expiryDate='" + expiryDate + '\'' +
+                ", storePlace=" + storePlace +
+                ", creationDate='" + creationDate + '\'' +
+                ", modificationDate='" + modificationDate + '\'' +
+                ", deletionDate='" + deletionDate + '\'' +
+                ", creator='" + creator + '\'' +
+                ", modifier='" + modifier + '\'' +
+                ", version=" + version +
+                '}';
     }
 }

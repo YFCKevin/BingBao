@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface InventoryService {
     List<Inventory> saveAll(List<Inventory> inventoryList);
 
-    List<Inventory> findByIdIn(List<String> receiveItemIds);
+    List<Inventory> findByReceiveItemIdIn(List<String> receiveItemIds);
 
     Map<String, Map<Long, List<Inventory>>> findByStoreDateIsTodayAndNoUsedAndNoDeleteAndInValidPeriod();
 

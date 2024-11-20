@@ -8,7 +8,7 @@ import jakarta.persistence.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "inventory")
-public class Inventory {
+public class Inventory implements Cloneable{
     @Id
     private String id;
     private String name;    //食材名稱
@@ -235,5 +235,45 @@ public class Inventory {
 
     public void setSupplierId(String supplierId) {
         this.supplierId = supplierId;
+    }
+
+    @Override
+    public String toString() {
+        return "Inventory{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", serialNumber='" + serialNumber + '\'' +
+                ", receiveFormId='" + receiveFormId + '\'' +
+                ", receiveFormNumber='" + receiveFormNumber + '\'' +
+                ", receiveItemId='" + receiveItemId + '\'' +
+                ", usedDate='" + usedDate + '\'' +
+                ", storeDate='" + storeDate + '\'' +
+                ", storeNumber='" + storeNumber + '\'' +
+                ", expiryDate='" + expiryDate + '\'' +
+                ", storePlace=" + storePlace +
+                ", packageForm=" + packageForm +
+                ", packageUnit=" + packageUnit +
+                ", packageQuantity='" + packageQuantity + '\'' +
+                ", packageNumber='" + packageNumber + '\'' +
+                ", overdueNotice='" + overdueNotice + '\'' +
+                ", productId='" + productId + '\'' +
+                ", supplierId='" + supplierId + '\'' +
+                ", addShoppingList=" + addShoppingList +
+                ", creationDate='" + creationDate + '\'' +
+                ", modificationDate='" + modificationDate + '\'' +
+                ", deletionDate='" + deletionDate + '\'' +
+                ", creator='" + creator + '\'' +
+                ", modifier='" + modifier + '\'' +
+                ", version=" + version +
+                '}';
+    }
+
+    @Override
+    public Inventory clone() {
+        try {
+            return (Inventory) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

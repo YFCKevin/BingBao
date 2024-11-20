@@ -4,6 +4,8 @@ import com.yfckevin.bingBao.ConfigProperties;
 import com.yfckevin.bingBao.dto.*;
 import com.yfckevin.bingBao.entity.Inventory;
 import com.yfckevin.bingBao.entity.Product;
+import com.yfckevin.bingBao.entity.ReceiveItem;
+import com.yfckevin.bingBao.enums.PackageForm;
 import com.yfckevin.bingBao.enums.StorePlace;
 import com.yfckevin.bingBao.exception.ResultStatus;
 import com.yfckevin.bingBao.service.*;
@@ -33,14 +35,16 @@ public class InventoryController {
     private final SimpleDateFormat sdf;
     private final ConfigProperties configProperties;
     private final InventoryService inventoryService;
+    private final ReceiveItemService receiveItemService;
     private final ProductService productService;
     private final DataProcessService dataProcessService;
     private final RestTemplate restTemplate;
 
-    public InventoryController(@Qualifier("sdf") SimpleDateFormat sdf, ConfigProperties configProperties, InventoryService inventoryService, ProductService productService, DataProcessService dataProcessService, RestTemplate restTemplate) {
+    public InventoryController(@Qualifier("sdf") SimpleDateFormat sdf, ConfigProperties configProperties, InventoryService inventoryService, ReceiveItemService receiveItemService, ProductService productService, DataProcessService dataProcessService, RestTemplate restTemplate) {
         this.sdf = sdf;
         this.configProperties = configProperties;
         this.inventoryService = inventoryService;
+        this.receiveItemService = receiveItemService;
         this.productService = productService;
         this.dataProcessService = dataProcessService;
         this.restTemplate = restTemplate;
@@ -95,6 +99,113 @@ public class InventoryController {
 
         dataProcessService.inventoryDataProcess(inventoriesToUpdate);
 
+        return ResponseEntity.ok(resultStatus);
+    }
+
+
+    /**
+     * 新增食材庫存以及更新收貨明細
+     * @param inventoryId
+     * @param cloneAmount
+     * @param session
+     * @return
+     */
+    @GetMapping("/cloneInventory/{inventoryId}/{cloneAmount}")
+    public ResponseEntity<?> cloneInventory (@PathVariable String inventoryId, @PathVariable int cloneAmount, HttpSession session) {
+        System.out.println("inventoryId = " + inventoryId);
+        System.out.println("cloneAmount = " + cloneAmount);
+        final MemberDTO member = (MemberDTO) session.getAttribute("member");
+        if (member != null) {
+            logger.info("[" + member.getName() + "]" + "[cloneInventory]");
+        }
+        ResultStatus resultStatus = new ResultStatus();
+
+        final Optional<Inventory> inventoryOpt = inventoryService.findById(inventoryId);
+        if (inventoryOpt.isEmpty()) {
+            resultStatus.setCode("C006");
+            resultStatus.setMessage("無庫存");
+        } else {
+            final Inventory inventory = inventoryOpt.get();
+            //更新receiveItem
+            Optional<ReceiveItem> receiveItemOpt = receiveItemService.findById(inventory.getReceiveItemId());
+            if (receiveItemOpt.isEmpty()) {
+                resultStatus.setCode("C013");
+                resultStatus.setMessage("查無收貨明細");
+            } else {
+                final ReceiveItem receiveItem = receiveItemOpt.get();
+                final Optional<Product> productOpt = productService.findById(receiveItem.getProductId());
+                if (productOpt.isEmpty()) {
+                    resultStatus.setCode("C001");
+                    resultStatus.setMessage("查無食材");
+                    return ResponseEntity.ok(resultStatus);
+                } else {
+                    final Product product = productOpt.get();
+                    if (PackageForm.COMPLETE.equals(product.getPackageForm())) {
+                        receiveItem.setTotalAmount((receiveItem.getAmount() + cloneAmount) * Integer.parseInt(product.getPackageQuantity()));
+                    } else {
+                        receiveItem.setTotalAmount(receiveItem.getAmount() + cloneAmount);
+                    }
+                    receiveItem.setAmount(receiveItem.getAmount() + cloneAmount);
+                    receiveItem.setModificationDate(sdf.format(new Date()));
+                    receiveItem.setModifier(member.getName());
+                    receiveItemService.save(receiveItem);
+
+                    //產生食材庫存
+                    List<Inventory> cloneInventoryList = new ArrayList<>();
+
+                    cloneAmount = PackageForm.COMPLETE.equals(product.getPackageForm())
+                            ? cloneAmount * Integer.parseInt(product.getPackageQuantity())
+                            : cloneAmount;
+
+                    for (int i = 0; i < cloneAmount; i++) {
+                        final Inventory cloneInventory = inventory.clone();
+                        cloneInventory.setId(null);
+                        cloneInventory.setCreationDate(sdf.format(new Date()));
+                        cloneInventory.setCreator(member.getName());
+                        cloneInventoryList.add(cloneInventory);
+                    }
+
+                    inventoryService.saveAll(cloneInventoryList);
+                }
+                resultStatus.setCode("C000");
+                resultStatus.setMessage("成功");
+            }
+        }
+        return ResponseEntity.ok(resultStatus);
+    }
+
+
+    /**
+     * 修改食材庫存的有效期限
+     * @param receiveItemId
+     * @param expiryDate
+     * @param session
+     * @return
+     */
+    @GetMapping("/editExpiryDate/{receiveItemId}/{expiryDate}")
+    public ResponseEntity<?> editExpiryDate (@PathVariable String receiveItemId, @PathVariable String expiryDate, HttpSession session){
+
+        final MemberDTO member = (MemberDTO) session.getAttribute("member");
+        if (member != null) {
+            logger.info("[" + member.getName() + "]" + "[editExpiryDate]");
+        }
+        ResultStatus resultStatus = new ResultStatus();
+
+        List<Inventory> inventoryList = inventoryService.findByReceiveItemId(receiveItemId);
+        if (inventoryList.size() == 0) {
+            resultStatus.setCode("C006");
+            resultStatus.setMessage("無庫存");
+        } else {
+            inventoryList = inventoryList.stream()
+                    .peek(inventory -> {
+                        inventory.setExpiryDate(expiryDate);
+                        inventory.setModificationDate(sdf.format(new Date()));
+                        inventory.setModifier(member.getName());
+                    }).toList();
+            inventoryService.saveAll(inventoryList);
+            resultStatus.setCode("C000");
+            resultStatus.setMessage("成功");
+        }
         return ResponseEntity.ok(resultStatus);
     }
 

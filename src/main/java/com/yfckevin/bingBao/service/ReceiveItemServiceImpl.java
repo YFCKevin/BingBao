@@ -29,4 +29,9 @@ public class ReceiveItemServiceImpl implements ReceiveItemService{
     public Optional<ReceiveItem> findFirstByProductId(String id) {
         return receiveItemRepository.findFirstByProductId(id);
     }
+
+    @Override
+    public Optional<ReceiveItem> findById(String receiveItemId) {
+        return receiveItemRepository.findById(receiveItemId);
+    }
 }
