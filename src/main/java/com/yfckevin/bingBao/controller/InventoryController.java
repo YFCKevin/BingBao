@@ -112,8 +112,7 @@ public class InventoryController {
      */
     @GetMapping("/cloneInventory/{inventoryId}/{cloneAmount}")
     public ResponseEntity<?> cloneInventory (@PathVariable String inventoryId, @PathVariable int cloneAmount, HttpSession session) {
-        System.out.println("inventoryId = " + inventoryId);
-        System.out.println("cloneAmount = " + cloneAmount);
+
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
             logger.info("[" + member.getName() + "]" + "[cloneInventory]");
@@ -225,7 +224,9 @@ public class InventoryController {
         }
         ResultStatus resultStatus = new ResultStatus();
 
-        List<Inventory> inventoryList = inventoryService.findByReceiveItemIdAndUsedDateIsNull(dto.getReceiveItemId());
+        // 只比對沒用過、沒刪除以及沒過期的食材庫存
+        List<Inventory> inventoryList = inventoryService.findByReceiveItemIdAndForEditStorePlaceInventory(dto.getReceiveItemId());
+
         if (inventoryList.size() == 0) {
             resultStatus.setCode("C006");
             resultStatus.setMessage("無庫存");

@@ -5,8 +5,11 @@ public enum SubCategory {
     PORK(2, "豬肉", MainCategory.MEAT),
     CHICKEN(3, "雞肉", MainCategory.MEAT),
     EGG(4, "雞蛋", MainCategory.MEAT),
-    FISH(5, "魚", MainCategory.SEAFOOD),
-    SHRIMP(6, "蝦", MainCategory.SEAFOOD);
+    LAMB(5, "羊肉", MainCategory.MEAT),
+    DUCK(6, "鴨肉", MainCategory.MEAT),
+    GOOSE(7, "鵝肉", MainCategory.MEAT),
+    FISH(8, "魚", MainCategory.SEAFOOD),
+    SHRIMP(9, "蝦", MainCategory.SEAFOOD);
     private int value;
     private String label;
     private MainCategory parent;

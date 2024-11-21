@@ -2620,4 +2620,18 @@ public class InventoryServiceImpl implements InventoryService {
 
         return result;
     }
+
+    @Override
+    public List<Inventory> findByReceiveItemIdAndForEditStorePlaceInventory(String receiveItemId) {
+        LocalDate today = LocalDate.now();
+        String onlyDateEndOfDay = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        Criteria criteria = new Criteria().andOperator(
+                Criteria.where("usedDate").exists(false),
+                Criteria.where("deletionDate").exists(false),
+                Criteria.where("expiryDate").gte(onlyDateEndOfDay),
+                Criteria.where("receiveItemId").is(receiveItemId)
+        );
+        Query query = new Query(criteria);
+        return mongoTemplate.find(query, Inventory.class);
+    }
 }

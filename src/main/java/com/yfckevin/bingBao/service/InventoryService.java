@@ -74,4 +74,6 @@ public interface InventoryService {
     Map<String, Map<Long, List<Inventory>>> searchByStorePlaceAndSupplierId(String storePlace, String supplierId, String type);
 
     Map<String, Map<Long, List<Inventory>>> searchBySupplierId(String supplierId, String type);
+
+    List<Inventory> findByReceiveItemIdAndForEditStorePlaceInventory(String receiveItemId);
 }
