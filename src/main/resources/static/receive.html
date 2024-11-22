@@ -1449,6 +1449,20 @@
 						let clonedProduct = { ...this.selectedProductList[index] };
 						clonedProduct.cloneTag = clonedProduct.id + "_clone_" + this.genRandomCloneCode();
 						this.selectedProductList.push(clonedProduct);
+
+						// 排序：相同id的在一起，且沒有cloneTag屬性的(本體)在前面
+						this.selectedProductList.sort((a, b) => {
+							if (a.id !== b.id) {
+								return a.id.localeCompare(b.id);
+							}
+							if (!a.cloneTag && b.cloneTag) {
+								return -1;
+							}
+							if (a.cloneTag && !b.cloneTag) {
+								return 1;
+							}
+							return 0;
+						});
 					}
 				},
 				removeClone(index){
