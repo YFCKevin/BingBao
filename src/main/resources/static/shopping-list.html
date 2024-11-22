@@ -338,12 +338,12 @@
                                                 <tr role="row">
                                                     <th>照片</th>
                                                     <th>名稱</th>
-                                                    <th>採購總數</th>
-                                                    <th>供應商</th>
-                                                    <th>包裝類型</th>
-                                                    <th>包裝方式</th>
-                                                    <th>食材分類</th>
-                                                    <th>建檔日期</th>
+                                                    <th class="text-truncate">採購總數</th>
+                                                    <th class="text-truncate">供應商</th>
+                                                    <th class="text-truncate">包裝類型</th>
+                                                    <th class="text-truncate">包裝方式</th>
+                                                    <th class="text-truncate">食材分類</th>
+                                                    <th class="text-truncate">建檔日期</th>
                                                     <th>動作</th>
                                                 </tr>
                                                 </thead>
@@ -359,17 +359,17 @@
                                                                 <i class="fas fa-search-plus text-secondary fa-2x" @click="showImagePreview(item.coverPath)"></i>
                                                             </div>
                                                         </td>
-                                                        <td x-show="item.priorityType == 'URGENT'" x-text="item.name" style="font-weight: bold; font-size: 1.2rem;"></td>
-                                                        <td x-show="item.priorityType == 'NORMAL'" x-text="item.name"></td>
+                                                        <td class="text-truncate" x-show="item.priorityType == 'URGENT'" x-text="item.name" style="font-weight: bold; font-size: 1.2rem;"></td>
+                                                        <td class="text-truncate" x-show="item.priorityType == 'NORMAL'" x-text="item.name"></td>
                                                         <td x-text="item.totalAmount"></td>
-                                                        <td x-show="item.supplier != null">
+                                                        <td class="text-truncate" x-show="item.supplier != null">
                                                             <span x-text="item.supplierName"></span>
                                                         </td>
                                                         <td x-show="item.supplier == null" class="text-center">
                                                             <span>-</span>
                                                         </td>
-                                                        <td x-text="item.packageFormLabel"></td>
-                                                        <td x-show="item.packageForm == 'COMPLETE'">
+                                                        <td class="text-truncate" x-text="item.packageFormLabel"></td>
+                                                        <td class="text-truncate" x-show="item.packageForm == 'COMPLETE'">
                                                             <span>每</span>
                                                             <span class="fw-bold" x-text="item.packageUnitLabel"></span>
                                                             <span>有</span>
@@ -379,7 +379,7 @@
                                                         <td x-show="item.packageForm == 'BULK'">
                                                             <span>-</span>
                                                         </td>
-                                                        <td x-show="item.mainCategory == 'MEAT' || item.mainCategory == 'SEAFOOD'">
+                                                        <td class="text-truncate" x-show="item.mainCategory == 'MEAT' || item.mainCategory == 'SEAFOOD'">
                                                             <span x-text="item.mainCategoryLabel"></span>
                                                             <br>
                                                             <template x-if="item.subCategoryLabel">
@@ -388,7 +388,7 @@
                                                                 </span>
                                                             </template>
                                                         </td>
-                                                        <td x-show="item.mainCategory !== 'MEAT' && item.mainCategory !== 'SEAFOOD'">
+                                                        <td class="text-truncate" x-show="item.mainCategory !== 'MEAT' && item.mainCategory !== 'SEAFOOD'">
                                                             <span x-text="item.mainCategoryLabel"></span>
                                                         </td>
                                                         <td x-text="item.creationDate"></td>

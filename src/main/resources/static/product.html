@@ -324,11 +324,11 @@
                                                 <tr role="row">
                                                     <th>照片</th>
                                                     <th>名稱</th>
-                                                    <th>包裝類型</th>
-                                                    <th>包裝方式</th>
-                                                    <th>食材分類</th>
-                                                    <th>距離<br>有效期限前<br>多久通知<br>(天)</th>
-                                                    <th>是否回購<br>(警戒庫存量)</th>
+                                                    <th class="text-truncate">包裝類型</th>
+                                                    <th class="text-truncate">包裝方式</th>
+                                                    <th class="text-truncate">食材分類</th>
+                                                    <th class="text-truncate">距離<br>有效期限前<br>多久通知<br>(天)</th>
+                                                    <th class="text-truncate">是否回購<br>(警戒庫存量)</th>
                                                     <th>建檔日期</th>
                                                     <th>動作</th>
                                                 </tr>
@@ -345,19 +345,19 @@
                                                                 <i class="fas fa-search-plus text-secondary fa-2x" @click="showImagePreview(item.coverPath)"></i>
                                                             </div>
                                                         </td>
-                                                        <td x-text="item.name"></td>
-                                                        <td x-text="item.packageFormLabel"></td>
-                                                        <td x-show="item.packageForm == 'COMPLETE'">
+                                                        <td x-text="item.name" class="text-truncate"></td>
+                                                        <td x-text="item.packageFormLabel" class="text-truncate"></td>
+                                                        <td x-show="item.packageForm == 'COMPLETE'" class="text-truncate">
                                                             <span>每</span>
                                                             <span class="fw-bold" x-text="item.packageUnitLabel"></span>
                                                             <span>有</span>
                                                             <span class="fw-bold" x-text="item.packageQuantity"></span>
                                                             <span>份</span>
                                                         </td>
-                                                        <td x-show="item.packageForm == 'BULK'">
+                                                        <td x-show="item.packageForm == 'BULK'" class="text-truncate">
                                                             <span>-</span>
                                                         </td>
-                                                        <td x-show="item.mainCategory == 'MEAT' || item.mainCategory == 'SEAFOOD'">
+                                                        <td x-show="item.mainCategory == 'MEAT' || item.mainCategory == 'SEAFOOD'" class="text-truncate">
                                                             <span x-text="item.mainCategoryLabel"></span>
                                                             <br>
                                                             <template x-if="item.subCategoryLabel">
@@ -366,7 +366,7 @@
                                                                 </span>
                                                             </template>
                                                         </td>
-                                                        <td x-show="item.mainCategory !== 'MEAT' && item.mainCategory !== 'SEAFOOD'">
+                                                        <td x-show="item.mainCategory !== 'MEAT' && item.mainCategory !== 'SEAFOOD'" class="text-truncate">
                                                             <span x-text="item.mainCategoryLabel"></span>
                                                         </td>
                                                         <td x-text="item.overdueNotice"></td>

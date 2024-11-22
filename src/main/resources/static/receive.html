@@ -293,11 +293,11 @@
 																		<table id="add-row" class="display table table-striped table-hover dataTable" role="grid" aria-describedby="add-row_info">
 																			<thead>
 																				<tr role="row">
-																					<th>選擇</th>
-																					<th>名稱</th>
-																					<th>電話</th>
-																					<th>網站</th>
-																					<th>地址</th>
+																					<th class="text-truncate">選擇</th>
+																					<th class="text-truncate">名稱</th>
+																					<th class="text-truncate">電話</th>
+																					<th class="text-truncate">網站</th>
+																					<th class="text-truncate">地址</th>
 																				</tr>
 																			</thead>
 																			<tbody>
@@ -308,10 +308,10 @@
 																								<input type="radio" :id="item.id" :value="item.id" x-model="selectedSupplierId" x-on:change="updateSelectedName(item.name)">
 																							</div>
 																						</td>
-																						<td x-text="item.name"></td>
-																						<td x-text="item.phone"></td>
-																						<td x-text="item.website"></td>
-																						<td x-text="item.address"></td>
+																						<td x-text="item.name" class="text-truncate"></td>
+																						<td x-text="item.phone" class="text-truncate"></td>
+																						<td x-text="item.website" class="text-truncate"></td>
+																						<td x-text="item.address" class="text-truncate"></td>
 																					</tr>
 																				</template>
 																			</tbody>
@@ -446,10 +446,10 @@
 																	<table id="select-product" class="display table table-striped table-hover dataTable" role="grid" aria-describedby="add-row_info">
 																		<thead>
 																			<tr role="row">
-																				<th>動作</th>
-																				<th>食材名稱</th>
-																				<th>食材數量</th>
-																				<th>新增時間</th>
+																				<th class="text-truncate">動作</th>
+																				<th class="text-truncate">食材名稱</th>
+																				<th class="text-truncate">食材數量</th>
+																				<th class="text-truncate">新增時間</th>
 																			</tr>
 																		</thead>
 																		<template x-for="(item, index) in getProductData()" :key="index">
@@ -479,8 +479,8 @@
 																									<th class="bg-primary text-white">選擇</th>
 																									<th class="bg-primary text-white">圖片</th>
 																									<th class="bg-primary text-white">名稱</th>
-																									<th class="bg-primary text-white">包裝類型</th>
-																									<th class="bg-primary text-white">包裝方式</th>
+																									<th class="bg-primary text-white text-truncate">包裝類型</th>
+																									<th class="bg-primary text-white text-truncate">包裝方式</th>
 																								</tr>
 																								</thead>
 																								<tbody>
@@ -500,9 +500,9 @@
 																												<i class="fas fa-search-plus text-secondary fa-2x" @click="showImagePreview(product.coverPath)"></i>
 																											</div>
 																										</td>
-																										<td x-html="product.name"></td>
-																										<td x-html="product.packageFormLabel"></td>
-																										<td>
+																										<td x-html="product.name" class="text-truncate"></td>
+																										<td x-html="product.packageFormLabel" class="text-truncate"></td>
+																										<td class="text-truncate">
 																											<span x-html="product.packageQuantity"></span>
 																											<span>份</span>
 																											<span x-show="product.packageUnit != null"> / </span>
@@ -722,7 +722,7 @@
 					<h5 class="modal-title">
 						<span class="fw-mediumbold">等待進冰箱的食材</span>
 					</h5>
-					<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+					<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" x-on:click="saveSelectedProduct()">
 						<span aria-hidden="true">×</span>
 					</button>
 				</div>
@@ -737,6 +737,7 @@
 								<table id="add-product" class="display table table-striped table-hover dataTable" role="grid" aria-describedby="add-row_info">
 									<thead>
 									<tr role="row">
+										<th class="text-truncate">動作</th>
 										<th>名稱</th>
 										<th>放進冰箱數量</th>
 										<th>總份數</th>
@@ -747,7 +748,11 @@
 									<template x-for="(item, index) in getSelectedProductData()" :key="index">
 										<tbody>
 										<tr role="row" class="odd">
-											<td x-html="item.name"></td>
+											<td>
+												<i x-show="item.cloneTag == ''" x-on:click="cloneProduct(index)" class="fas fa-plus-circle text-success fs-4"></i>
+												<i x-show="item.cloneTag != ''" x-on:click="removeClone(index)" class="fas fa-minus-circle text-danger fs-4"></i>
+											</td>
+											<td x-html="item.name" class="text-truncate">
 											<td>
 												<input type="number" min="1" x-model="item.quantity" x-on:input="updateTotal(index, $event.target.value)">
 											</td>
@@ -755,7 +760,7 @@
 												<input type="number" disabled x-model="item.total">
 											</td>
 											<td>
-												<select x-model="item.expiryDate" class="form-control" x-on:change="updateExpiryDate(index, $event.target.value)">
+												<select x-model="item.expiryDate" class="form-control" x-on:change="updateExpiryDate(index, $event.target.value)" style="width: 160px">
 													<option value="">請選擇有效期限</option>
 													<template x-if="item.customExpiryDate !== '' && item.customExpiryDate !== undefined">
 														<option :value="item.expiryDate" x-text="`${item.customExpiryDate}`"></option>
@@ -776,7 +781,7 @@
 <!--												<input type="date" x-model="item.expiryDate" x-on:input="updateExpiryDate(index, $event.target.value)">-->
 											</td>
 											<td>
-												<select class="form-select" x-on:input="updateStorePlace(index, $event.target.value)">
+												<select x-model="item.storePlace" class="form-select" x-on:input="updateStorePlace(index, $event.target.value)" style="width: 160px">
 													<option value="">請選擇存放位置</option>
 													<option value="HUALIEN_REF_2F_LEFT">花蓮2樓左側冰箱</option>
 													<option value="HUALIEN_REF_2F_RIGHT">花蓮2樓右側冰箱</option>
@@ -801,6 +806,24 @@
 					<button type="button" class="btn btn-danger" data-bs-dismiss="modal" x-on:click="saveSelectedProduct()">
 						關閉
 					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="expiryDateModal" tabindex="-1" aria-labelledby="expiryDateModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="expiryDateModalLabel">請選擇有效期限</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<input type="date" id="expiryDateInput" class="form-control" min="" />
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-success" id="confirmExpiryDateButton">確認</button>
+					<button type="button" class="btn btn-danger clean" data-bs-dismiss="modal">清空</button>
 				</div>
 			</div>
 		</div>
@@ -994,7 +1017,8 @@
 							quantity: item.quantity || '',
 							total: item.total || '',
 							expiryDate: expiryDate,
-							storePlace: item.storePlace || ''
+							storePlace: item.storePlace || '',
+							cloneTag: item.cloneTag || ''
 						};
 					});
 				},
@@ -1061,16 +1085,41 @@
 								let storedData = localStorage.getItem('selectedProductList');
 								if (storedData) {
 									storedData = JSON.parse(storedData);
+									// 1.當前使用者選填的產品(本體)，把localStorage儲存的過往紀錄附值上去
 									_this.selectedProductList.forEach(product => {
-										let storedProduct = storedData.find(p => p.id === product.id);
+										let storedProduct = storedData.find(p => p.id === product.id && !p.cloneTag);
 										if (storedProduct) {
 											product.expiryDate = storedProduct.expiryDate;
 											product.quantity = storedProduct.quantity;
 											product.total = storedProduct.total;
 											product.storePlace = storedProduct.storePlace;
+											product.customExpiryDate = storedProduct.customExpiryDate;
 										}
+
+										// 2.有選填該項產品，存在localStorage的複製品要放入selectedProductList
+										storedData
+            								.filter(p => p.id === product.id && p.cloneTag)
+											.forEach(cloneProduct => {
+												_this.selectedProductList.push(cloneProduct);
+											});
 									});
 								}
+
+								// 3.排序：相同id的在一起，且沒有cloneTag屬性的(本體)在前面
+								_this.selectedProductList.sort((a, b) => {
+									if (a.id !== b.id) {
+										return a.id.localeCompare(b.id);
+									}
+									if (!a.cloneTag && b.cloneTag) {
+										return -1;
+									}
+									if (a.cloneTag && !b.cloneTag) {
+										return 1;
+									}
+									return 0;
+								});
+
+								console.log(_this.selectedProductList)
 
 								$("#selectedProductModal").modal('show');
 							}
@@ -1106,53 +1155,58 @@
 					}
 				},
 				showCustomExpiryDateInput(index) {
-					let item = this.selectedProductList[index];
-					Swal.fire({
-						title: '請選擇有效期限',
-						input: 'date',
-						inputValue: item.customExpiryDate,  // 已選定的日期
-						inputAttributes: {
-							min: new Date().toISOString().split("T")[0], // 限制不能選擇今天之前的日期
-						},
-						showDenyButton: true,
-						confirmButtonText: '確認',
-						denyButtonText: '清空',
-						customClass: {
-							confirmButton: 'btn btn-success',
-							denyButton: 'btn btn-danger',
-						},
-						inputValidator: (value) => {
-							if (!value) {
-								return '請選擇有效期限！';
-							}
+				    let item = this.selectedProductList[index];
+				    if (item.customExpiryDate == undefined){
+						// 今天日期
+						item.customExpiryDate = new Date().toISOString().split('T')[0];
+				    }
+
+				  	const modal = new bootstrap.Modal(document.getElementById('expiryDateModal'));
+				  	const expiryDateInput = document.getElementById('expiryDateInput');
+				  	const confirmButton = document.getElementById('confirmExpiryDateButton');
+
+				  	// 設定最小日期為今天
+				  	expiryDateInput.value = item.customExpiryDate;
+
+					$("#expiryDateModal").modal('show');
+				  	modal.show();
+
+				  	// 點擊確認
+				  	confirmButton.onclick = () => {
+						let userInputDate = expiryDateInput.value;
+						if (!userInputDate) {
+							alert('請選擇有效期限！');
+							return;
 						}
-					}).then((result) => {
-						if (result.isConfirmed) {
-							// 使用者輸入的日期
-							let userInputDate = result.value;
-							// 轉換為 Date
-							let inputDate = new Date(userInputDate);
-							// 當前日期
-							let currentDate = new Date();
-							// 將時間部分設定為 00:00:00，這樣比較只會考慮日期部分
-							inputDate.setHours(0, 0, 0, 0);
-							currentDate.setHours(0, 0, 0, 0);
-							// 計算兩個日期之間的天數差
-							let timeDifference = inputDate - currentDate;  // 毫秒差
-							let daysDifference = Math.floor(timeDifference / (1000 * 3600 * 24));  // 轉換為天數
-							// 更新有效期限(天數)
-							item.customExpiryDate = userInputDate;
-							item.expiryDate = daysDifference + '';
-						} else if (result.isDenied) {
-							// 點擊清空
-							item.customExpiryDate = '';  // 清空自訂日期
-							item.expiryDate = '';  		// 清空天數差
-						}
-						//同步data，使得自訂的有效期限與select綁定
+
+						// 轉換為 Date
+						let inputDate = new Date(userInputDate);
+						let currentDate = new Date();
+						// 將時間部分設定為 00:00:00，這樣比較只會考慮日期部分
+						inputDate.setHours(0, 0, 0, 0);
+						currentDate.setHours(0, 0, 0, 0);
+						// 計算兩個日期之間的天數差
+						let timeDifference = inputDate - currentDate;  // 毫秒差
+						let daysDifference = Math.floor(timeDifference / (1000 * 3600 * 24));  // 轉換為天數
+
+						// 更新有效期限(天數)
+						item.customExpiryDate = userInputDate;
+						item.expiryDate = daysDifference + '';
+
+						modal.hide();
+
+						// 同步 data，使得自訂的有效期限與 select 綁定
 						this.$nextTick(() => {
-							this.selectedProductList = [...this.selectedProductList];
+					  		this.selectedProductList = [...this.selectedProductList];
 						});
-					});
+				  	};
+
+				    // 點擊清空
+				    document.querySelector('.clean').onclick = () => {
+					    item.customExpiryDate = '';  // 清空自訂日期
+						item.expiryDate = '';        // 清空天數差
+						modal.hide();
+				  	};
 				},
 				updateStorePlace(index, storePlace) {
 					let item = this.selectedProductList[index];
@@ -1389,6 +1443,32 @@
 							console.error('Error:', error);
 						}
 				  	});
+				},
+				cloneProduct(index) {
+					if (this.selectedProductList && this.selectedProductList[index]) {
+						let clonedProduct = { ...this.selectedProductList[index] };
+						clonedProduct.cloneTag = clonedProduct.id + "_clone_" + this.genRandomCloneCode();
+						this.selectedProductList.push(clonedProduct);
+					}
+				},
+				removeClone(index){
+					if (this.selectedProductList && this.selectedProductList[index]) {
+						let productToRemove = this.selectedProductList[index];
+						if (productToRemove.cloneTag) {
+							this.selectedProductList = this.selectedProductList.filter(product => product.cloneTag !== productToRemove.cloneTag);
+						} else {
+							alert("該食材不是複製品，不可刪除");
+						}
+					}
+				},
+				genRandomCloneCode() {
+					const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+					let result = '';
+					for (let i = 0; i < 8; i++) {
+						const randomIndex = Math.floor(Math.random() * characters.length);
+						result += characters[randomIndex];
+					}
+					return result;
 				},
 				pages() {
 					return Array.from({

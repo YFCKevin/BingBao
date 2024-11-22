@@ -349,12 +349,12 @@
 																	<table id="add-row_1" class="display table table-striped table-hover dataTable" role="grid" aria-describedby="add-row_info">
 																		<thead>
 																		<tr role="row">
-																			<th>食材照片</th>
-																			<th>食材名稱</th>
-																			<th>存放位置</th>
-																			<th>剩餘數量</th>
-																			<th>有效期限</th>
-																			<th>何時通知快過期</th>
+																			<th class="text-truncate">食材照片</th>
+																			<th class="text-truncate">食材名稱</th>
+																			<th class="text-truncate">存放位置</th>
+																			<th class="text-truncate">剩餘數量</th>
+																			<th class="text-truncate">有效期限</th>
+																			<th class="text-truncate">何時<br>通知<br>快過期</th>
 																			<th>動作</th>
 																		</tr>
 																		</thead>
@@ -370,8 +370,8 @@
 																						<i class="fas fa-search-plus text-secondary fa-2x" @click="showImagePreview(item.coverPath)"></i>
 																					</div>
 																				</td>
-																				<td x-text="item.name"></td>
-																				<td x-text="item.storePlaceLabel"></td>
+																				<td x-text="item.name" class="text-truncate"></td>
+																				<td x-text="item.storePlaceLabel" class="text-truncate"></td>
 																				<td x-text="item.totalAmount"></td>
 																				<td x-text="item.expiryDate"></td>
 																				<td x-text="item.noticeDate"></td>
@@ -584,14 +584,14 @@
 																	<table id="add-row_2" class="display table table-striped table-hover dataTable" role="grid" aria-describedby="add-row_info">
 																		<thead>
 																		<tr role="row">
-																			<th>食材照片</th>
-																			<th>食材名稱</th>
-																			<th>存放位置</th>
-																			<th>剩餘數量</th>
-																			<th>有效期限</th>
-																			<th>再過多久過期</th>
-																			<th>已存放多久</th>
-																			<th>動作</th>
+																			<th class="text-truncate">食材照片</th>
+																			<th class="text-truncate">食材名稱</th>
+																			<th class="text-truncate">存放位置</th>
+																			<th class="text-truncate">剩餘數量</th>
+																			<th class="text-truncate">有效期限</th>
+																			<th class="text-truncate">再過<br>多久<br>過期</th>
+																			<th class="text-truncate">已存放<br>多久</th>
+																			<th class="text-truncate">動作</th>
 																		</tr>
 																		</thead>
 																		<tbody>
@@ -606,8 +606,8 @@
 																						<i class="fas fa-search-plus text-secondary fa-2x" @click="showImagePreview(item.coverPath)"></i>
 																					</div>
 																				</td>
-																				<td x-text="item.name"></td>
-																				<td x-text="item.storePlaceLabel"></td>
+																				<td x-text="item.name" class="text-truncate"></td>
+																				<td x-text="item.storePlaceLabel" class="text-truncate"></td>
 																				<td x-text="item.totalAmount"></td>
 																				<td x-text="item.expiryDate"></td>
 																				<td x-text="item.expiryTime === '0天' ? '今天到期' : item.expiryTime"></td>
@@ -821,15 +821,15 @@
 																	<table id="add-row" class="display table table-striped table-hover dataTable" role="grid" aria-describedby="add-row_info">
 																		<thead>
 																		<tr role="row">
-																			<th>食材照片</th>
-																			<th>食材名稱</th>
-																			<th>存放位置</th>
-																			<th>剩餘數量</th>
-																			<th>有效期限</th>
-																			<th>再過多久過期</th>
-																			<th>已存放多久</th>
-																			<th>何時通知快過期</th>
-																			<th>動作</th>
+																			<th class="text-truncate">食材照片</th>
+																			<th class="text-truncate">食材名稱</th>
+																			<th class="text-truncate">存放位置</th>
+																			<th class="text-truncate">剩餘數量</th>
+																			<th class="text-truncate">有效期限</th>
+																			<th class="text-truncate">再過<br>多久<br>過期</th>
+																			<th class="text-truncate">已存放<br>多久</th>
+																			<th class="text-truncate">何時<br>通知<br>快過期</th>
+																			<th class="text-truncate">動作</th>
 																		</tr>
 																		</thead>
 																		<tbody>
@@ -844,8 +844,8 @@
 																						<i class="fas fa-search-plus text-secondary fa-2x" @click="showImagePreview(item.coverPath)"></i>
 																					</div>
 																				</td>
-																				<td x-text="item.name"></td>
-																				<td x-text="item.storePlaceLabel"></td>
+																				<td x-text="item.name" class="text-truncate"></td>
+																				<td x-text="item.storePlaceLabel" class="text-truncate"></td>
 																				<td x-text="item.totalAmount"></td>
 																				<td x-text="item.expiryDate"></td>
 																				<td x-text="item.expiryTime === '0天' ? '今天到期' : item.expiryTime"></td>
