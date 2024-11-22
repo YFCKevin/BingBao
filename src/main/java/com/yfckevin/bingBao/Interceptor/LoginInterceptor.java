@@ -1,8 +1,7 @@
 package com.yfckevin.bingBao.Interceptor;
 
-import com.yfckevin.bingBao.controller.ProductController;
+import com.yfckevin.bingBao.ConfigProperties;
 import com.yfckevin.bingBao.dto.MemberDTO;
-import com.yfckevin.bingBao.entity.Member;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -14,6 +13,12 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Configuration
 public class LoginInterceptor implements HandlerInterceptor{
     Logger logger = LoggerFactory.getLogger(LoginInterceptor.class);
+    private final ConfigProperties configProperties;
+
+    public LoginInterceptor(ConfigProperties configProperties) {
+        this.configProperties = configProperties;
+    }
+
     @Override
     public boolean preHandle(HttpServletRequest request,
                              HttpServletResponse response,
@@ -31,7 +36,7 @@ public class LoginInterceptor implements HandlerInterceptor{
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member == null) {
             logger.warn("未登入索取的資源是：{}", request.getRequestURI());
-            response.sendRedirect(request.getContextPath() + "/login.html");
+            response.sendRedirect(configProperties.getGlobalDomain() + "login.html");
             return false;
         }
         return true;

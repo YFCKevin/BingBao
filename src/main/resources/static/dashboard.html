@@ -1896,14 +1896,14 @@
                                 newTotalAmount = enteredAmount * packageQuantity;
 
                                 if (packageForm === 'COMPLETE') {
-                                    newAmountText = enteredAmount + ' x ' + packageQuantity + packageUnitLabel + ' = ' + newTotalAmount + packageUnitLabel;
+                                    newAmountText = enteredAmount + packageUnitLabel + ' x ' + packageQuantity + '個' + ' = ' + newTotalAmount + '個';
                                 } else {
                                     newAmountText = enteredAmount + '個';
                                 }
 
                                 let finalAmountText;
                                 if (packageForm === 'COMPLETE') {
-                                    finalAmountText = enteredAmount + ' x ' + packageQuantity + packageUnitLabel + ' = ' + (+newTotalAmount + +totalAmount) + '個';
+                                    finalAmountText = enteredAmount + packageUnitLabel + ' x ' + packageQuantity + '個' + ' = ' + (+newTotalAmount + +totalAmount) + '個';
                                 } else {
                                     finalAmountText = (+enteredAmount + +totalAmount) + '個';
                                 }
