@@ -263,7 +263,7 @@
                                                     <input x-on:keydown.enter="search()" id="keyword" type="search" class="form-control" placeholder="可搜尋食材名稱" aria-controls="add-row">
                                                 </div>
                                                 <div class="d-flex flex-column flex-md-row align-items-start mb-3">
-                                                    <input x-model="startDate" type="date" class="form-control me-2" placeholder="起始日期" aria-controls="add-row" x-on:change="startDateChange()">
+                                                    <input x-model="startDate" type="date" class="form-control me-2 mb-2" placeholder="起始日期" aria-controls="add-row" x-on:change="startDateChange()">
                                                     <input x-model="endDate" type="date" class="form-control" placeholder="結束日期" aria-controls="add-row" x-on:change="endDateChange()">
                                                 </div>
                                                 <div class="d-flex flex-column flex-md-row align-items-start mb-3">
@@ -713,11 +713,17 @@
                         return item.replace(/,/g, '<br>'); // 替換所有逗號為換行
                     };
 
+                    const formatMember = (name) => {
+                        if (!name) return "";
+                        return name.replace(/管理員/g, "陳奕帆");
+                    }
+
                     const formattedList = this.recordList.map(record => {
                         return {
                             ...record,
                             currentTime: formatDate(record.currentTime),
                             item: formatItem(record.item),
+                            operator: formatMember(record.operator)
                         };
                     });
 
