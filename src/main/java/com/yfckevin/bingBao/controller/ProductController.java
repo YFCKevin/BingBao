@@ -45,8 +45,9 @@ public class ProductController {
     private final OpenAiService openAiService;
     private final ConfigProperties configProperties;
     private final DataProcessService dataProcessService;
+    private final RecordService recordService;
 
-    public ProductController(@Qualifier("sdf") SimpleDateFormat sdf, @Qualifier("picSuffix") SimpleDateFormat picSuffix, ProductService productService, GoogleVisionService googleVisionService, TempMasterService tempMasterService, ReceiveItemService receiveItemService, OpenAiService openAiService, ConfigProperties configProperties, DataProcessService dataProcessService) {
+    public ProductController(@Qualifier("sdf") SimpleDateFormat sdf, @Qualifier("picSuffix") SimpleDateFormat picSuffix, ProductService productService, GoogleVisionService googleVisionService, TempMasterService tempMasterService, ReceiveItemService receiveItemService, OpenAiService openAiService, ConfigProperties configProperties, DataProcessService dataProcessService, RecordService recordService) {
         this.sdf = sdf;
         this.picSuffix = picSuffix;
         this.productService = productService;
@@ -56,6 +57,7 @@ public class ProductController {
         this.openAiService = openAiService;
         this.configProperties = configProperties;
         this.dataProcessService = dataProcessService;
+        this.recordService = recordService;
     }
 
 
@@ -126,6 +128,8 @@ public class ProductController {
         product.setInventoryAlert(dto.getInventoryAlert());
 
         final Product savedProduct = productService.save(product);
+
+        recordService.createProduct(List.of(savedProduct));
 
         resultStatus.setCode("C000");
         resultStatus.setMessage("成功");
@@ -199,6 +203,7 @@ public class ProductController {
                 product.setCoverName(fileName);
             }
             final Product savedProduct = productService.save(product);
+            recordService.editProduct(savedProduct);
             resultStatus.setCode("C000");
             resultStatus.setMessage("成功");
             resultStatus.setData(savedProduct);
@@ -269,6 +274,7 @@ public class ProductController {
                     resultStatus.setCode("C000");
                     resultStatus.setMessage("成功");
                     resultStatus.setData(savedTempMaster);
+                    recordService.importImage(savedTempMaster);
                 } else {
                     resultStatus.setCode("C010");
                     resultStatus.setMessage("轉換失敗");
@@ -354,6 +360,8 @@ public class ProductController {
         }
         List<Product> savedProductList = productService.saveAll(productList);
         List<ProductDTO> productDTOS = savedProductList.stream().map(this::constructProductDTO).toList();
+
+        recordService.createProduct(savedProductList);
 
         resultStatus.setCode("C000");
         resultStatus.setMessage("成功");
@@ -453,8 +461,8 @@ public class ProductController {
      * @param session
      * @return
      */
-    @DeleteMapping("/deleteProduct/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable String id, HttpSession session) {
+    @DeleteMapping("/deleteProduct/{id}/{name}")
+    public ResponseEntity<?> deleteProduct(@PathVariable String id, @PathVariable String name, HttpSession session) {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
@@ -472,6 +480,7 @@ public class ProductController {
                             logger.error(e.getMessage(), e);
                         }
                         productService.deleteById(id);
+                        recordService.deleteProduct(name, member);
                         resultStatus.setCode("C000");
                         resultStatus.setMessage("成功");
                         dataProcessService.productDataProcessToDelete(p);

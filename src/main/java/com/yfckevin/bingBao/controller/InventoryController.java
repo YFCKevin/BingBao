@@ -39,8 +39,9 @@ public class InventoryController {
     private final ProductService productService;
     private final DataProcessService dataProcessService;
     private final RestTemplate restTemplate;
+    private final RecordService recordService;
 
-    public InventoryController(@Qualifier("sdf") SimpleDateFormat sdf, ConfigProperties configProperties, InventoryService inventoryService, ReceiveItemService receiveItemService, ProductService productService, DataProcessService dataProcessService, RestTemplate restTemplate) {
+    public InventoryController(@Qualifier("sdf") SimpleDateFormat sdf, ConfigProperties configProperties, InventoryService inventoryService, ReceiveItemService receiveItemService, ProductService productService, DataProcessService dataProcessService, RestTemplate restTemplate, RecordService recordService) {
         this.sdf = sdf;
         this.configProperties = configProperties;
         this.inventoryService = inventoryService;
@@ -48,6 +49,7 @@ public class InventoryController {
         this.productService = productService;
         this.dataProcessService = dataProcessService;
         this.restTemplate = restTemplate;
+        this.recordService = recordService;
     }
 
     /**
@@ -86,7 +88,8 @@ public class InventoryController {
             }
         }
         if (!inventoriesToUpdate.isEmpty()) {
-            inventoryService.saveAll(inventoriesToUpdate);
+            final List<Inventory> saveInventoryList = inventoryService.saveAll(inventoriesToUpdate);
+            recordService.editInventoryAmount(saveInventoryList, dto.getUsedAmount());
         }
 
         if (amountToUse > 0) {
@@ -164,7 +167,8 @@ public class InventoryController {
                         cloneInventoryList.add(cloneInventory);
                     }
 
-                    inventoryService.saveAll(cloneInventoryList);
+                    final List<Inventory> inventoryList = inventoryService.saveAll(cloneInventoryList);
+                    recordService.cloneInventory(inventoryList, cloneAmount);
                 }
                 resultStatus.setCode("C000");
                 resultStatus.setMessage("成功");
@@ -201,7 +205,8 @@ public class InventoryController {
                         inventory.setModificationDate(sdf.format(new Date()));
                         inventory.setModifier(member.getName());
                     }).toList();
-            inventoryService.saveAll(inventoryList);
+            final List<Inventory> saveInventoryList = inventoryService.saveAll(inventoryList);
+            recordService.editInventoryExpiryDate(saveInventoryList, expiryDate);
             resultStatus.setCode("C000");
             resultStatus.setMessage("成功");
         }
@@ -237,10 +242,13 @@ public class InventoryController {
         final String newStorePlace = dto.getNewStorePlace();
         for (Inventory inventory : inventoryList) {
             inventory.setStorePlace(StorePlace.valueOf(newStorePlace));
+            inventory.setModifier(member.getName());
+            inventory.setModificationDate(sdf.format(new Date()));
             inventoriesToUpdate.add(inventory);
         }
         if (!inventoriesToUpdate.isEmpty()) {
-            inventoryService.saveAll(inventoriesToUpdate);
+            final List<Inventory> saveInventoryList = inventoryService.saveAll(inventoriesToUpdate);
+            recordService.editInventoryStorePlace(saveInventoryList, dto.getNewStorePlace());
             resultStatus.setCode("C000");
             resultStatus.setMessage("成功");
         }
@@ -262,7 +270,8 @@ public class InventoryController {
 
         final List<Inventory> inventoryList = inventoryService.findByReceiveItemIdAndUsedDateIsNull(id);
         final List<Inventory> inventoriesToDelete = inventoryList.stream().peek(i -> i.setDeletionDate(sdf.format(new Date()))).toList();
-        inventoryService.saveAll(inventoriesToDelete);
+        final List<Inventory> saveInventoryList = inventoryService.saveAll(inventoriesToDelete);
+        recordService.deleteInventory(saveInventoryList, member);
 
         dataProcessService.inventoryDataProcess(inventoriesToDelete);
 

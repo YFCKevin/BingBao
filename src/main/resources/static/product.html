@@ -204,6 +204,12 @@
                             <p>食材放進冰箱</p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="record.html">
+                            <i class="fas fa-book"></i>
+                            <p>紀錄</p>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -396,7 +402,7 @@
                                                                 <a :href="'add.html?id=' + item.id" type="button" data-bs-toggle="tooltip" title="複製食材模板" class="btn btn-link btn-secondary">
                                                                     <i class="far fa-copy fs-4"></i>
                                                                 </a>
-                                                                <button @click="openDeleteModal(item.id)" type="button" data-bs-toggle="tooltip" title="丟棄食材模板" class="btn btn-link btn-danger">
+                                                                <button @click="openDeleteModal(item.id, item.name)" type="button" data-bs-toggle="tooltip" title="丟棄食材模板" class="btn btn-link btn-danger">
                                                                     <i class="fas fa-trash-alt fs-4"></i>
                                                                 </button>
                                                             </div>
@@ -791,6 +797,7 @@
 				shoppingListLabel: [],
 				productListLabel: [],
 				targetDeleteId: "",
+				targetDeleteProductName: "",
 				targetEditId: "",
 				imageSrc: '',
                 hasImage: false,
@@ -895,7 +902,7 @@
 						showConfirmButton: false, // 不顯示確認按鈕
 					});
 				},
-				openDeleteModal(id){
+				openDeleteModal(id, name){
 					let _this = this;
 					Swal.fire({
 						title: '確認要刪除？',
@@ -911,6 +918,7 @@
 					}).then((result) => {
 						if (result.isConfirmed) {
 							_this.targetDeleteId = id;
+							_this.targetDeleteProductName = name;
 							_this.deleteProduct();
 						}
 					});
@@ -918,7 +926,7 @@
 				deleteProduct(){
 				    let _this = this;
 				    $.ajax({
-						url: "deleteProduct/" + this.targetDeleteId,
+						url: "deleteProduct/" + this.targetDeleteId + "/" + this.targetDeleteProductName,
 						type: "delete",
 						contentType: "application/json; charset=utf-8",
 						success: function (response) {

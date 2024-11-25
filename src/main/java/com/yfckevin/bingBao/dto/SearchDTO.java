@@ -1,5 +1,7 @@
 package com.yfckevin.bingBao.dto;
 
+import com.yfckevin.bingBao.enums.Action;
+
 public class SearchDTO {
     private String keyword;
     private String startDate;
@@ -11,6 +13,8 @@ public class SearchDTO {
     private String priority;
     private String type;    // today, soon, valid
     private String storePlace;
+    private String memberName;
+    private String actionType;
 
     public SearchDTO() {}
     public SearchDTO(String type) {
@@ -100,6 +104,22 @@ public class SearchDTO {
 
     public void setSupplierName(String supplierName) {
         this.supplierName = supplierName;
+    }
+
+    public String getMemberName() {
+        return memberName;
+    }
+
+    public void setMemberName(String memberName) {
+        this.memberName = memberName;
+    }
+
+    public String getActionType() {
+        return actionType;
+    }
+
+    public void setActionType(String actionType) {
+        this.actionType = actionType;
     }
 
     @Override

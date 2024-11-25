@@ -10,26 +10,22 @@ import com.yfckevin.bingBao.service.*;
 import com.yfckevin.bingBao.utils.INUtil;
 import com.yfckevin.bingBao.utils.RNUtil;
 import jakarta.servlet.http.HttpSession;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 @RestController
 public class ReceiveController {
     Logger logger = LoggerFactory.getLogger(ReceiveController.class);
+    private final RecordService recordService;
     private final ProductService productService;
     private final SupplierService supplierService;
     private final ReceiveFormService receiveFormService;
@@ -38,7 +34,8 @@ public class ReceiveController {
     private final ConfigProperties configProperties;
     private final SimpleDateFormat sdf;
 
-    public ReceiveController(ProductService productService, SupplierService supplierService, ReceiveFormService receiveFormService, ReceiveItemService receiveItemService, InventoryService inventoryService, ConfigProperties configProperties, @Qualifier("sdf") SimpleDateFormat sdf) {
+    public ReceiveController(RecordService recordService, ProductService productService, SupplierService supplierService, ReceiveFormService receiveFormService, ReceiveItemService receiveItemService, InventoryService inventoryService, ConfigProperties configProperties, @Qualifier("sdf") SimpleDateFormat sdf) {
+        this.recordService = recordService;
         this.productService = productService;
         this.supplierService = supplierService;
         this.receiveFormService = receiveFormService;
@@ -148,7 +145,8 @@ public class ReceiveController {
                 }
             }
         }
-        inventoryService.saveAll(inventoryList);
+        final List<Inventory> saveInventoryList = inventoryService.saveAll(inventoryList);
+        recordService.receive(saveInventoryList, dto);
         resultStatus.setCode("C000");
         resultStatus.setMessage("成功");
         resultStatus.setData(savedReceiveForm);

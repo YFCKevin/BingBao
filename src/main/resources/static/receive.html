@@ -171,6 +171,12 @@
 								<p>食材放進冰箱</p>
 							</a>
 						</li>
+						<li class="nav-item">
+							<a href="record.html">
+								<i class="fas fa-book"></i>
+								<p>紀錄</p>
+							</a>
+						</li>
 					</ul>
 				</div>
 			</div>
@@ -860,7 +866,6 @@
 	<script src="js/marked.min.js"></script>
 	<script src="js/sockjs.min.js"></script>
 	<script src="js/stomp.min.js"></script>
-	<script src="js/chatroom.js"></script>
 	<script>
 
 		function loadData() {
@@ -1433,8 +1438,8 @@
 						contentType: "application/json; charset=utf-8",
 						success: function (response) {
 							if (response.code == "C000"){
-								_this.init();
 								$("#addSupplierModal").modal('hide');
+								_this.init();
 							}
 						},
 						error: function(error) {
@@ -1558,5 +1563,6 @@
 			return true;
 		}
 	</script>
+	<script src="js/chatroom.js"></script>
 </body>
 </html>

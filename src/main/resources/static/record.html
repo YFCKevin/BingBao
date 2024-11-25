@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="zh-TW" xmlns:x-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>冰寶 - 您的冰箱智慧助手</title>
+    <meta property="og:title" content="冰寶 - 您的冰箱智慧助手">
+    <meta property="og:description" content="「冰寶」是一款智慧冰箱管理助手，專為食品管理而設計。幫助您輕鬆追蹤冰箱內的食材，提供有效的存放建議，並提醒您即將過期的食品。利用AI掃描技術，讓您的食材快速建檔，放進冰箱。冰寶都是提升食品管理的理想夥伴。">
+    <meta property="og:image" content="images/favicon.ico">
+    <meta property="og:url" content="https://gurula.cc/bingBao/dashboard.html">
+    <meta property="og:type" content="website">
+    <meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway|Ubuntu&display=swap">
+    <style>
+		.image-container {
+            position: relative;
+			overflow: hidden;
+			background-color: #fff;
+		}
+
+		.overlay {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 100%;
+			height: 100%;
+			opacity: 0;
+			transition: opacity 0.3s ease;
+		}
+
+		.image-container:hover .overlay {
+			opacity: 1;
+		}
+
+
+        .description-container {
+            position: relative;
+            max-height: 3em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .description-container.expanded {
+            max-height: none;
+            white-space: normal;
+        }
+
+        .expand-button {
+            display: none;
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
+        }
+
+        .description-container.expanded + .expand-button {
+            display: block;
+        }
+        .selected {
+            background-color: #31ce36;  /* Bootstrap primary color */
+            color: white;
+        }
+	    .nav-link.error-style {
+			border: 2px solid red; /* 红色邊框 */
+			background-color: white; /* 白色背景 */
+			color: black; /* 黑色文字 */
+		}
+
+
+		.loading-dots::after {
+			content: ' ';
+			display: inline-block;
+			width: 1em;
+			text-align: left;
+			animation: dots 1s steps(5, end) infinite;
+		}
+
+		@keyframes dots {
+			0%, 20% {
+				content: '';
+			}
+			40% {
+				content: '.';
+			}
+			60% {
+				content: '..';
+			}
+			80%, 100% {
+				content: '...';
+			}
+		}
+    </style>
+
+    <!-- Fonts and icons -->
+    <script src="js/webfont.min.js"></script>
+    <script>
+		WebFont.load({
+			google: {"families":["Public Sans:300,400,500,600,700"]},
+			custom: {"families":["Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands", "simple-line-icons"], urls: ['css/fonts.min.css']},
+			active: function() {
+				sessionStorage.fonts = true;
+			}
+		});
+	</script>
+    <script src="js/deviceType.js"></script>
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/plugins.min.css">
+    <link rel="stylesheet" href="css/kaiadmin.min.css">
+
+    <!-- CSS Just for demo purpose, don't include it in your project -->
+    <!--	<link rel="stylesheet" href="css/demo.css">-->
+</head>
+<body x-data="loadData()" x-init="init()">
+    <div class="wrapper sidebar_minimize">
+        <!-- Sidebar -->
+        <div class="sidebar" data-background-color="dark">
+            <div class="sidebar-logo">
+                <!-- Logo Header -->
+                <div class="logo-header" data-background-color="dark">
+
+                    <a href="dashboard.html" class="logo">
+                        <img src="images/fridge001.jpg" alt="navbar brand" class="navbar-brand" height="20">
+                    </a>
+                    <div class="nav-toggle">
+                        <button class="btn btn-toggle toggle-sidebar">
+                            <i class="gg-menu-right"></i>
+                        </button>
+                        <button class="btn btn-toggle sidenav-toggler">
+                            <i class="gg-menu-left"></i>
+                        </button>
+                    </div>
+                    <button class="topbar-toggler more">
+                        <i class="gg-more-vertical-alt"></i>
+                    </button>
+                </div>
+                <!-- End Logo Header -->
+            </div>
+            <div class="sidebar-wrapper scrollbar scrollbar-inner">
+                <div class="sidebar-content">
+                    <ul class="nav nav-secondary">
+                        <li class="nav-section">
+                                <span class="sidebar-mini-icon">
+                                    <i class="fa fa-ellipsis-h"></i>
+                                </span>
+                            <h4 class="text-section">清單</h4>
+                        </li>
+                        <li class="nav-item">
+                            <a href="dashboard.html">
+                                <i class="fas fa-desktop"></i>
+                                <p>冰箱清單</p>
+                                <span class="badge badge-primary" x-text="todayListLabel"></span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="product.html">
+                                <i class="fas fa-fish"></i>
+                                <p>食材模板</p>
+                                <span class="badge" x-text="productListLabel" style="background-color: gray; color: white; border: none;"></span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="shopping-list.html">
+                                <i class="fas fa-shopping-basket"></i>
+                                <p>回購清單</p>
+                                <span class="badge badge-secondary" x-text="shoppingListLabel"></span>
+                            </a>
+                        </li>
+                        <li class="nav-section">
+                                <span class="sidebar-mini-icon">
+                                    <i class="fa fa-ellipsis-h"></i>
+                                </span>
+                            <h4 class="text-section">動作</h4>
+                        </li>
+                        <li class="nav-item submenu">
+                            <a data-bs-toggle="collapse" href="#submenu" class="" aria-expanded="true">
+                                <i class="fas fa-bars"></i>
+                                <p>食材建檔</p>
+                                <span class="caret"></span>
+                            </a>
+                            <div class="collapse show" id="submenu" style="">
+                                <ul class="nav nav-collapse">
+                                    <li class="submenu">
+                                        <a href="import.html">
+                                            <span class="sub-item">AI建檔</span>
+                                        </a>
+                                        <a href="add.html">
+                                            <span class="sub-item">手動輸入</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a href="receive.html">
+                                <i class="fas fa-box-open"></i>
+                                <p>食材放進冰箱</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="record.html">
+                                <i class="fas fa-book"></i>
+                                <p>紀錄</p>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- End Sidebar -->
+
+        <div class="main-panel">
+            <div class="main-header">
+                <div class="main-header-logo">
+                    <!-- Logo Header -->
+                    <div class="logo-header" data-background-color="dark">
+
+                        <a href="dashboard.html" class="logo">
+                            <img src="images/fridge001.jpg" alt="navbar brand" class="navbar-brand" height="20">
+                        </a>
+                        <div class="nav-toggle">
+                            <button class="btn btn-toggle toggle-sidebar">
+                                <i class="gg-menu-right"></i>
+                            </button>
+                            <button class="btn btn-toggle sidenav-toggler">
+                                <i class="gg-menu-left"></i>
+                            </button>
+                        </div>
+                        <button class="topbar-toggler more">
+                            <i class="gg-more-vertical-alt"></i>
+                        </button>
+
+                    </div>
+                    <!-- End Logo Header -->
+                </div>
+                <!-- Navbar Header -->
+                <nav hidden="hidden" class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom"></nav>
+                <!-- End Navbar -->
+            </div>
+
+            <div class="container">
+                <div class="page-inner">
+                    <div class="row">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="d-flex align-items-center">
+                                    <h4 class="card-title">操作紀錄</h4>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <div id="add-row_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
+                                        <div class="row">
+                                            <div class="col-sm-12 col-md-6">
+                                                <div id="select-product_filter_today" class="mb-3">
+                                                    <input x-on:keydown.enter="search()" id="keyword" type="search" class="form-control" placeholder="可搜尋食材名稱" aria-controls="add-row">
+                                                </div>
+                                                <div class="d-flex flex-column flex-md-row align-items-start mb-3">
+                                                    <input x-model="startDate" type="date" class="form-control me-2" placeholder="起始日期" aria-controls="add-row" x-on:change="startDateChange()">
+                                                    <input x-model="endDate" type="date" class="form-control" placeholder="結束日期" aria-controls="add-row" x-on:change="endDateChange()">
+                                                </div>
+                                                <div class="d-flex flex-column flex-md-row align-items-start mb-3">
+                                                    <select class="form-select form-control me-2 mb-2 mb-md-0" x-model="selectedOperator" x-on:change="operatorChange()">
+                                                        <option value="">請選擇操作者</option>
+                                                        <option value="王湘蓮">王湘蓮</option>
+                                                        <option value="陳奕州">陳奕州</option>
+                                                        <option value="管理員">陳奕帆</option>
+                                                    </select>
+                                                    <select class="form-select form-control" x-model="selectedAction" x-on:change="actionSearch()">
+                                                        <option value="">請選擇操作狀態</option>
+                                                        <option value="IMPORT_IMAGE">匯入照片</option>
+                                                        <option value="CREATE_PRODUCT">創建食材模板</option>
+                                                        <option value="EDIT_PRODUCT">編輯食材模板</option>
+                                                        <option value="DELETE_PRODUCT">刪除食材模板</option>
+                                                        <option value="RECEIVE">食材放入冰箱</option>
+                                                        <option value="EDIT_INVENTORY_AMOUNT">修改庫存使用數量</option>
+                                                        <option value="EDIT_INVENTORY_EXPIRYDATE">修改庫存有效期限</option>
+                                                        <option value="CLONE_INVENTORY">增加庫存數量</option>
+                                                        <option value="EDIT_INVENTORY_STOREPLACE">變更庫存存放位置</option>
+                                                        <option value="DELETE_INVENTORY">刪除庫存</option>
+                                                        <option value="EXPORT_EXCEL">匯出excel</option>
+                                                        <option value="CREATE_SUPPLIER">新增供應商</option>
+                                                        <option value="EDIT_SUPPLIER">修改供應商</option>
+                                                        <option value="DELETE_SUPPLIER">刪除供應商</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <table id="add-row" class="display table table-striped table-hover dataTable" role="grid" aria-describedby="add-row_info">
+                                                    <thead>
+                                                    <tr role="row">
+                                                        <th class="text-truncate">操作者</th>
+                                                        <th class="text-truncate">操作日期時間</th>
+                                                        <th class="text-truncate">食材名</th>
+                                                        <th class="text-truncate">操作狀態</th>
+                                                        <th class="text-truncate">備註</th>
+                                                        <th>動作</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <template x-for="(item,index) in getData()" :key="index">
+                                                        <tr role="row" class="odd">
+                                                            <td x-text="item.operator" class="text-truncate"></td>
+                                                            <td x-text="item.currentTime" class="text-truncate"></td>
+                                                            <td x-html="item.item" class="text-truncate"></td>
+                                                            <td x-text="item.action" class="text-truncate"></td>
+                                                            <td x-text="item.actionDetail" class="text-truncate"></td>
+                                                            <td>
+                                                                <div class="form-button-action d-flex gap-2 flex-wrap">
+                                                                    <button x-show="item.storeRecordList.length != 0" @click="openDetailModal(item.id)" type="button" data-bs-toggle="tooltip" title="查看紀錄細節" class="btn btn-link btn-primary">
+                                                                        <i class="fas fa-list fs-4"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </template>
+                                                    </tbody>
+                                                </table>
+                                                <nav class="mt-5 mb-4" x-show="pageCount() > 1">
+                                                    <ul class="pagination justify-content-center card-page">
+                                                        <li class="page-item" :class="{ 'disabled' : pageNumber==0 }">
+                                                            <a
+                                                                    class="page-link page-prev"
+                                                                    type="button"
+                                                                    x-on:click="prevPage();"
+                                                                    :disabled="pageNumber==0"
+                                                            >
+                                                                <i class="fa fas fa-chevron-left"></i>
+                                                            </a>
+                                                        </li>
+                                                        <li
+                                                                class="page-item disabled"
+                                                                :class="{ 'd-none' : pageCount() <= 4 || pageNumber == 0 || ( pageCount() > 4 && pageNumber == pageCount() ) }"
+                                                        >
+                                                            <a class="page-link">···</a>
+                                                        </li>
+                                                        <template x-for="(page,index) in pages()" :key="index">
+                                                            <li
+                                                                    class="page-item"
+                                                                    :class="{ 'active' : index === pageNumber , 'd-none' : pageCount() > 4 && ( (index < pageNumber && pageNumber < pageCount() -4) || (index < pageCount() -4 && pageNumber >= pageCount() -4) || index >= pageNumber+4 ) }"
+                                                            >
+                                                                <a
+                                                                        class="page-link"
+                                                                        type="button"
+                                                                        x-on:click="viewPage(index);"
+                                                                        x-text="index+1"
+                                                                ></a>
+                                                            </li>
+                                                        </template>
+                                                        <li
+                                                                class="page-item disabled"
+                                                                :class="{ 'd-none' : pageCount() <= 4 || pageNumber >= pageCount() -4}"
+                                                        >
+                                                            <a class="page-link">···</a>
+                                                        </li>
+                                                        <li
+                                                                class="page-item"
+                                                                :class="{ 'disabled' : pageNumber >= pageCount() -1 }"
+                                                        >
+                                                            <a
+                                                                    class="page-link page-next"
+                                                                    type="button"
+                                                                    x-on:click="nextPage();"
+                                                                    :disabled="pageNumber >= pageCount() -1"
+                                                            >
+                                                                <i class="fa fas fa-chevron-right"></i>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </nav>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="footer">
+                <div class="container-fluid d-flex justify-content-between">
+                    <nav class="pull-left">
+                        <ul class="nav">
+                            <li class="nav-item">
+                                <a class="nav-link" href="http://www.themekita.com">
+                                    ThemeKita
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#"> Help </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#"> Licenses </a>
+                            </li>
+                        </ul>
+                    </nav>
+                    <div class="copyright">
+                        2024, made with <i class="fa fa-heart heart text-danger"></i> by
+                        <a href="http://www.themekita.com">ThemeKita</a>
+                    </div>
+                    <div>
+                        Distributed by
+                        <a target="_blank" href="https://themewagon.com/">ThemeWagon</a>.
+                    </div>
+                </div>
+            </footer>
+        </div>
+
+        <div x-data="loadData_chatroom()" x-init="init_chatroom()">
+            <div class="position-fixed bottom-0 end-0 mb-4 me-4">
+                <button x-on:click="connect($event)" id="open-chat" class="btn btn-dark rounded-circle d-flex align-items-center justify-content-center p-3" style="width: 60px; height: 60px;">
+                    <i class="fas fa-comments text-white fa-lg"></i>
+                </button>
+            </div>
+            <div id="chat-container" class="d-none position-fixed bottom-0 end-0 me-4" style="width: 24rem; margin-bottom:6rem">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-dark d-flex justify-content-between align-items-center">
+                        <h6 class="mb-2 mt-2" style="color: white;">冰寶小助手</h6>
+                        <button x-on:click="disconnect()" id="close-chat" class="btn-close btn-close-white" aria-label="Close"></button>
+                    </div>
+                    <template x-if="memberId != undefined">
+                        <div id="chatbox" class="card-body overflow-auto" style="height: 20rem;">
+                            <!-- Chat messages will be displayed here -->
+                            <template x-for="(chat, index) in chatData" :key="index">
+                                <div :class="index % 2 === 0 ? 'text-end' : 'text-start'" class="mb-2">
+                                    <p x-html="chat.text"
+                                       :class="index % 2 === 0 ? 'bg-primary text-white' : 'text-black'"
+                                       class="rounded-3 py-2 px-3 d-inline-block"
+                                       :style="index % 2 !== 0 ? 'background-color: var(--bs-gray-300); margin-bottom: 0rem;' : 'margin-bottom: 0rem;'">
+                                    </p>
+                                </div>
+                            </template>
+
+                            <template x-if="isLoading">
+                                <div class="text-start mb-2">
+                                    <p class="loading-dots bg-light text-secondary rounded-3 py-2 px-3 d-inline-block"></p>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="card-footer d-flex">
+                            <textarea id="userText" x-model="userText" placeholder="請輸入訊息" class="form-control me-2"></textarea>
+                            <button id="sendBtn" x-on:click="sendMessage($event)" class="btn btn-dark"><i class="far fa-paper-plane"></i></button>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- recordDetailModal -->
+    <div class="modal fade" id="recordDetailModal" tabindex="-1" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title">
+                        <span class="fw-mediumbold">細節資訊</span>
+                    </h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <div class="dataTables_wrapper container-fluid dt-bootstrap4">
+                            <div class="row">
+                                <div class="col-12">
+                                    <template x-for="(record,index) in getDetailData()" :key="index">
+                                        <div>
+                                            <ul id="dataList" class="list-group" style="list-style-type: none; padding-left: 0;">
+                                                <li class="d-flex align-items-center fs-5 mb-2">
+                                                    食材名：<span x-text="record.name"></span>
+                                                </li>
+                                                <li class="d-flex align-items-center fs-5 mb-2">
+                                                    放入冰箱的數量：
+                                                    <span x-text="record.totalAmount"></span>
+                                                    <span>個</span>
+                                                </li>
+                                                <li class="d-flex align-items-center fs-5 mb-2">
+                                                    有效期限：
+                                                    <span x-text="record.expiryDate"></span>
+                                                </li>
+                                                <li class="d-flex align-items-center fs-5 mb-2">
+                                                    存放位置：
+                                                    <span x-text="record.storePlace"></span>
+                                                </li>
+                                            </ul>
+                                            <template x-if="index < getDetailData().length - 1">
+                                                <hr class="my-3">
+                                            </template>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                        關閉
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!--   Core JS Files   -->
+    <script src="js/jquery-3.7.1.min.js"></script>
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <!-- jQuery Scrollbar -->
+    <script src="js/jquery.scrollbar.min.js"></script>
+    <!-- Moment JS -->
+    <script src="js/moment.min.js"></script>
+    <!-- Chart JS -->
+    <script src="js/chart.min.js"></script>
+    <!-- jQuery Sparkline -->
+    <script src="js/jquery.sparkline.min.js"></script>
+    <!-- Chart Circle -->
+    <script src="js/circles.min.js"></script>
+    <!-- Datatables -->
+    <script src="js/datatables.min.js"></script>
+    <!-- Bootstrap Notify -->
+    <script src="js/bootstrap-notify.min.js"></script>
+    <!-- jQuery Vector Maps -->
+    <script src="js/jsvectormap.min.js"></script>
+    <script src="js/world.js"></script>
+    <!-- Sweet Alert -->
+    <script src="js/sweetalert.min.js"></script>
+    <!-- Kaiadmin JS -->
+    <script src="js/kaiadmin.min.js"></script>
+    <script src="js/alpine.2.8.2.min.js"></script>
+    <!--  聊天室-->
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/marked.min.js"></script>
+    <script src="js/sockjs.min.js"></script>
+    <script src="js/stomp.min.js"></script>
+    <script src="js/chatroom.js"></script>
+    <script>
+
+		function loadData() {
+			return {
+				pageNumber: 0,
+				size: 10,
+				total: "",
+				recordList: [],
+				todayListLabel: [],
+				shoppingListLabel: [],
+				productListLabel: [],
+				selectedOperator: "",
+				selectedAction: "",
+				startDate: "",
+				endDate: "",
+				recordDetail: [],	//放庫存食材細節資訊，開啟modal時呈現
+
+
+				init(){
+					let _this = this;
+					let data = {};
+					data.keyword = $("#keyword").val();
+					data.startDate = this.startDate;
+					data.endDate = this.endDate;
+					data.memberName = this.selectedOperator;
+					data.actionType = this.selectedAction;
+
+				    $.ajax({
+						url: "recordSearch",
+						type: "post",
+						data: JSON.stringify(data),
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.recordList = response.data;
+							}
+						},
+						error: function(error) {
+							Swal.fire({
+								title: '系統錯誤，請聯繫管理員！',
+								text: '',
+								icon: 'error',
+								confirmButtonText: '關閉',
+								customClass: {
+									confirmButton: 'btn btn-danger'
+								}
+							})
+							console.error('Error:', error);
+						}
+				  	});
+				    $.ajax({
+						url: "getTodaySize",
+						type: "get",
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.todayListLabel = response.data;
+							}
+						},
+				  	});
+				    $.ajax({
+						url: "getShoppingListSize",
+						type: "get",
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.shoppingListLabel = response.data;
+							}
+						},
+				  	});
+				    $.ajax({
+						url: "getProductSize",
+						type: "get",
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.productListLabel = response.data;
+							}
+						},
+				  	});
+				},
+                operatorChange() {
+					this.search();
+				},
+				actionSearch() {
+				    this.search();
+				},
+				startDateChange() {
+				    this.search();
+				},
+				endDateChange() {
+				    this.search();
+				},
+				search(){
+					let _this = this;
+					let data = {};
+					data.keyword = $("#keyword").val();
+					data.startDate = this.startDate;
+					data.endDate = this.endDate;
+					data.memberName = this.selectedOperator;
+					data.actionType = this.selectedAction;
+
+				    $.ajax({
+						url: "recordSearch",
+						type: "post",
+						data: JSON.stringify(data),
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+							    _this.pageNumber = 0;
+								_this.recordList = response.data;
+							}
+						},
+						error: function(error) {
+							Swal.fire({
+								title: '系統錯誤，請聯繫管理員！',
+								text: '',
+								icon: 'error',
+								confirmButtonText: '關閉',
+								customClass: {
+									confirmButton: 'btn btn-danger'
+								}
+							})
+							console.error('Error:', error);
+						}
+				  	});
+				},
+				openDetailModal(recordId){
+					let _this = this;
+				    $.ajax({
+						url: "getRecordInfo/" + recordId,
+						type: "get",
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.code == "C000"){
+								_this.recordDetail = response.data;
+								$("#recordDetailModal").modal('show');
+							}
+						},
+						error: function(error) {
+							Swal.fire({
+								title: '系統錯誤，請聯繫管理員！',
+								text: '',
+								icon: 'error',
+								confirmButtonText: '關閉',
+								customClass: {
+									confirmButton: 'btn btn-danger'
+								}
+							})
+							console.error('Error:', error);
+						}
+				  	});
+				},
+                getData() {
+                    const start = this.pageNumber * this.size,
+                          end = start + this.size;
+
+                    const formatDate = (dateTime) => {
+                        if (!dateTime) return "";
+                        return dateTime.slice(0, 16); // 轉換格式為 yyyy-MM-dd HH:mm
+                    };
+
+                    const formatItem = (item) => {
+                        if (!item) return "";
+                        return item.replace(/,/g, '<br>'); // 替換所有逗號為換行
+                    };
+
+                    const formattedList = this.recordList.map(record => {
+                        return {
+                            ...record,
+                            currentTime: formatDate(record.currentTime),
+                            item: formatItem(record.item),
+                        };
+                    });
+
+                    this.total = formattedList.length;
+                    return formattedList.slice(start, end);
+                },
+                getDetailData (){
+                    return this.recordDetail;
+                },
+				pages() {
+					return Array.from({
+						length: Math.ceil(this.total / this.size),
+					});
+				},
+				nextPage() { this.pageNumber++;},
+				prevPage() { this.pageNumber--;},
+				pageCount() { return Math.ceil(this.total / this.size);},
+				viewPage(index) { this.pageNumber = index;},
+			};
+		}
+
+	</script>
+</body>
+</html>

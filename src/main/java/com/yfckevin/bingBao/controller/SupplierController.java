@@ -6,6 +6,7 @@ import com.yfckevin.bingBao.dto.SearchDTO;
 import com.yfckevin.bingBao.dto.SupplierDTO;
 import com.yfckevin.bingBao.entity.Supplier;
 import com.yfckevin.bingBao.exception.ResultStatus;
+import com.yfckevin.bingBao.service.RecordService;
 import com.yfckevin.bingBao.service.SupplierService;
 import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
@@ -25,11 +26,13 @@ public class SupplierController {
     private final SimpleDateFormat sdf;
     private final ConfigProperties configProperties;
     private final SupplierService supplierService;
+    private final RecordService recordService;
 
-    public SupplierController(@Qualifier("sdf") SimpleDateFormat sdf, ConfigProperties configProperties, SupplierService supplierService) {
+    public SupplierController(@Qualifier("sdf") SimpleDateFormat sdf, ConfigProperties configProperties, SupplierService supplierService, RecordService recordService) {
         this.sdf = sdf;
         this.configProperties = configProperties;
         this.supplierService = supplierService;
+        this.recordService = recordService;
     }
 
     /**
@@ -59,6 +62,7 @@ public class SupplierController {
             resultStatus.setCode("C000");
             resultStatus.setMessage("成功");
             resultStatus.setData(savedSupplier);
+            recordService.saveSupplier(savedSupplier);
         } else {    //更新
             supplierService.findById(dto.getId())
                     .map(supplier -> {
@@ -72,6 +76,7 @@ public class SupplierController {
                         resultStatus.setCode("C000");
                         resultStatus.setMessage("成功");
                         resultStatus.setData(savedSupplier);
+                        recordService.editSupplier(savedSupplier);
                         return resultStatus;
                     })
                     .orElseGet(() -> {
@@ -159,6 +164,7 @@ public class SupplierController {
                     resultStatus.setCode("C000");
                     resultStatus.setMessage("成功");
                     resultStatus.setData(savedSupplier);
+                    recordService.deleteSupplier(savedSupplier, member);
                     return resultStatus;
                 })
                 .orElseGet(() -> {
