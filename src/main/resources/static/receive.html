@@ -1151,7 +1151,14 @@
 						this.showCustomExpiryDateInput(index);
 					} else {
 						item.expiryDate = expiryDate;
-						item.customExpiryDate = '';  // 清空自訂日期
+						if (['30', '60', '90', '180', '270', '365', '455', '545', '730', '910', '1095'].includes(expiryDate)) {
+							item.customExpiryDate = '';  // 清空自訂日期
+						} else {
+							item.customExpiryDate = this.addDaysToNewExpiryDate(expiryDate);
+						}
+						// 將修改過的有效期限，再次存入localStorage，能正確渲染出option
+						this.selectedProductList = [...this.selectedProductList];
+						this.saveSelectedProduct();
 					}
 				},
 				showCustomExpiryDateInput(index) {
@@ -1483,6 +1490,14 @@
 						result += characters[randomIndex];
 					}
 					return result;
+				},
+				addDaysToNewExpiryDate(days) {
+					const today = new Date();
+					today.setDate(today.getDate() + +days);
+					const year = today.getFullYear();
+					const month = String(today.getMonth() + 1).padStart(2, '0');
+					const day = String(today.getDate()).padStart(2, '0');
+					return `${year}-${month}-${day}`;
 				},
 				pages() {
 					return Array.from({
