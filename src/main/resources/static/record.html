@@ -643,8 +643,8 @@
 					let _this = this;
 					let data = {};
 					data.keyword = $("#keyword").val();
-					data.startDate = this.startDate;
-					data.endDate = this.endDate;
+					data.startDate = this.startDate + " 00:00:00";
+					data.endDate = this.endDate + " 23:59:59";
 					data.memberName = this.selectedOperator;
 					data.actionType = this.selectedAction;
 
