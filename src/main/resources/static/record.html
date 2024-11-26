@@ -275,20 +275,29 @@
                                                     </select>
                                                     <select class="form-select form-control" x-model="selectedAction" x-on:change="actionSearch()">
                                                         <option value="">請選擇操作狀態</option>
-                                                        <option value="IMPORT_IMAGE">匯入照片</option>
-                                                        <option value="CREATE_PRODUCT">創建食材模板</option>
-                                                        <option value="EDIT_PRODUCT">編輯食材模板</option>
-                                                        <option value="DELETE_PRODUCT">刪除食材模板</option>
-                                                        <option value="RECEIVE">食材放入冰箱</option>
-                                                        <option value="EDIT_INVENTORY_AMOUNT">修改庫存使用數量</option>
-                                                        <option value="EDIT_INVENTORY_EXPIRYDATE">修改庫存有效期限</option>
-                                                        <option value="CLONE_INVENTORY">增加庫存數量</option>
-                                                        <option value="EDIT_INVENTORY_STOREPLACE">變更庫存存放位置</option>
-                                                        <option value="DELETE_INVENTORY">刪除庫存</option>
-                                                        <option value="EXPORT_EXCEL">匯出excel</option>
-                                                        <option value="CREATE_SUPPLIER">新增供應商</option>
-                                                        <option value="EDIT_SUPPLIER">修改供應商</option>
-                                                        <option value="DELETE_SUPPLIER">刪除供應商</option>
+
+                                                        <optgroup label="--------庫存--------">
+                                                            <option value="RECEIVE">食材放入冰箱</option>
+                                                            <option value="EDIT_INVENTORY_AMOUNT">修改庫存使用數量</option>
+                                                            <option value="EDIT_INVENTORY_EXPIRYDATE">修改庫存有效期限</option>
+                                                            <option value="CLONE_INVENTORY">增加庫存數量</option>
+                                                            <option value="EDIT_INVENTORY_STOREPLACE">變更庫存存放位置</option>
+                                                            <option value="DELETE_INVENTORY">刪除庫存</option>
+                                                            <option value="EXPORT_EXCEL">匯出excel</option>
+                                                        </optgroup>
+
+                                                        <optgroup label="--------食材模板--------">
+                                                            <option value="IMPORT_IMAGE">匯入照片</option>
+                                                            <option value="CREATE_PRODUCT">創建食材模板</option>
+                                                            <option value="EDIT_PRODUCT">編輯食材模板</option>
+                                                            <option value="DELETE_PRODUCT">刪除食材模板</option>
+                                                        </optgroup>
+
+                                                        <optgroup label="--------供應商--------">
+                                                            <option value="CREATE_SUPPLIER">新增供應商</option>
+                                                            <option value="EDIT_SUPPLIER">修改供應商</option>
+                                                            <option value="DELETE_SUPPLIER">刪除供應商</option>
+                                                        </optgroup>
                                                     </select>
                                                 </div>
                                             </div>
@@ -643,8 +652,12 @@
 					let _this = this;
 					let data = {};
 					data.keyword = $("#keyword").val();
-					data.startDate = this.startDate + " 00:00:00";
-					data.endDate = this.endDate + " 23:59:59";
+					if (this.startDate != ""){
+					    data.startDate = this.startDate + " 00:00:00";
+					}
+					if (this.endDate != ""){
+					    data.endDate = this.endDate + " 23:59:59";
+					}
 					data.memberName = this.selectedOperator;
 					data.actionType = this.selectedAction;
 
