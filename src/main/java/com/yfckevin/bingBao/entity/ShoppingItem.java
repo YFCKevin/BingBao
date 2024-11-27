@@ -30,6 +30,7 @@ public class ShoppingItem {
     private String deletionDate;
     private String creator;
     private String modifier;
+    private String productId;
     @Version
     private long version;
 
@@ -199,5 +200,13 @@ public class ShoppingItem {
 
     public void setPurchased(boolean purchased) {
         this.purchased = purchased;
+    }
+
+    public String getProductId() {
+        return productId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
     }
 }

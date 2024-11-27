@@ -6,10 +6,7 @@ import com.yfckevin.bingBao.entity.*;
 import com.yfckevin.bingBao.enums.PackageForm;
 import com.yfckevin.bingBao.enums.PriorityType;
 import com.yfckevin.bingBao.exception.ResultStatus;
-import com.yfckevin.bingBao.service.InventoryService;
-import com.yfckevin.bingBao.service.ProductService;
-import com.yfckevin.bingBao.service.ReceiveFormService;
-import com.yfckevin.bingBao.service.ShoppingService;
+import com.yfckevin.bingBao.service.*;
 import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -37,14 +34,16 @@ public class ShoppingListController {
     private final InventoryService inventoryService;
     private final ProductService productService;
     private final ReceiveFormService receiveFormService;
+    private final RecordService recordService;
 
-    public ShoppingListController(@Qualifier("sdf") SimpleDateFormat sdf, ConfigProperties configProperties, ShoppingService shoppingService, InventoryService inventoryService, ProductService productService, ReceiveFormService receiveFormService) {
+    public ShoppingListController(@Qualifier("sdf") SimpleDateFormat sdf, ConfigProperties configProperties, ShoppingService shoppingService, InventoryService inventoryService, ProductService productService, ReceiveFormService receiveFormService, RecordService recordService) {
         this.sdf = sdf;
         this.configProperties = configProperties;
         this.shoppingService = shoppingService;
         this.inventoryService = inventoryService;
         this.productService = productService;
         this.receiveFormService = receiveFormService;
+        this.recordService = recordService;
     }
 
 //    @GetMapping("/addToShoppingList")
@@ -121,6 +120,7 @@ public class ShoppingListController {
                     shoppingItem.setCreationDate(sdf.format(new Date()));
                     shoppingItem.setSupplier(receiveFormIdSupplierMap.getOrDefault(inventoryDTO.getReceiveFormId(), null));
                     shoppingItem.setPurchased(false);
+                    shoppingItem.setProductId(inventoryDTO.getProductId());
                     return shoppingItem;
                 }).toList();
         List<ShoppingItem> savedShoppingList = shoppingService.saveAll(shoppingItemList);
@@ -128,6 +128,8 @@ public class ShoppingListController {
         //將這批放進回購清單的庫存食材標記 "已放入"
         final List<Inventory> markedInventoryList = inventoryList.stream().peek(inventory -> inventory.setAddShoppingList(true)).toList();
         inventoryService.saveAll(markedInventoryList);
+
+        recordService.addToShoppingList(markedInventoryList, savedShoppingList);
 
         resultStatus.setCode("C000");
         resultStatus.setMessage("成功");
@@ -231,10 +233,12 @@ public class ShoppingListController {
         } else {
             final ShoppingItem shoppingItem = opt.get();
             shoppingItem.setDeletionDate(sdf.format(new Date()));
+            shoppingItem.setModifier(member.getName());
             ShoppingItem savedShoppingItem = shoppingService.save(shoppingItem);
             resultStatus.setCode("C000");
             resultStatus.setMessage("成功");
             resultStatus.setData(constructShoppingDTO(savedShoppingItem));
+            recordService.deleteShoppingItem(savedShoppingItem);
         }
         return ResponseEntity.ok(resultStatus);
     }
@@ -262,10 +266,13 @@ public class ShoppingListController {
         } else {
             final ShoppingItem shoppingItem = opt.get();
             shoppingItem.setPurchased(true);
+            shoppingItem.setModifier(member.getName());
+            shoppingItem.setModificationDate(sdf.format(new Date()));
             ShoppingItem savedShoppingItem = shoppingService.save(shoppingItem);
             resultStatus.setCode("C000");
             resultStatus.setMessage("成功");
             resultStatus.setData(constructShoppingDTO(savedShoppingItem));
+            recordService.changePurchase(savedShoppingItem);
         }
         return ResponseEntity.ok(resultStatus);
     }
@@ -293,10 +300,13 @@ public class ShoppingListController {
         } else {
             final ShoppingItem shoppingItem = opt.get();
             shoppingItem.setPurchaseQuantity(dto.getAmount());
+            shoppingItem.setModifier(member.getName());
+            shoppingItem.setModificationDate(sdf.format(new Date()));
             final ShoppingItem savedShoppingItem = shoppingService.save(shoppingItem);
             resultStatus.setCode("C000");
             resultStatus.setMessage("成功");
             resultStatus.setData(constructShoppingDTO(savedShoppingItem));
+            recordService.editPurchaseQuantity(savedShoppingItem);
         }
         return ResponseEntity.ok(resultStatus);
     }
@@ -329,10 +339,13 @@ public class ShoppingListController {
             } else if (PriorityType.NORMAL.equals(shoppingItem.getPriorityType())) {
                 shoppingItem.setPriorityType(PriorityType.URGENT);
             }
+            shoppingItem.setModifier(member.getName());
+            shoppingItem.setModificationDate(sdf.format(new Date()));
             final ShoppingItem savedShoppingItem = shoppingService.save(shoppingItem);
             resultStatus.setCode("C000");
             resultStatus.setMessage("成功");
             resultStatus.setData(constructShoppingDTO(savedShoppingItem));
+            recordService.changePriority(savedShoppingItem);
         }
         return ResponseEntity.ok(resultStatus);
     }
@@ -439,6 +452,7 @@ public class ShoppingListController {
         dto.setDeletionDate(inventory.getDeletionDate());
         dto.setCreator(inventory.getCreator());
         dto.setModifier(inventory.getModifier());
+        dto.setProductId(inventory.getProductId());
         return dto;
     }
 }

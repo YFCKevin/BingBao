@@ -25,6 +25,7 @@ public class InventoryDTO {
     private String mainCategoryLabel;
     private SubCategory subCategory;
     private String subCategoryLabel;
+    private String productId;
     private String overdueNotice;   //通知過期天數
     private String expiryTime;  //再過多久過期(天數or月數or年數)
     private String existedTime; //已存放多久(天數or月數or年數)
@@ -319,6 +320,14 @@ public class InventoryDTO {
         this.supplier = supplier;
     }
 
+    public String getProductId() {
+        return productId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
+    }
+
     @Override
     public String toString() {
         return "InventoryDTO{" +
@@ -344,6 +353,7 @@ public class InventoryDTO {
                 ", mainCategoryLabel='" + mainCategoryLabel + '\'' +
                 ", subCategory=" + subCategory +
                 ", subCategoryLabel='" + subCategoryLabel + '\'' +
+                ", productId='" + productId + '\'' +
                 ", overdueNotice='" + overdueNotice + '\'' +
                 ", expiryTime='" + expiryTime + '\'' +
                 ", existedTime='" + existedTime + '\'' +

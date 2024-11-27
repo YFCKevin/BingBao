@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -80,10 +81,17 @@ public class RecordController {
         recordDTO.setId(record.getId());
         recordDTO.setOperator(record.getOperator());
         recordDTO.setCurrentTime(record.getCurrentTime());
-        recordDTO.setAction(record.getAction().getLabel());
+        recordDTO.setAction(record.getAction() != null ? record.getAction().getLabel() : null);
         recordDTO.setItem(record.getItem());
-        recordDTO.setStoreRecordList(record.getStoreRecordList());
+        recordDTO.setStoreRecordList(record.getStoreRecordList() != null ? new ArrayList<>(record.getStoreRecordList()) : new ArrayList<>());
         recordDTO.setActionDetail(record.getActionDetail());
+        recordDTO.setTraceId(record.getTraceId());
+        recordDTO.setTraceState(record.getTraceState() != null ? record.getTraceState().getLabel() : null);
+        recordDTO.setTempMasterId(record.getTempMasterId());
+        recordDTO.setProductId(record.getProductId() != null ? new ArrayList<>(record.getProductId()) : new ArrayList<>());
+        recordDTO.setReceiveItemId(record.getReceiveItemId() != null ? new ArrayList<>(record.getReceiveItemId()) : null);
+        recordDTO.setSupplierId(record.getSupplierId());
+        recordDTO.setShoppingItemId(record.getShoppingItemId() != null ? new ArrayList<>(record.getShoppingItemId()) : null);
         return recordDTO;
     }
 }

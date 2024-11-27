@@ -129,7 +129,7 @@ public class ProductController {
 
         final Product savedProduct = productService.save(product);
 
-        recordService.createProduct(List.of(savedProduct));
+        recordService.createProduct(List.of(savedProduct), null);
 
         resultStatus.setCode("C000");
         resultStatus.setMessage("成功");
@@ -361,7 +361,7 @@ public class ProductController {
         List<Product> savedProductList = productService.saveAll(productList);
         List<ProductDTO> productDTOS = savedProductList.stream().map(this::constructProductDTO).toList();
 
-        recordService.createProduct(savedProductList);
+        recordService.createProduct(savedProductList, productDTOListWrapperDTO.getTempMasterId());
 
         resultStatus.setCode("C000");
         resultStatus.setMessage("成功");
@@ -480,7 +480,7 @@ public class ProductController {
                             logger.error(e.getMessage(), e);
                         }
                         productService.deleteById(id);
-                        recordService.deleteProduct(name, member);
+                        recordService.deleteProduct(name, p.getId(), member);
                         resultStatus.setCode("C000");
                         resultStatus.setMessage("成功");
                         dataProcessService.productDataProcessToDelete(p);

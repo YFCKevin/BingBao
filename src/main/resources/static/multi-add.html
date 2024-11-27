@@ -564,10 +564,12 @@
 					"STRIP": "條",
 					"PORTION": "份"
 				},
+				tempMasterId: "",
 
 				init(){
 					const params = new URLSearchParams(window.location.search);
 					const id = params.get('id');
+					this.tempMasterId = id;
 					let _this = this;
 				    $.ajax({
 						url: "getTempMasterInfo/" + id,
@@ -751,6 +753,8 @@
 							formData.append(`productDTOList[${index}].multipartFile`, product.multipartFile);
 						}
 					});
+
+					formData.append("tempMasterId", this.tempMasterId);
 
 					$.ajax({
 						url: 'importIntoDB',

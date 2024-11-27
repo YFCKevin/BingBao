@@ -17,7 +17,12 @@ public enum Action {
     CREATE_SUPPLIER(14, "新增供應商"),
     EDIT_SUPPLIER(15, "修改供應商"),
     DELETE_SUPPLIER(16, "刪除供應商"),
-    QUERY_SUPPLIER(17, "查詢供應商");
+    QUERY_SUPPLIER(17, "查詢供應商"),
+    ADD_SHOPPING_LIST(18, "加入回購清單"),
+    DELETE_SHOPPING_ITEM(19, "刪除回購品項"),
+    CHANGE_PURCHASE(20, "變更回購品項購買狀態"),
+    EDIT_PURCHASE_QUANTITY(21, "變更回購品項數量"),
+    CHANGE_PRIORITY(22, "變更回購品項優先級別");
 
     private int value;
     private String label;

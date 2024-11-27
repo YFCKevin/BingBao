@@ -11,11 +11,11 @@ import java.util.List;
 public interface RecordService {
     void importImage(TempMaster tempMaster);
 
-    void createProduct(List<Product> productList);
+    void createProduct(List<Product> productList, String tempMasterId);
 
     void editProduct(Product product);
 
-    void deleteProduct(String name, MemberDTO member);
+    void deleteProduct(String name, String productId, MemberDTO member);
 
     void receive(List<Inventory> inventoryList, ReceiveRequestDTO dto);
 
@@ -34,6 +34,16 @@ public interface RecordService {
     void editSupplier(Supplier savedSupplier);
 
     void deleteSupplier(Supplier savedSupplier, MemberDTO member);
+
+    void addToShoppingList(List<Inventory> markedInventoryList, List<ShoppingItem> savedShoppingList);
+
+    void deleteShoppingItem(ShoppingItem savedShoppingItem);
+
+    void changePriority(ShoppingItem savedShoppingItem);
+
+    void editPurchaseQuantity(ShoppingItem savedShoppingItem);
+
+    void changePurchase(ShoppingItem savedShoppingItem);
 
     List<Record> searchRecord(SearchDTO searchDTO);
 

@@ -159,6 +159,7 @@ public class NotifyController {
         dto.setDeletionDate(inventory.getDeletionDate());
         dto.setCreator(inventory.getCreator());
         dto.setModifier(inventory.getModifier());
+        dto.setProductId(inventory.getProductId());
         return dto;
     }
 }

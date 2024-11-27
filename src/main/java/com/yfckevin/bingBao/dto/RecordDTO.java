@@ -1,6 +1,7 @@
 package com.yfckevin.bingBao.dto;
 
 import com.yfckevin.bingBao.enums.Action;
+import com.yfckevin.bingBao.enums.TraceState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,55 @@ public class RecordDTO {
     private String item;    //項目名
     private List<StoredRecord> storeRecordList = new ArrayList<>(); //食材放入冰箱細節
     private String actionDetail;    //操作細節
+    private String traceId; //追蹤編號
+    private String traceState;  //追蹤階段
+
+    //用於追蹤匯入圖片
+    private String tempMasterId;
+
+    //用於追蹤食材跟庫存
+    private List<String> productId = new ArrayList<>();
+    private List<String> receiveItemId;
+
+    //用於追蹤供應商
+    private String supplierId;
+
+    //用於追蹤待購清單
+    private List<String> shoppingItemId;
+
+
+    public String getTraceState() {
+        return traceState;
+    }
+
+    public void setTraceState(String traceState) {
+        this.traceState = traceState;
+    }
+
+    public String getTempMasterId() {
+        return tempMasterId;
+    }
+
+    public void setTempMasterId(String tempMasterId) {
+        this.tempMasterId = tempMasterId;
+    }
+
+    public void setProductId(List<String> productId) {
+        this.productId = productId;
+    }
+
+    public void setReceiveItemId(List<String> receiveItemId) {
+        this.receiveItemId = receiveItemId;
+    }
+
+    public List<String> getShoppingItemId() {
+        return shoppingItemId;
+    }
+
+    public void setShoppingItemId(List<String> shoppingItemId) {
+        this.shoppingItemId = shoppingItemId;
+    }
+
     public String getId() {
         return id;
     }
@@ -67,5 +117,29 @@ public class RecordDTO {
 
     public void setActionDetail(String actionDetail) {
         this.actionDetail = actionDetail;
+    }
+
+    public String getTraceId() {
+        return traceId;
+    }
+
+    public void setTraceId(String traceId) {
+        this.traceId = traceId;
+    }
+
+    public List<String> getProductId() {
+        return productId;
+    }
+
+    public List<String> getReceiveItemId() {
+        return receiveItemId;
+    }
+
+    public String getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(String supplierId) {
+        this.supplierId = supplierId;
     }
 }
