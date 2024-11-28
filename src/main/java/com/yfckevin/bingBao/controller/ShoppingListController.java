@@ -129,7 +129,9 @@ public class ShoppingListController {
         final List<Inventory> markedInventoryList = inventoryList.stream().peek(inventory -> inventory.setAddShoppingList(true)).toList();
         inventoryService.saveAll(markedInventoryList);
 
-        recordService.addToShoppingList(markedInventoryList, savedShoppingList);
+        if (savedShoppingList.size() > 0) {
+            recordService.addToShoppingList(markedInventoryList, savedShoppingList);
+        }
 
         resultStatus.setCode("C000");
         resultStatus.setMessage("成功");
