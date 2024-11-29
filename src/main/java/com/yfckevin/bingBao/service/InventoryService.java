@@ -49,7 +49,7 @@ public interface InventoryService {
 
     Map<String, Map<Long, List<Inventory>>> findAllAndDeletionDateIsNull();
 
-    List<Inventory> findByReceiveItemIdAndUsedDateIsNull(String receiveItemId);
+    List<Inventory> findByReceiveItemIdAndUsedDateIsNullAndDeletionDateIsNull(String receiveItemId);
 
     Map<String, Map<Long, List<Inventory>>> searchByNameAndSupplierId(String keyword, String supplierId, String type);
 

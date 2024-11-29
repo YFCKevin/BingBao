@@ -1572,6 +1572,16 @@
 										_this.init();
 									}
 								});
+							} else if (response.code == "C006"){
+								Swal.fire({
+									title: '食材已刪除',
+									text: '',
+									icon: 'info',
+									confirmButtonText: '關閉',
+									customClass: {
+										confirmButton: 'btn btn-secondary'
+									}
+								})
 							} else {
 								Swal.fire({
 									title: '錯誤發生，請聯繫管理員！',

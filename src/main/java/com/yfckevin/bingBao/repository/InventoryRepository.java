@@ -10,5 +10,5 @@ public interface InventoryRepository extends MongoRepository<Inventory, String> 
 
     List<Inventory> findByReceiveItemId(String receiveItemId);
 
-    List<Inventory> findByReceiveItemIdAndUsedDateIsNull(String receiveItemId);
+    List<Inventory> findByReceiveItemIdAndUsedDateIsNullAndDeletionDateIsNull(String receiveItemId);
 }

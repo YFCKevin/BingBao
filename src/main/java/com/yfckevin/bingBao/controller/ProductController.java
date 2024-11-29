@@ -222,7 +222,7 @@ public class ProductController {
      * @return
      */
     @PostMapping("/convertDataByPhoto")
-    public ResponseEntity<?> importDataByPhoto(@RequestBody ImageRequestDTO imageDTO, HttpSession session) {
+    public ResponseEntity<?> convertDataByPhoto(@RequestBody ImageRequestDTO imageDTO, HttpSession session) {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
@@ -542,7 +542,7 @@ public class ProductController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[" + member.getName() + "]" + "[productSearch]");
+            logger.info("[" + member.getName() + "]" + "[searchProductTemplate]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -654,7 +654,7 @@ public class ProductController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[" + member.getName() + "]" + "[getShoppingListSize]");
+            logger.info("[" + member.getName() + "]" + "[getProductSize]");
         }
         ResultStatus resultStatus = new ResultStatus();
 

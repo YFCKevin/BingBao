@@ -63,11 +63,11 @@ public class InventoryController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[" + member.getName() + "]" + "[useInventoryProduct]");
+            logger.info("[" + member.getName() + "]" + "[editAmountInventory]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
-        List<Inventory> inventoryList = inventoryService.findByReceiveItemIdAndUsedDateIsNull(dto.getReceiveItemId());
+        List<Inventory> inventoryList = inventoryService.findByReceiveItemIdAndUsedDateIsNullAndDeletionDateIsNull(dto.getReceiveItemId());
         if (inventoryList.size() == 0) {
             resultStatus.setCode("C006");
             resultStatus.setMessage("無庫存");
@@ -268,7 +268,12 @@ public class InventoryController {
         }
         ResultStatus resultStatus = new ResultStatus();
 
-        final List<Inventory> inventoryList = inventoryService.findByReceiveItemIdAndUsedDateIsNull(id);
+        final List<Inventory> inventoryList = inventoryService.findByReceiveItemIdAndUsedDateIsNullAndDeletionDateIsNull(id);
+        if (inventoryList.size() == 0) {
+            resultStatus.setCode("C006");
+            resultStatus.setMessage("無庫存");
+            return ResponseEntity.ok(resultStatus);
+        }
         final List<Inventory> inventoriesToDelete = inventoryList.stream().peek(i -> i.setDeletionDate(sdf.format(new Date()))).toList();
         final List<Inventory> saveInventoryList = inventoryService.saveAll(inventoriesToDelete);
         recordService.deleteInventory(saveInventoryList, member);
@@ -292,7 +297,7 @@ public class InventoryController {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
-            logger.info("[" + member.getName() + "]" + "[deleteInventory]");
+            logger.info("[" + member.getName() + "]" + "[getInventoryInfo]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
