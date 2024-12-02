@@ -1180,12 +1180,12 @@
 						success: function (response) {
 							if (response.code == "C000"){
 								console.log(response.data)
-								const { today, expiringSoon, valid } = response.data;
+								const { today, soon, valid } = response.data;
 
 								_this.todayList = today.map(item => ({
 									...item,
 								}))
-								_this.expiringSoonList = expiringSoon.map(item => ({
+								_this.expiringSoonList = soon.map(item => ({
 									...item,
 								}))
 								_this.validList = valid.map(item => ({

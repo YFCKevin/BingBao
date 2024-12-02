@@ -1,5 +1,6 @@
 package com.yfckevin.bingBao.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yfckevin.bingBao.ConfigProperties;
 import com.yfckevin.bingBao.dto.*;
 import com.yfckevin.bingBao.entity.Inventory;
@@ -13,10 +14,15 @@ import com.yfckevin.bingBao.utils.FileUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -40,8 +46,9 @@ public class InventoryController {
     private final DataProcessService dataProcessService;
     private final RestTemplate restTemplate;
     private final RecordService recordService;
+    private final ObjectMapper objectMapper;
 
-    public InventoryController(@Qualifier("sdf") SimpleDateFormat sdf, ConfigProperties configProperties, InventoryService inventoryService, ReceiveItemService receiveItemService, ProductService productService, DataProcessService dataProcessService, RestTemplate restTemplate, RecordService recordService) {
+    public InventoryController(@Qualifier("sdf") SimpleDateFormat sdf, ConfigProperties configProperties, InventoryService inventoryService, ReceiveItemService receiveItemService, ProductService productService, DataProcessService dataProcessService, RestTemplate restTemplate, RecordService recordService, ObjectMapper objectMapper) {
         this.sdf = sdf;
         this.configProperties = configProperties;
         this.inventoryService = inventoryService;
@@ -50,6 +57,7 @@ public class InventoryController {
         this.dataProcessService = dataProcessService;
         this.restTemplate = restTemplate;
         this.recordService = recordService;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -326,62 +334,42 @@ public class InventoryController {
 
     @PostMapping("/dashboard")
     public ResponseEntity<?> dashboard(@RequestBody List<SearchDTO> searchCondition, HttpSession session) {
-
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
         if (member != null) {
             logger.info("[" + member.getName() + "]" + "[dashboard]");
         }
         ResultStatus resultStatus = new ResultStatus();
-
         Map<String, List<InventoryDTO>> inventoryMap = new HashMap<>();
 
         String url = configProperties.getGlobalDomain() + "inventorySearch";
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Internal-Request", "true");
 
-        //今日放進冰箱的
-        final SearchDTO todaySearchDTO = searchCondition.stream()
-                .filter(searchDTO -> "today".equals(searchDTO.getType())).findFirst().orElse(new SearchDTO("today"));
-        HttpEntity<SearchDTO> todayEntity = new HttpEntity<>(todaySearchDTO, headers);
-        ResponseEntity<ResultStatus<List<InventoryDTO>>> todayResponse = restTemplate.exchange(
-                url,
-                HttpMethod.POST,
-                todayEntity,
-                new ParameterizedTypeReference<>() {}
-        );
-        if ("C000".equals(todayResponse.getBody().getCode())) {
-            inventoryMap.put("today", todayResponse.getBody().getData());
-        }
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
+            for (String type : new String[] { "today", "soon", "valid" }) {
+                SearchDTO searchDTO = searchCondition.stream()
+                        .filter(dto -> type.equals(dto.getType()))
+                        .findFirst()
+                        .orElse(new SearchDTO(type));
 
+                HttpPost post = new HttpPost(url);
+                post.setHeader("Internal-Request", "true");
+                post.setHeader("Content-Type", "application/json");
+                StringEntity entity = new StringEntity(objectMapper.writeValueAsString(searchDTO), ContentType.APPLICATION_JSON);
+                post.setEntity(entity);
 
-        //快過期的且沒用完
-        final SearchDTO soonSearchDTO = searchCondition.stream()
-                .filter(searchDTO -> "soon".equals(searchDTO.getType())).findFirst().orElse(new SearchDTO("soon"));
-        HttpEntity<SearchDTO> soonEntity = new HttpEntity<>(soonSearchDTO, headers);
-        ResponseEntity<ResultStatus<List<InventoryDTO>>> soonResponse = restTemplate.exchange(
-                url,
-                HttpMethod.POST,
-                soonEntity,
-                new ParameterizedTypeReference<>() {}
-        );
-        if ("C000".equals(soonResponse.getBody().getCode())) {
-            inventoryMap.put("expiringSoon", soonResponse.getBody().getData());
-        }
-
-
-        //在有效期限內且沒用完
-        final SearchDTO validSearchDTO = searchCondition.stream()
-                .filter(searchDTO -> "valid".equals(searchDTO.getType())).findFirst().orElse(new SearchDTO("valid"));
-        HttpEntity<SearchDTO> validEntity = new HttpEntity<>(validSearchDTO, headers);
-        ResponseEntity<ResultStatus<List<InventoryDTO>>> validResponse = restTemplate.exchange(
-                url,
-                HttpMethod.POST,
-                validEntity,
-                new ParameterizedTypeReference<>() {}
-        );
-        if ("C000".equals(validResponse.getBody().getCode())) {
-            inventoryMap.put("valid", validResponse.getBody().getData());
+                try (CloseableHttpResponse response = client.execute(post)) {
+                    if (response.getCode() == 200) {
+                        ResultStatus<List<InventoryDTO>> result = objectMapper.readValue(
+                                response.getEntity().getContent(),
+                                objectMapper.getTypeFactory().constructParametricType(ResultStatus.class, List.class)
+                        );
+                        if ("C000".equals(result.getCode())) {
+                            inventoryMap.put(type, result.getData());
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error fetching inventory", e);
         }
 
         resultStatus.setCode("C000");
