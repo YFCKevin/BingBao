@@ -1,7 +1,7 @@
 server:
-  port: 8098
+  port: 8082
   servlet:
-    contextPath: /bingBao
+    contextPath: /bingBaoTest
     session:
       timeout: 30d
   error:
@@ -9,21 +9,19 @@ server:
       enabled: false
 spring:
   application:
-    name: bing_bao
+    name: bing_bao_test
   servlet:
     multipart:
       enabled: true
       max-file-size: 100MB
       max-request-size: 100MB
   resources:
-    static-locations: file:/Users/chenyifan/Documents/workspace-fan/bingBao/src/main/resources/static/
-    cache:
-      enabled: false
+    static-locations: file:/opt/bingBaoTest/static/
   thymeleaf:
     mode: HTML
     encoding: UTF-8
     cache: true
-    prefix: file:/Users/chenyifan/Documents/workspace-fan/bingBao/src/main/resources/templates/
+    prefix: file:/opt/bingBaoTest/templates/
   mail:
     host: smtp.gmail.com
     port: 587
@@ -43,14 +41,13 @@ spring:
       password: ${db-password}
   data:
     mongodb:
-      uri: mongodb://${db-username}:${db-password}@35.201.158.246:27017
-      name: bingBao
+      uri: mongodb://${db-username}:${db-password}@localhost:27017
+      name: bingBaoTest
   redis:
     host: localhost            # Redis 服務器的主機名或 IP 地址
     port: 6379                 # Redis 服務器的端口號
     password: ${db-password}   # Redis 的密碼（如果有設定）
     ssl: false                 # 是否啟用 SSL（預設為 false）
-
 logging:
   level:
     org:
@@ -68,13 +65,13 @@ line:
       secret: ${channel-access-secret}
 
 config:
-  jsonPath: /Users/chenyifan/Documents/workspace-fan/bingBao/src/main/resources/static/js/
-  globalDomain: http://localhost:8098/bingBao/
-  picSavePath: /Users/chenyifan/Documents/workspace-fan/bingBao/bingBao_images/
-  aiPicSavePath: /Users/chenyifan/Documents/workspace-fan/bingBao/ai_images/
-  picShowPath: http://localhost:8098/bingBao/bingBao_images/
-  aiPicShowPath: http://localhost:8098/bingBao/ai_images/
-  fileSavePath: /Users/chenyifan/Documents/workspace-fan/bingBao/bingBao_files/
-  fileShowPath: http://localhost:8098/bingBao/bingBao_files/
+  jsonPath: /opt/bingBaoTest/static/js/
+  globalDomain: https://gurula.cc/bingBaoTest/
+  picSavePath: /opt/bingBaoTest/bingBao_images/
+  aiPicSavePath: /opt/bingBaoTest/ai_images/
+  picShowPath: https://gurula.cc/bingBaoTest/bingBao_images/
+  aiPicShowPath: https://gurula.cc/bingBaoTest/ai_images/
+  fileSavePath: /opt/bingBaoTest/bingBao_files/
+  fileShowPath: https://gurula.cc/bingBaoTest/bingBao_files/
   apiKey: ${openai-api-key}
   channelAccessToken: ${channel-access-token}
