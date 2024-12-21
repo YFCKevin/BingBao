@@ -11,6 +11,7 @@ import com.yfckevin.bingBao.enums.StorePlace;
 import com.yfckevin.bingBao.exception.ResultStatus;
 import com.yfckevin.bingBao.service.*;
 import com.yfckevin.bingBao.utils.FileUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -70,8 +72,11 @@ public class InventoryController {
     public ResponseEntity<?> editAmountInventory(@RequestBody UseRequestDTO dto, HttpSession session) {
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
+        final String memberName = dto.getMemberName();
         if (member != null) {
             logger.info("[" + member.getName() + "]" + "[editAmountInventory]");
+        } else if (StringUtils.isNotBlank(memberName)) {
+            logger.info("[" + memberName + "]" + "[editAmountInventory]");
         }
         ResultStatus resultStatus = new ResultStatus();
 
@@ -86,7 +91,11 @@ public class InventoryController {
         int amountToUse = dto.getUsedAmount();
         for (Inventory inventory : inventoryList) {
             inventory.setUsedDate(sdf.format(new Date()));
-            inventory.setModifier(member.getName());
+            if (StringUtils.isNotBlank(memberName)) {
+                inventory.setModifier(memberName);
+            } else if (member != null) {
+                inventory.setModifier(member.getName());
+            }
             inventory.setModificationDate(sdf.format(new Date()));
             inventoriesToUpdate.add(inventory);
             amountToUse--;
@@ -188,33 +197,40 @@ public class InventoryController {
 
     /**
      * 修改食材庫存的有效期限
-     * @param receiveItemId
-     * @param expiryDate
      * @param session
      * @return
      */
-    @GetMapping("/editExpiryDate/{receiveItemId}/{expiryDate}")
-    public ResponseEntity<?> editExpiryDate (@PathVariable String receiveItemId, @PathVariable String expiryDate, HttpSession session){
+    @PostMapping("/editExpiryDate")
+    public ResponseEntity<?> editExpiryDate (@RequestBody ExpiryDateRequestDTO dto, HttpSession session){
 
         final MemberDTO member = (MemberDTO) session.getAttribute("member");
+        final String memberName = dto.getMemberName();
         if (member != null) {
             logger.info("[" + member.getName() + "]" + "[editExpiryDate]");
+        } else {
+            if (StringUtils.isNotBlank(memberName)) {
+                logger.info("[" + memberName + "]" + "[editExpiryDate]");
+            }
         }
         ResultStatus resultStatus = new ResultStatus();
 
-        List<Inventory> inventoryList = inventoryService.findByReceiveItemId(receiveItemId);
+        List<Inventory> inventoryList = inventoryService.findByReceiveItemId(dto.getReceiveItemId());
         if (inventoryList.size() == 0) {
             resultStatus.setCode("C006");
             resultStatus.setMessage("無庫存");
         } else {
             inventoryList = inventoryList.stream()
                     .peek(inventory -> {
-                        inventory.setExpiryDate(expiryDate);
+                        inventory.setExpiryDate(dto.getExpiryDate());
                         inventory.setModificationDate(sdf.format(new Date()));
-                        inventory.setModifier(member.getName());
+                        if (StringUtils.isNotBlank(memberName)) {
+                            inventory.setModifier(memberName);
+                        } else if (member != null) {
+                            inventory.setModifier(member.getName());
+                        }
                     }).toList();
             final List<Inventory> saveInventoryList = inventoryService.saveAll(inventoryList);
-            recordService.editInventoryExpiryDate(saveInventoryList, expiryDate);
+            recordService.editInventoryExpiryDate(saveInventoryList, dto.getExpiryDate());
             resultStatus.setCode("C000");
             resultStatus.setMessage("成功");
         }

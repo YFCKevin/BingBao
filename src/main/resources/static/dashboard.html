@@ -1839,10 +1839,15 @@
 				},
 				editExpiryDate (expiryDate){
 					let _this = this;
+					let data = {};
+					data.receiveItemId = this.targetEditId;
+					data.expiryDate = expiryDate;
+					data.memberName = "";
 				    $.ajax({
-						url: "editExpiryDate/" + this.targetEditId + "/" + expiryDate,
-						type: "get",
+						url: "editExpiryDate",
+						type: "post",
 						contentType: "application/json; charset=utf-8",
+						data: JSON.stringify(data),
 						success: function (response) {
 							if (response.code == "C000"){
 								Swal.fire({

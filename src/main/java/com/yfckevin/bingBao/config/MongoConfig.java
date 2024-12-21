@@ -20,7 +20,7 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
 
     @Override
     protected String getDatabaseName() {
-        return "bingBao";
+        return configProperties.getMongodbName();
     }
 
     @Override
@@ -28,12 +28,12 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
         // vm上的mongo
 //        return MongoClients.create(configProperties.getMongodbUri());
         // 本地測試用
-        return MongoClients.create("mongodb://localhost:27017");
+        return MongoClients.create(configProperties.getMongodbUri());
     }
 
     @Bean
     public MongoTemplate mongoTemplate() throws Exception {
-        return new MongoTemplate(mongoClient(), "bingBao");
+        return new MongoTemplate(mongoClient(), configProperties.getMongodbName());
     }
 
 }

@@ -113,25 +113,36 @@ public class FlexMessageUtil {
             Map<String, String> defaultAction = new HashMap<>();
             defaultAction.put("type", "uri");
             defaultAction.put("label", "前往首頁");
-            defaultAction.put("uri", "https://gurula.cc/bingBao/dashboard.html");
+            defaultAction.put("uri", configProperties.getGlobalDomain() + "dashboard.html");
             column.put("defaultAction", defaultAction);
 
             // Actions
             List<Map<String, Object>> actions = new ArrayList<>();
 
-            // 前往冰箱清單的action
+            final String receiveItemId = inventoryDTO.getReceiveItemId();
+            final String productName = inventoryDTO.getName();
+
+            // 標記用完的action
             Map<String, Object> viewDetailAction = new HashMap<>();
-            viewDetailAction.put("type", "uri");
-            viewDetailAction.put("label", "前往冰箱清單");
-            viewDetailAction.put("uri", "https://gurula.cc/bingBao/dashboard.html");
+            viewDetailAction.put("type", "postback");
+            viewDetailAction.put("label", "標記用完");
+            viewDetailAction.put("data", "action=markAsFinished&receiveItemId=" + receiveItemId + "&productName=" + productName);
             actions.add(viewDetailAction);
 
-//            // 前往報名的action
-//            Map<String, Object> signupAction = new HashMap<>();
-//            signupAction.put("type", "uri");
-//            signupAction.put("label", "");
-//            signupAction.put("uri", "https://www.gurula.cc/bingBaoTest/dashboard.html");
-//            actions.add(signupAction);
+            // 修改有效期限
+            Map<String, Object> editExpiryDateAction = new HashMap<>();
+            editExpiryDateAction.put("type", "datetimepicker");
+            editExpiryDateAction.put("label", "修改有效期限");
+            editExpiryDateAction.put("data", "action=editExpiryDate&receiveItemId=" + receiveItemId + "&productName=" + productName);
+            editExpiryDateAction.put("mode", "date");
+            actions.add(editExpiryDateAction);
+
+            // 修改剩餘數量
+            Map<String, Object> editAmountAction = new HashMap<>();
+            editAmountAction.put("type", "postback");
+            editAmountAction.put("label", "修改剩餘數量");
+            editAmountAction.put("data", "action=editAmount&receiveItemId=" + receiveItemId + "&productName=" + productName);
+            actions.add(editAmountAction);
 
             column.put("actions", actions);
             columns.add(column);

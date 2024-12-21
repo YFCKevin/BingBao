@@ -23,6 +23,8 @@ public class ConfigProperties {
     public String globalDomain;
     @Value("${spring.data.mongodb.uri}")
     public String mongodbUri;
+    @Value("${spring.data.mongodb.name}")
+    public String mongodbName;
     @Value("${config.aiPicSavePath}")
     public String aiPicSavePath;
     @Value("${config.aiPicShowPath}")
@@ -94,5 +96,9 @@ public class ConfigProperties {
 
     public int getRedisPort() {
         return redisPort;
+    }
+
+    public String getMongodbName() {
+        return mongodbName;
     }
 }
