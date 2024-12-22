@@ -5,10 +5,13 @@ import com.yfckevin.bingBao.ConfigProperties;
 import com.yfckevin.bingBao.dto.*;
 import com.yfckevin.bingBao.entity.Follower;
 import com.yfckevin.bingBao.entity.Inventory;
+import com.yfckevin.bingBao.entity.Product;
+import com.yfckevin.bingBao.enums.StorePlace;
 import com.yfckevin.bingBao.exception.ResultStatus;
 import com.yfckevin.bingBao.service.FollowerService;
 import com.yfckevin.bingBao.service.InventoryService;
 import com.yfckevin.bingBao.service.LineService;
+import com.yfckevin.bingBao.service.ProductService;
 import com.yfckevin.bingBao.utils.FlexMessageUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -25,6 +28,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static com.yfckevin.bingBao.utils.DateUtil.genDateFormatted;
+import static com.yfckevin.bingBao.utils.DateUtil.genNoticeDateFormatted;
 
 @RestController
 public class LineController {
@@ -36,9 +44,10 @@ public class LineController {
     private final SimpleDateFormat ssf;
     private final LineService lineService;
     private final InventoryService inventoryService;
+    private final ProductService productService;
     Logger logger = LoggerFactory.getLogger(LineController.class);
 
-    public LineController(ConfigProperties configProperties, RestTemplate restTemplate, FollowerService followerService, FlexMessageUtil flexMessageUtil, SimpleDateFormat sdf, SimpleDateFormat ssf, LineService lineService, InventoryService inventoryService) {
+    public LineController(ConfigProperties configProperties, RestTemplate restTemplate, FollowerService followerService, FlexMessageUtil flexMessageUtil, SimpleDateFormat sdf, SimpleDateFormat ssf, LineService lineService, InventoryService inventoryService, ProductService productService) {
         this.configProperties = configProperties;
         this.restTemplate = restTemplate;
         this.followerService = followerService;
@@ -47,31 +56,83 @@ public class LineController {
         this.ssf = ssf;
         this.lineService = lineService;
         this.inventoryService = inventoryService;
+        this.productService = productService;
     }
 
 
     @Scheduled(cron = "0 0 8 * * ?")
     public void sendOverdueNoticeByLine() {
         try {
-            final Map<String, Object> imageCarouselTemplate = flexMessageUtil.assembleImageCarouselTemplate();
+            final List<InventoryDTO> finalInventoryDTOList = getInventoryDTOList();
+
             //今日無快過期的庫存食材則不傳送任何資訊
-            if ("今日無快過期的庫存食材".equals(imageCarouselTemplate.getOrDefault("error", null))) {
+            if (finalInventoryDTOList.size() == 0) {
                 return;
             }
-            String url = "https://api.line.me/v2/bot/message/multicast";
-            Map<String, Object> data = new HashMap<>();
-            final List<String> followerIdList = followerService.findAll().stream().map(Follower::getUserId).toList();
-            data.put("to", followerIdList);
-            data.put("messages", List.of(imageCarouselTemplate));
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(configProperties.getChannelAccessToken());
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(data, headers);
-            ResponseEntity<LineUserProfileResponseDTO> response = restTemplate.exchange(url, HttpMethod.POST, entity, LineUserProfileResponseDTO.class);
+
+            int totalSize = finalInventoryDTOList.size();
+            int chunkSize = 10;
+            for (int i = 0; i < totalSize; i += chunkSize) {
+                int index = Math.min(i + chunkSize, totalSize);
+                final Map<String, Object> imageCarouselTemplate = flexMessageUtil.assembleImageCarouselTemplate(finalInventoryDTOList.subList(i, index));
+                multicast(imageCarouselTemplate);
+            }
+
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
 
+    }
+
+    private void multicast(Map<String, Object> imageCarouselTemplate) {
+        String url = "https://api.line.me/v2/bot/message/multicast";
+        Map<String, Object> data = new HashMap<>();
+        final List<String> followerIdList = followerService.findAll().stream().map(Follower::getUserId).toList();
+        data.put("to", followerIdList);
+        data.put("messages", List.of(imageCarouselTemplate));
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(configProperties.getChannelAccessToken());
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(data, headers);
+        ResponseEntity<LineUserProfileResponseDTO> response = restTemplate.exchange(url, HttpMethod.POST, entity, LineUserProfileResponseDTO.class);
+    }
+
+    private List<InventoryDTO> getInventoryDTOList() {
+        List<Inventory> inventoryList = inventoryService.findInventoryNoticeDateIsBeforeExpiryDate();
+        final List<String> productIds = inventoryList.stream().map(Inventory::getProductId).toList();
+        final Map<String, Product> productMap = productService.findByIdIn(productIds).stream()
+                .collect(Collectors.toMap(Product::getId, Function.identity()));
+        Map<String, Long> inventoryCountMap = inventoryList.stream()
+                .collect(Collectors.groupingBy(
+                        Inventory::getReceiveItemId,
+                        Collectors.counting()
+                ));
+        final List<InventoryDTO> inventoryDTOList = inventoryList.stream()
+                .map(inventory -> {
+                    final Long amount = inventoryCountMap.get(inventory.getReceiveItemId());
+                    final Product product = productMap.get(inventory.getProductId());
+                    return constructInventoryDTO(inventory, product, String.valueOf(amount));
+                }).toList();
+        //取唯一值的receiveItemId
+        final List<String> uniqueReceiveItemIds = inventoryDTOList.stream().map(InventoryDTO::getReceiveItemId).distinct().toList();
+        //根據唯一的 ReceiveItemId 過濾出 Inventory
+        final Map<String, InventoryDTO> inventoryDTOMap = inventoryDTOList.stream().collect(Collectors.toMap(
+                InventoryDTO::getReceiveItemId,
+                inventoryDTO -> inventoryDTO,
+                (existing, replacement) -> existing
+        ));
+        //取得所有唯一的 Inventory
+        final List<InventoryDTO> tempInventoryDTOList = uniqueReceiveItemIds.stream()
+                .map(inventoryDTOMap::get)
+                .toList();
+        //相同storePlace放一起且根據有效期限做遞增排序
+        final Map<StorePlace, List<InventoryDTO>> groupedByStorePlace = tempInventoryDTOList.stream().collect(Collectors.groupingBy(InventoryDTO::getStorePlace));
+        final List<InventoryDTO> finalInventoryDTOList = groupedByStorePlace.values().stream()
+                .flatMap(inventoryDTOS -> inventoryDTOS.stream()
+                        .sorted(Comparator.comparing(InventoryDTO::getExpiryDate)))
+//                .filter(inventoryDTO -> !"0".equals(inventoryDTO.getOverdueNotice()))   //去掉沒有設定「通知過期天數」的品項
+                .toList();
+        return finalInventoryDTOList;
     }
 
 
@@ -83,16 +144,7 @@ public class LineController {
             if ("今日無即期的庫存食材".equals(textTemplate.getOrDefault("error", null))) {
                 return;
             }
-            String url = "https://api.line.me/v2/bot/message/multicast";
-            Map<String, Object> data = new HashMap<>();
-            final List<String> followerIdList = followerService.findAll().stream().map(Follower::getUserId).toList();
-            data.put("to", followerIdList);
-            data.put("messages", List.of(textTemplate));
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(configProperties.getChannelAccessToken());
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(data, headers);
-            ResponseEntity<LineUserProfileResponseDTO> response = restTemplate.exchange(url, HttpMethod.POST, entity, LineUserProfileResponseDTO.class);
+            multicast(textTemplate);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
@@ -110,16 +162,7 @@ public class LineController {
                 resultStatus.setMessage("今日無即期的庫存食材");
                 return ResponseEntity.ok(resultStatus);
             }
-            String url = "https://api.line.me/v2/bot/message/multicast";
-            Map<String, Object> data = new HashMap<>();
-            final List<String> followerIdList = followerService.findAll().stream().map(Follower::getUserId).toList();
-            data.put("to", followerIdList);
-            data.put("messages", List.of(textTemplate));
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(configProperties.getChannelAccessToken());
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(data, headers);
-            ResponseEntity<LineUserProfileResponseDTO> response = restTemplate.exchange(url, HttpMethod.POST, entity, LineUserProfileResponseDTO.class);
+            multicast(textTemplate);
             resultStatus.setCode("C000");
             resultStatus.setMessage("成功");
         } catch (Exception e) {
@@ -135,23 +178,20 @@ public class LineController {
     public ResponseEntity<?> sendOverdueNoticeByLine_test() {
         ResultStatus resultStatus = new ResultStatus();
         try {
-            final Map<String, Object> imageCarouselTemplate = flexMessageUtil.assembleImageCarouselTemplate();
+            final List<InventoryDTO> finalInventoryDTOList = getInventoryDTOList();
+
             //今日無快過期的庫存食材則不傳送任何資訊
-            if ("今日無快過期的庫存食材".equals(imageCarouselTemplate.getOrDefault("error", null))) {
-                resultStatus.setCode("C997");
-                resultStatus.setMessage("今日無快過期的庫存食材");
+            if (finalInventoryDTOList.size() == 0) {
                 return ResponseEntity.ok(resultStatus);
             }
-            String url = "https://api.line.me/v2/bot/message/multicast";
-            Map<String, Object> data = new HashMap<>();
-            final List<String> followerIdList = followerService.findAll().stream().map(Follower::getUserId).toList();
-            data.put("to", followerIdList);
-            data.put("messages", List.of(imageCarouselTemplate));
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(configProperties.getChannelAccessToken());
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(data, headers);
-            ResponseEntity<LineUserProfileResponseDTO> response = restTemplate.exchange(url, HttpMethod.POST, entity, LineUserProfileResponseDTO.class);
+
+            int totalSize = finalInventoryDTOList.size();
+            int chunkSize = 10;
+            for (int i = 0; i < totalSize; i += chunkSize) {
+                int index = Math.min(i + chunkSize, totalSize);
+                final Map<String, Object> imageCarouselTemplate = flexMessageUtil.assembleImageCarouselTemplate(finalInventoryDTOList.subList(i, index));
+                multicast(imageCarouselTemplate);
+            }
             resultStatus.setCode("C000");
             resultStatus.setMessage("成功");
         } catch (Exception e) {
@@ -159,6 +199,7 @@ public class LineController {
             resultStatus.setCode("C999");
             resultStatus.setMessage("例外發生");
         }
+
         return ResponseEntity.ok(resultStatus);
     }
 
@@ -253,6 +294,7 @@ public class LineController {
                     String receiveItemId = null;
                     String productName = null;
                     String memberName = null;
+                    long oldAmount = 0;
 
                     final Optional<Follower> followerOpt = followerService.findByUserId(userId);
                     if (followerOpt.isPresent()) {
@@ -270,6 +312,12 @@ public class LineController {
                         } else if (param.startsWith("productName=")) {
                             productName = param.substring("productName=".length());
                             logger.info("productName: " + productName);
+                        } else if (param.startsWith("memberName=")) {
+                            memberName = param.substring("memberName=".length());
+                            logger.info("memberName: " + memberName);
+                        } else if (param.startsWith("oldAmount=")) {
+                            oldAmount = Long.parseLong(param.substring("oldAmount=".length()));
+                            logger.info("oldAmount: " + oldAmount);
                         }
                     }
 
@@ -308,21 +356,14 @@ public class LineController {
                             }
                             case "editAmount": {
                                 logger.info("[editAmount]");
-                                final long oldAmount = inventoryService.findByReceiveItemId(receiveItemId).stream()
-                                        .filter(inventory -> StringUtils.isBlank(inventory.getUsedDate()) &&
-                                                StringUtils.isBlank(inventory.getDeletionDate()) &&
-                                                !LocalDate.now().isAfter(LocalDate.parse(inventory.getExpiryDate())))
-                                        .count();
                                 StringBuilder builder = new StringBuilder();
                                 final String url = builder.append(configProperties.getGlobalDomain())
-                                        .append("edit-amount-page.html")
+                                        .append("checkInventory")
                                         .append("?")
                                         .append("receiveItemId=")
                                         .append(receiveItemId)
                                         .append("&productName=")
                                         .append(productName)
-                                        .append("&oldAmount=")
-                                        .append(oldAmount)
                                         .append("&memberName=")
                                         .append(memberName).toString();
                                 msg = String.format("{\n" +
@@ -334,44 +375,130 @@ public class LineController {
                             }
                             case "markAsFinished": {
                                 logger.info("[markAsFinished]");
-                                final long oldAmount = inventoryService.findByReceiveItemId(receiveItemId).stream()
+
+                                oldAmount = inventoryService.findByReceiveItemId(receiveItemId).stream()
                                         .filter(inventory -> StringUtils.isBlank(inventory.getUsedDate()) &&
                                                 StringUtils.isBlank(inventory.getDeletionDate()) &&
                                                 !LocalDate.now().isAfter(LocalDate.parse(inventory.getExpiryDate())))
                                         .count();
-                                if (oldAmount > 0) {
-                                    HttpHeaders headers = new HttpHeaders();
-                                    headers.setContentType(MediaType.APPLICATION_JSON);
-                                    headers.set("Internal-Request", "true");
-                                    UseRequestDTO useRequestDTO = new UseRequestDTO();
-                                    useRequestDTO.setMemberName(memberName);
-                                    useRequestDTO.setReceiveItemId(receiveItemId);
-                                    useRequestDTO.setUsedAmount((int) oldAmount);
-                                    ResponseEntity<ResultStatus> response = restTemplate.exchange(
-                                            configProperties.getGlobalDomain() + "editAmountInventory",
-                                            HttpMethod.POST,
-                                            new HttpEntity<>(useRequestDTO, headers),
-                                            ResultStatus.class
-                                    );
-                                    if ("C000".equals(response.getBody().getCode())) {
-                                        msg = String.format("{\n" +
-                                                "  \"type\": \"text\",\n" +
-                                                "  \"text\": \"[%s]變更成功，\\n已標記用完。\"\n" +
-                                                "}", productName);
-                                    } else {
-                                        msg = String.format("{\n" +
-                                                "  \"type\": \"text\",\n" +
-                                                "  \"text\": \"[%s]變更失敗，\\n請聯繫管理員！\"\n" +
-                                                "}", productName);
-                                    }
-                                } else {
+
+                                if (oldAmount <= 0) {
                                     msg = String.format("{\n" +
                                             "  \"type\": \"text\",\n" +
-                                            "  \"text\": \"[%s]無庫存，無需標記\"\n" +
+                                            "  \"text\": \"[%s]無庫存，無需再標記\"\n" +
+                                            "}", productName);
+                                } else {
+                                    msg = String.format("{\n" +
+                                            "  \"type\": \"flex\",\n" +
+                                            "  \"altText\": \"確認是否標記 [%s] 用完\",\n" +
+                                            "  \"contents\": {\n" +
+                                            "    \"type\": \"bubble\",\n" +
+                                            "    \"header\": {\n" +
+                                            "      \"type\": \"box\",\n" +
+                                            "      \"layout\": \"vertical\",\n" +
+                                            "      \"contents\": [\n" +
+                                            "        {\n" +
+                                            "          \"type\": \"text\",\n" +
+                                            "          \"text\": \"將 [%s] 標記用完？\",\n" +
+                                            "          \"weight\": \"bold\",\n" +
+                                            "          \"size\": \"lg\",\n" +
+                                            "          \"wrap\": true\n" +
+                                            "        }\n" +
+                                            "      ]\n" +
+                                            "    },\n" +
+                                            "    \"body\": {\n" +
+                                            "      \"type\": \"box\",\n" +
+                                            "      \"layout\": \"vertical\",\n" +
+                                            "      \"contents\": [\n" +
+                                            "        {\n" +
+                                            "          \"type\": \"text\",\n" +
+                                            "          \"text\": \"剩餘數量：%d\",\n" +
+                                            "          \"wrap\": true\n" +
+                                            "        }\n" +
+                                            "      ]\n" +
+                                            "    },\n" +
+                                            "    \"footer\": {\n" +
+                                            "      \"type\": \"box\",\n" +
+                                            "      \"layout\": \"vertical\",\n" +
+                                            "      \"contents\": [\n" +
+                                            "        {\n" +
+                                            "          \"type\": \"button\",\n" +
+                                            "          \"style\": \"primary\",\n" +
+                                            "          \"color\": \"#1DB446\",\n" +
+                                            "          \"action\": {\n" +
+                                            "            \"type\": \"postback\",\n" +
+                                            "            \"label\": \"確認\",\n" +
+                                            "            \"data\": \"action=confirmMarkAsFinished&receiveItemId=%s&productName=%s&memberName=%s&oldAmount=%d\"\n" +
+                                            "          }\n" +
+                                            "        },\n" +
+                                            "        {\n" +
+                                            "          \"type\": \"separator\",\n" +
+                                            "          \"margin\": \"sm\"\n" +
+                                            "        },\n" +
+                                            "        {\n" +
+                                            "          \"type\": \"button\",\n" +
+                                            "          \"style\": \"primary\",\n" +
+                                            "          \"color\": \"#FF0000\",\n" +
+                                            "          \"action\": {\n" +
+                                            "            \"type\": \"postback\",\n" +
+                                            "            \"label\": \"取消\",\n" +
+                                            "            \"data\": \"action=cancelMarkAsFinished&productName=%s&receiveItemId=%s\"\n" +
+                                            "          }\n" +
+                                            "        }\n" +
+                                            "      ]\n" +
+                                            "    }\n" +
+                                            "  }\n" +
+                                            "}", productName, productName, oldAmount, receiveItemId, productName, memberName, oldAmount, productName, receiveItemId);
+                                }
+                                break;
+                            }
+                            case "cancelMarkAsFinished": {
+                                logger.info("[cancelMarkAsFinished]");
+                                msg = String.format("{\n" +
+                                        "  \"type\": \"text\",\n" +
+                                        "  \"text\": \"[%s]取消標記\"\n" +
+                                        "}", productName);
+                                break;
+                            }
+                            case "confirmMarkAsFinished": {
+                                logger.info("[confirmMarkAsFinished]");
+                                HttpHeaders headers = new HttpHeaders();
+                                headers.setContentType(MediaType.APPLICATION_JSON);
+                                headers.set("Internal-Request", "true");
+
+                                UseRequestDTO useRequestDTO = new UseRequestDTO();
+                                useRequestDTO.setMemberName(memberName);
+                                useRequestDTO.setReceiveItemId(receiveItemId);
+                                useRequestDTO.setUsedAmount((int) oldAmount);
+
+                                ResponseEntity<ResultStatus> response = restTemplate.exchange(
+                                        configProperties.getGlobalDomain() + "editAmountInventory",
+                                        HttpMethod.POST,
+                                        new HttpEntity<>(useRequestDTO, headers),
+                                        ResultStatus.class
+                                );
+
+                                if ("C000".equals(response.getBody().getCode())) {
+                                    msg = String.format("{\n" +
+                                            "  \"type\": \"text\",\n" +
+                                            "  \"text\": \"[%s]變更成功，\\n已標記用完。\"\n" +
+                                            "}", productName);
+                                } else if ("C006".equals(response.getBody().getCode())) {
+                                    //無庫存
+                                    msg = String.format("{\n" +
+                                            "  \"type\": \"text\",\n" +
+                                            "  \"text\": \"[%s]無庫存，\\n無需再標記！\"\n" +
+                                            "}", productName);
+                                } else if ("C007".equals(response.getBody().getCode())) {
+                                    //庫存不足
+                                    msg = String.format("{\n" +
+                                            "  \"type\": \"text\",\n" +
+                                            "  \"text\": \"[%s]庫存不足變更失敗，\\n請聯繫管理員！\"\n" +
                                             "}", productName);
                                 }
                                 break;
                             }
+
                         }
                     } else {
                         msg = "{\n" +
@@ -392,7 +519,6 @@ public class LineController {
     }
 
 
-
     private LineUserProfileResponseDTO getUserProfile(String userId) {
         String url = "https://api.line.me/v2/bot/profile/" + userId;
         HttpHeaders headers = new HttpHeaders();
@@ -401,5 +527,46 @@ public class LineController {
         ResponseEntity<LineUserProfileResponseDTO> response = restTemplate.exchange(url, HttpMethod.GET, entity, LineUserProfileResponseDTO.class);
 
         return response.getBody();
+    }
+
+
+    private InventoryDTO constructInventoryDTO(Inventory inventory, Product product, String totalAmount) {
+        InventoryDTO dto = new InventoryDTO();
+        dto.setId(inventory.getId());
+        dto.setName(product.getName());
+        dto.setSerialNumber(inventory.getSerialNumber());
+        dto.setReceiveFormId(inventory.getReceiveFormId());
+        dto.setReceiveFormNumber(inventory.getReceiveFormNumber());
+        dto.setReceiveItemId(inventory.getReceiveItemId());
+        dto.setUsedDate(inventory.getUsedDate());
+        dto.setStoreDate(inventory.getStoreDate());
+        dto.setStoreNumber(inventory.getStoreNumber());
+        dto.setExpiryDate(inventory.getExpiryDate());
+        dto.setStorePlace(inventory.getStorePlace());
+        dto.setStorePlaceLabel(inventory.getStorePlace() != null ? inventory.getStorePlace().getLabel() : null);
+        dto.setPackageForm(inventory.getPackageForm());
+        dto.setPackageFormLabel(inventory.getPackageForm() != null ? inventory.getPackageForm().getLabel() : null);
+        dto.setPackageUnit(inventory.getPackageUnit());
+        dto.setPackageUnitLabel(inventory.getPackageUnit() != null ? inventory.getPackageUnit().getLabel() : null);
+        dto.setPackageQuantity(inventory.getPackageQuantity());
+        dto.setPackageNumber(inventory.getPackageNumber());
+        dto.setMainCategory(product.getMainCategory());
+        dto.setSubCategory(product.getSubCategory());
+        dto.setMainCategoryLabel(product.getMainCategory() != null ? product.getMainCategory().getLabel() : null);
+        dto.setSubCategoryLabel(product.getSubCategory() != null ? product.getSubCategory().getLabel() : null);
+        dto.setOverdueNotice(inventory.getOverdueNotice());
+        dto.setSerialNumber(product.getSerialNumber());
+        dto.setExpiryTime(genDateFormatted(sdf.format(new Date()), inventory.getExpiryDate()));
+        dto.setExistedTime(genDateFormatted(inventory.getStoreDate(), sdf.format(new Date())));
+        dto.setNoticeDate(genNoticeDateFormatted(inventory.getExpiryDate(), inventory.getOverdueNotice()));
+        dto.setTotalAmount(totalAmount);
+        dto.setCoverPath(configProperties.getPicShowPath() + product.getCoverName());
+        dto.setCreationDate(inventory.getCreationDate());
+        dto.setModificationDate(inventory.getModificationDate());
+        dto.setDeletionDate(inventory.getDeletionDate());
+        dto.setCreator(inventory.getCreator());
+        dto.setModifier(inventory.getModifier());
+        dto.setProductId(inventory.getProductId());
+        return dto;
     }
 }

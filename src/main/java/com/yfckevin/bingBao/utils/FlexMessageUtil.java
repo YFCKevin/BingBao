@@ -42,43 +42,8 @@ public class FlexMessageUtil {
     }
 
     // 組建圖文輪詢
-    public Map<String, Object> assembleImageCarouselTemplate() {
+    public Map<String, Object> assembleImageCarouselTemplate(List<InventoryDTO> finalInventoryDTOList) {
         logger.info("每日寄送快過期的庫存食材");
-        List<Inventory> inventoryList = inventoryService.findInventoryNoticeDateIsBeforeExpiryDate();
-        final List<String> productIds = inventoryList.stream().map(Inventory::getProductId).toList();
-        final Map<String, Product> productMap = productService.findByIdIn(productIds).stream()
-                .collect(Collectors.toMap(Product::getId, Function.identity()));
-        Map<String, Long> inventoryCountMap = inventoryList.stream()
-                .collect(Collectors.groupingBy(
-                        Inventory::getReceiveItemId,
-                        Collectors.counting()
-                ));
-        final List<InventoryDTO> inventoryDTOList = inventoryList.stream()
-                .map(inventory -> {
-                    final Long amount = inventoryCountMap.get(inventory.getReceiveItemId());
-                    final Product product = productMap.get(inventory.getProductId());
-                    return constructInventoryDTO(inventory, product, String.valueOf(amount));
-                }).toList();
-        //取唯一值的receiveItemId
-        final List<String> uniqueReceiveItemIds = inventoryDTOList.stream().map(InventoryDTO::getReceiveItemId).distinct().toList();
-        //根據唯一的 ReceiveItemId 過濾出 Inventory
-        final Map<String, InventoryDTO> inventoryDTOMap = inventoryDTOList.stream().collect(Collectors.toMap(
-                InventoryDTO::getReceiveItemId,
-                inventoryDTO -> inventoryDTO,
-                (existing, replacement) -> existing
-        ));
-        //取得所有唯一的 Inventory
-        final List<InventoryDTO> tempInventoryDTOList = uniqueReceiveItemIds.stream()
-                .map(inventoryDTOMap::get)
-                .toList();
-        //相同storePlace放一起且根據有效期限做遞增排序
-        final Map<StorePlace, List<InventoryDTO>> groupedByStorePlace = tempInventoryDTOList.stream().collect(Collectors.groupingBy(InventoryDTO::getStorePlace));
-        final List<InventoryDTO> finalInventoryDTOList = groupedByStorePlace.values().stream()
-                .flatMap(inventoryDTOS -> inventoryDTOS.stream()
-                        .sorted(Comparator.comparing(InventoryDTO::getExpiryDate)))
-//                .filter(inventoryDTO -> !"0".equals(inventoryDTO.getOverdueNotice()))   //去掉沒有設定「通知過期天數」的品項
-                .toList();
-
         if (finalInventoryDTOList.size() == 0) {
             Map<String, Object> result = new HashMap<>();
             result.put("error", "今日無快過期的庫存食材");

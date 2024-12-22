@@ -71,6 +71,8 @@
 <!-- Kaiadmin JS -->
 <script src="js/kaiadmin.min.js"></script>
 <script>
+    const usedAmountInput = document.getElementById('usedAmount');
+    const confirmButton = document.querySelector('a[onclick="editAmount()"]');
     const urlParams = new URLSearchParams(window.location.search);
 	const receiveItemId = urlParams.get('receiveItemId');
 	const oldAmount = urlParams.get('oldAmount');
@@ -79,13 +81,25 @@
 	document.getElementById('oldAmount').textContent = oldAmount;
 	document.getElementById('productName').textContent = productName;
 
+    if (parseInt(oldAmount, 10) === 0) {
+        // 禁用輸入框和按鈕
+        usedAmountInput.disabled = true;
+        confirmButton.classList.add('disabled');
+        confirmButton.style.pointerEvents = 'none'; // 防止觸發點擊事件
+        confirmButton.textContent = '無法點擊（數量為 0）';
+    }
+
     function editAmount(){
 	    let _this = this;
 		let data = {};
 		data.receiveItemId = receiveItemId;
 		data.usedAmount = $("#usedAmount").val();
 		data.memberName = memberName;
-		console.log(data)
+
+		// 避免多次觸擊
+		confirmButton.classList.add('disabled');
+        confirmButton.style.pointerEvents = 'none'; // 防止觸發點擊事件
+
 		$.ajax({
 		    url: "editAmountInventory",
 			type: "post",
@@ -106,6 +120,7 @@
 						}
 					}).then((result) => {
 					    if (result.isConfirmed) {
+					        window.close();
 						    console.log('變更完成庫存數量')
 						}
 					});

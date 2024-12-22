@@ -25,9 +25,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.*;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.view.RedirectView;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
@@ -37,7 +43,7 @@ import java.util.stream.Collectors;
 import static com.yfckevin.bingBao.utils.DateUtil.genDateFormatted;
 import static com.yfckevin.bingBao.utils.DateUtil.genNoticeDateFormatted;
 
-@RestController
+@Controller
 public class InventoryController {
     Logger logger = LoggerFactory.getLogger(InventoryController.class);
     private final SimpleDateFormat sdf;
@@ -120,6 +126,47 @@ public class InventoryController {
         dataProcessService.inventoryDataProcess(inventoriesToUpdate);
 
         return ResponseEntity.ok(resultStatus);
+    }
+
+
+    /**
+     * 檢查該食材是否有庫存 (line點擊「修改剩餘數量」用)
+     * @param receiveItemId
+     * @param productName
+     * @param memberName
+     * @param response
+     * @throws IOException
+     */
+    @GetMapping("/checkInventory")
+    public void checkInventory(@RequestParam("receiveItemId") String receiveItemId,
+                               @RequestParam("productName") String productName,
+                               @RequestParam("memberName") String memberName,
+                               HttpServletResponse response) throws IOException {
+        if (memberName != null) {
+            logger.info("[" + memberName + "]" + "[checkInventory]");
+        }
+
+        final long oldAmount = inventoryService.findByReceiveItemId(receiveItemId).stream()
+                .filter(inventory -> StringUtils.isBlank(inventory.getUsedDate()) &&
+                        StringUtils.isBlank(inventory.getDeletionDate()) &&
+                        !LocalDate.now().isAfter(LocalDate.parse(inventory.getExpiryDate())))
+                .count();
+
+        // URL 進行編碼
+        try {
+            String encodedProductName = URLEncoder.encode(productName, StandardCharsets.UTF_8);
+            String encodedMemberName = URLEncoder.encode(memberName, StandardCharsets.UTF_8);
+            String url = configProperties.getGlobalDomain() + "edit-amount-page.html" +
+                    "?receiveItemId=" + receiveItemId +
+                    "&productName=" + encodedProductName +
+                    "&memberName=" + encodedMemberName +
+                    "&oldAmount=" + oldAmount;
+
+            response.sendRedirect(url);
+        } catch (UnsupportedEncodingException e) {
+            logger.error("URL encoding failed", e);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "URL encoding failed");
+        }
     }
 
 
