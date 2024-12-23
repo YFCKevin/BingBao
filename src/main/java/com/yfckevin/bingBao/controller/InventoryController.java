@@ -261,7 +261,10 @@ public class InventoryController {
         }
         ResultStatus resultStatus = new ResultStatus();
 
-        List<Inventory> inventoryList = inventoryService.findByReceiveItemId(dto.getReceiveItemId());
+        List<Inventory> inventoryList = inventoryService.findByReceiveItemId(dto.getReceiveItemId())
+                .stream()
+                .filter(inventory -> inventory.getDeletionDate() == null)
+                .toList();
         if (inventoryList.size() == 0) {
             resultStatus.setCode("C006");
             resultStatus.setMessage("無庫存");
