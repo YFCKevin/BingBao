@@ -2,7 +2,7 @@
       return {
         chatData: [],
         channel: "bingBao",
-        memberId: "home",
+        memberId: "",
         connectedMemberId: "",
         chatChannel: "",
         userText: "",
@@ -11,6 +11,9 @@
 
         init_chatroom() {
           let _this = this;
+
+          this.memberId = this.getCookie("MEMBER_ID");
+          console.log(this.memberId);
 
           let isChatboxOpen = false; // 預設關閉
           $("#chat-container").addClass("d-none");
@@ -75,6 +78,7 @@
               this.onConnected();
             }, (error) => {
               console.error('連接失敗: ' + error);
+              this.connectedMemberId = "";
               alert('聊天室閒置過久，請重新整理畫面再次連線小助手！')
             });
           } else {

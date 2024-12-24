@@ -991,7 +991,7 @@
 						<h6 class="mb-2 mt-2" style="color: white;">冰寶小助手</h6>
 						<button x-on:click="disconnect()" id="close-chat" class="btn-close btn-close-white" aria-label="Close"></button>
 					</div>
-					<template x-if="memberId != undefined">
+					<template x-if="memberId != '' && memberId != undefined">
 						<div id="chatbox" class="card-body overflow-auto" style="height: 20rem;">
 							<!-- Chat messages will be displayed here -->
 							<template x-for="(chat, index) in chatData" :key="index">
@@ -1013,6 +1013,16 @@
 						<div class="card-footer d-flex">
 							<textarea id="userText" x-model="userText" placeholder="請輸入訊息" class="form-control me-2"></textarea>
 							<button id="sendBtn" x-on:click="sendMessage($event)" class="btn btn-dark"><i class="far fa-paper-plane"></i></button>
+						</div>
+					</template>
+					<template x-if="memberId == '' || memberId == undefined">
+						<div id="chatbox" class="d-flex justify-content-center align-items-center card-body bg-light">
+							<a href="/chatbot/login?type=google&project=bingBao&page=dashboard.html" class="btn btn-dark me-2">
+								Google登入
+							</a>
+							<a href="/chatbot/login?type=line&project=bingBao&page=dashboard.html" class="btn btn-dark">
+								Line登入
+							</a>
 						</div>
 					</template>
 				</div>
