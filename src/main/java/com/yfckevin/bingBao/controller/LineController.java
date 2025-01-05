@@ -326,32 +326,46 @@ public class LineController {
                             case "editExpiryDate": {
                                 logger.info("重新選擇的有效期限是：" + event.getPostback().getParams().get("date"));
                                 String newExpiryDate = event.getPostback().getParams().get("date");
-                                HttpHeaders headers = new HttpHeaders();
-                                headers.setContentType(MediaType.APPLICATION_JSON);
-                                headers.set("Internal-Request", "true");
-                                ExpiryDateRequestDTO expiryDateRequestDTO = new ExpiryDateRequestDTO();
-                                expiryDateRequestDTO.setExpiryDate(newExpiryDate);
-                                expiryDateRequestDTO.setReceiveItemId(receiveItemId);
-                                expiryDateRequestDTO.setMemberName(memberName);
-                                ResponseEntity<ResultStatus> response = restTemplate.exchange(
-                                        configProperties.getGlobalDomain() + "editExpiryDate",
-                                        HttpMethod.POST,
-                                        new HttpEntity<>(expiryDateRequestDTO, headers),
-                                        ResultStatus.class
-                                );
-                                if ("C000".equals(response.getBody().getCode())) {
-                                    msg = String.format("{\n" +
-                                            "  \"type\": \"text\",\n" +
-                                            "  \"text\": \"[%s]變更成功！\\n新的有效日期是：%s\"\n" +
-                                            "}", productName, newExpiryDate);
-                                    lineService.autoReply(msg, event.getReplyToken());
+
+                                oldAmount = inventoryService.findByReceiveItemId(receiveItemId).stream()
+                                        .filter(inventory -> StringUtils.isBlank(inventory.getUsedDate()) &&
+                                                StringUtils.isBlank(inventory.getDeletionDate()) &&
+                                                !LocalDate.now().isAfter(LocalDate.parse(inventory.getExpiryDate())))
+                                        .count();
+
+                                if (oldAmount > 0) {
+                                    HttpHeaders headers = new HttpHeaders();
+                                    headers.setContentType(MediaType.APPLICATION_JSON);
+                                    headers.set("Internal-Request", "true");
+                                    ExpiryDateRequestDTO expiryDateRequestDTO = new ExpiryDateRequestDTO();
+                                    expiryDateRequestDTO.setExpiryDate(newExpiryDate);
+                                    expiryDateRequestDTO.setReceiveItemId(receiveItemId);
+                                    expiryDateRequestDTO.setMemberName(memberName);
+                                    ResponseEntity<ResultStatus> response = restTemplate.exchange(
+                                            configProperties.getGlobalDomain() + "editExpiryDate",
+                                            HttpMethod.POST,
+                                            new HttpEntity<>(expiryDateRequestDTO, headers),
+                                            ResultStatus.class
+                                    );
+                                    if ("C000".equals(response.getBody().getCode())) {
+                                        msg = String.format("{\n" +
+                                                "  \"type\": \"text\",\n" +
+                                                "  \"text\": \"[%s]變更成功！\\n新的有效日期是：%s\"\n" +
+                                                "}", productName, newExpiryDate);
+                                    } else {
+                                        msg = String.format("{\n" +
+                                                "  \"type\": \"text\",\n" +
+                                                "  \"text\": \"[%s]變更失敗，\\n請聯繫管理員！\"\n" +
+                                                "}", productName);
+
+                                    }
                                 } else {
                                     msg = String.format("{\n" +
                                             "  \"type\": \"text\",\n" +
-                                            "  \"text\": \"[%s]變更失敗，\\n請聯繫管理員！\"\n" +
+                                            "  \"text\": \"[%s]無庫存，\\n該食材已經用完或刪除。\"\n" +
                                             "}", productName);
-                                    lineService.autoReply(msg, event.getReplyToken());
                                 }
+                                lineService.autoReply(msg, event.getReplyToken());
                                 break;
                             }
                             case "editAmount": {
