@@ -12,6 +12,7 @@ import com.yfckevin.bingBao.enums.StorePlace;
 import com.yfckevin.bingBao.exception.ResultStatus;
 import com.yfckevin.bingBao.service.*;
 import com.yfckevin.bingBao.utils.FileUtils;
+import com.yfckevin.bingBao.utils.JwtTool;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +31,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
@@ -53,8 +53,9 @@ public class InventoryController {
     private final RecordService recordService;
     private final ObjectMapper objectMapper;
     private final FollowerService followerService;
+    private final JwtTool jwtTool;
 
-    public InventoryController(@Qualifier("sdf") SimpleDateFormat sdf, ConfigProperties configProperties, InventoryService inventoryService, ReceiveItemService receiveItemService, ProductService productService, DataProcessService dataProcessService, RestTemplate restTemplate, RecordService recordService, ObjectMapper objectMapper, FollowerService followerService) {
+    public InventoryController(@Qualifier("sdf") SimpleDateFormat sdf, ConfigProperties configProperties, InventoryService inventoryService, ReceiveItemService receiveItemService, ProductService productService, DataProcessService dataProcessService, RestTemplate restTemplate, RecordService recordService, ObjectMapper objectMapper, FollowerService followerService, JwtTool jwtTool) {
         this.sdf = sdf;
         this.configProperties = configProperties;
         this.inventoryService = inventoryService;
@@ -65,6 +66,7 @@ public class InventoryController {
         this.recordService = recordService;
         this.objectMapper = objectMapper;
         this.followerService = followerService;
+        this.jwtTool = jwtTool;
     }
 
     /**
@@ -140,27 +142,39 @@ public class InventoryController {
     public void checkInventory(@RequestParam("receiveItemId") String receiveItemId,
                                @RequestParam("productId") String productId,
                                @RequestParam("memberId") String memberId,
+                               @RequestParam("token") String token,
                                HttpServletResponse response) throws IOException {
+        try {
+            jwtTool.parseToken(token);
 
-        final Optional<Follower> followerOpt = followerService.findByUserId(memberId);
-        if (followerOpt.isPresent()) {
-            final Follower follower = followerOpt.get();
-            String memberName = follower.getDisplayName();
-            logger.info("[" + memberName + "]" + "[checkInventory]");
+            final Optional<Follower> followerOpt = followerService.findByUserId(memberId);
+            if (followerOpt.isPresent()) {
+                final Follower follower = followerOpt.get();
+                String memberName = follower.getDisplayName();
+                logger.info("[" + memberName + "]" + "[checkInventory]");
+            }
+
+            final long oldAmount = inventoryService.findByReceiveItemId(receiveItemId).stream()
+                    .filter(inventory -> StringUtils.isBlank(inventory.getUsedDate()) &&
+                            StringUtils.isBlank(inventory.getDeletionDate()) &&
+                            !LocalDate.now().isAfter(LocalDate.parse(inventory.getExpiryDate())))
+                    .count();
+
+            String url = configProperties.getGlobalDomain() + "edit-amount-page.html" +
+                    "?receiveItemId=" + receiveItemId +
+                    "&productId=" + productId +
+                    "&memberId=" + memberId +
+                    "&oldAmount=" + oldAmount;
+
+            response.sendRedirect(url);
+
+        } catch (RuntimeException e) {
+
+            String url = configProperties.getGlobalDomain() + "error.html?token=expired";
+
+            response.sendRedirect(url);
+
         }
-
-        final long oldAmount = inventoryService.findByReceiveItemId(receiveItemId).stream()
-                .filter(inventory -> StringUtils.isBlank(inventory.getUsedDate()) &&
-                        StringUtils.isBlank(inventory.getDeletionDate()) &&
-                        !LocalDate.now().isAfter(LocalDate.parse(inventory.getExpiryDate())))
-                .count();
-
-        String url = configProperties.getGlobalDomain() + "edit-amount-page.html" +
-                "?receiveItemId=" + receiveItemId +
-                "&productId=" + productId +
-                "&memberId=" + memberId +
-                "&oldAmount=" + oldAmount;
-        response.sendRedirect(url);
     }
 
 

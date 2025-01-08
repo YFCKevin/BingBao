@@ -6,13 +6,17 @@ import com.yfckevin.bingBao.dto.*;
 import com.yfckevin.bingBao.entity.Follower;
 import com.yfckevin.bingBao.entity.Inventory;
 import com.yfckevin.bingBao.entity.Product;
+import com.yfckevin.bingBao.entity.Token;
 import com.yfckevin.bingBao.enums.StorePlace;
 import com.yfckevin.bingBao.exception.ResultStatus;
+import com.yfckevin.bingBao.repository.TokenRepository;
 import com.yfckevin.bingBao.service.FollowerService;
 import com.yfckevin.bingBao.service.InventoryService;
 import com.yfckevin.bingBao.service.LineService;
 import com.yfckevin.bingBao.service.ProductService;
 import com.yfckevin.bingBao.utils.FlexMessageUtil;
+import com.yfckevin.bingBao.utils.JwtTool;
+import com.yfckevin.bingBao.utils.TokenShortUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +27,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
@@ -42,9 +47,12 @@ public class LineController {
     private final LineService lineService;
     private final InventoryService inventoryService;
     private final ProductService productService;
+    private final JwtTool jwtTool;
     Logger logger = LoggerFactory.getLogger(LineController.class);
+    private final TokenRepository tokenRepository;
 
-    public LineController(ConfigProperties configProperties, RestTemplate restTemplate, FollowerService followerService, FlexMessageUtil flexMessageUtil, SimpleDateFormat sdf, SimpleDateFormat ssf, LineService lineService, InventoryService inventoryService, ProductService productService) {
+    public LineController(ConfigProperties configProperties, RestTemplate restTemplate, FollowerService followerService, FlexMessageUtil flexMessageUtil, SimpleDateFormat sdf, SimpleDateFormat ssf, LineService lineService, InventoryService inventoryService, ProductService productService, JwtTool jwtTool,
+                          TokenRepository tokenRepository) {
         this.configProperties = configProperties;
         this.restTemplate = restTemplate;
         this.followerService = followerService;
@@ -54,6 +62,8 @@ public class LineController {
         this.lineService = lineService;
         this.inventoryService = inventoryService;
         this.productService = productService;
+        this.jwtTool = jwtTool;
+        this.tokenRepository = tokenRepository;
     }
 
 
@@ -307,6 +317,7 @@ public class LineController {
                     String productName = null;
                     String memberName = null;
                     String memberId = null;
+                    String token = null;
                     long oldAmount = 0;
 
                     final Optional<Follower> followerOpt = followerService.findByUserId(userId);
@@ -332,6 +343,9 @@ public class LineController {
                         } else if (param.startsWith("oldAmount=")) {
                             oldAmount = Long.parseLong(param.substring("oldAmount=".length()));
                             logger.info("oldAmount: " + oldAmount);
+                        } else if (param.startsWith("token=")) {
+                            token = param.substring("token=".length());
+                            logger.info("token: " + token);
                         }
                     }
 
@@ -399,7 +413,9 @@ public class LineController {
                                         .append("&productId=")
                                         .append(productId)
                                         .append("&memberId=")
-                                        .append(memberId).toString();
+                                        .append(memberId)
+                                        .append("&token=")
+                                        .append(jwtTool.createToken(Duration.ofMinutes(10))).toString();
                                 msg = String.format("{\n" +
                                         "  \"type\": \"text\",\n" +
                                         "  \"text\": \"請點擊連結修改[%s]的剩餘數量：\\n%s\"\n" +
@@ -422,6 +438,11 @@ public class LineController {
                                             "  \"text\": \"[%s]無庫存，無需再標記\"\n" +
                                             "}", productName);
                                 } else {
+                                    final String jwtToken = jwtTool.createToken(Duration.ofMinutes(10));
+                                    Token t = new Token();
+                                    t.setJwtToken(jwtToken);
+                                    t.setShortStr(TokenShortUtil.genShortStr(10));
+                                    final Token savedToken = tokenRepository.save(t);
                                     msg = String.format("{\n" +
                                             "  \"type\": \"flex\",\n" +
                                             "  \"altText\": \"確認是否標記 [%s] 用完\",\n" +
@@ -462,7 +483,7 @@ public class LineController {
                                             "          \"action\": {\n" +
                                             "            \"type\": \"postback\",\n" +
                                             "            \"label\": \"確認\",\n" +
-                                            "            \"data\": \"action=confirmMarkAsFinished&receiveItemId=%s&productId=%s&memberId=%s&oldAmount=%d\"\n" +
+                                            "            \"data\": \"action=confirmMarkAsFinished&receiveItemId=%s&productId=%s&memberId=%s&oldAmount=%d&token=%s\"\n" +
                                             "          }\n" +
                                             "        },\n" +
                                             "        {\n" +
@@ -476,58 +497,78 @@ public class LineController {
                                             "          \"action\": {\n" +
                                             "            \"type\": \"postback\",\n" +
                                             "            \"label\": \"取消\",\n" +
-                                            "            \"data\": \"action=cancelMarkAsFinished&productId=%s&receiveItemId=%s\"\n" +
+                                            "            \"data\": \"action=cancelMarkAsFinished&productId=%s&receiveItemId=%s&token=%s\"\n" +
                                             "          }\n" +
                                             "        }\n" +
                                             "      ]\n" +
                                             "    }\n" +
                                             "  }\n" +
-                                            "}", productName, productName, oldAmount, receiveItemId, productId, memberId, oldAmount, productId, receiveItemId);
+                                            "}", productName, productName, oldAmount, receiveItemId, productId, memberId, oldAmount, savedToken.getShortStr(), productId, receiveItemId, savedToken.getShortStr());
                                 }
                                 break;
                             }
                             case "cancelMarkAsFinished": {
                                 logger.info("[cancelMarkAsFinished]");
-                                msg = String.format("{\n" +
-                                        "  \"type\": \"text\",\n" +
-                                        "  \"text\": \"[%s]取消標記\"\n" +
-                                        "}", productName);
+                                try {
+                                    tokenRepository.findByShortStr(token)
+                                            .ifPresent(t -> jwtTool.parseToken(t.getJwtToken()));
+
+                                    msg = String.format("{\n" +
+                                            "  \"type\": \"text\",\n" +
+                                            "  \"text\": \"[%s]取消標記\"\n" +
+                                            "}", productName);
+                                } catch (RuntimeException e) {
+                                    msg = String.format("{\n" +
+                                            "  \"type\": \"text\",\n" +
+                                            "  \"text\": \"按鈕失效，請再次點擊[%s]的標記用完\"\n" +
+                                            "}", productName);
+                                }
                                 break;
                             }
                             case "confirmMarkAsFinished": {
                                 logger.info("[confirmMarkAsFinished]");
-                                HttpHeaders headers = new HttpHeaders();
-                                headers.setContentType(MediaType.APPLICATION_JSON);
-                                headers.set("Internal-Request", "true");
+                                try {
+                                    tokenRepository.findByShortStr(token)
+                                            .ifPresent(t -> jwtTool.parseToken(t.getJwtToken()));
 
-                                UseRequestDTO useRequestDTO = new UseRequestDTO();
-                                useRequestDTO.setMemberName(memberName);
-                                useRequestDTO.setReceiveItemId(receiveItemId);
-                                useRequestDTO.setUsedAmount((int) oldAmount);
+                                    HttpHeaders headers = new HttpHeaders();
+                                    headers.setContentType(MediaType.APPLICATION_JSON);
+                                    headers.set("Internal-Request", "true");
 
-                                ResponseEntity<ResultStatus> response = restTemplate.exchange(
-                                        configProperties.getGlobalDomain() + "editAmountInventory",
-                                        HttpMethod.POST,
-                                        new HttpEntity<>(useRequestDTO, headers),
-                                        ResultStatus.class
-                                );
+                                    UseRequestDTO useRequestDTO = new UseRequestDTO();
+                                    useRequestDTO.setMemberName(memberName);
+                                    useRequestDTO.setReceiveItemId(receiveItemId);
+                                    useRequestDTO.setUsedAmount((int) oldAmount);
 
-                                if ("C000".equals(response.getBody().getCode())) {
+                                    ResponseEntity<ResultStatus> response = restTemplate.exchange(
+                                            configProperties.getGlobalDomain() + "editAmountInventory",
+                                            HttpMethod.POST,
+                                            new HttpEntity<>(useRequestDTO, headers),
+                                            ResultStatus.class
+                                    );
+
+                                    if ("C000".equals(response.getBody().getCode())) {
+                                        msg = String.format("{\n" +
+                                                "  \"type\": \"text\",\n" +
+                                                "  \"text\": \"[%s]變更成功，\\n已標記用完。\"\n" +
+                                                "}", productName);
+                                    } else if ("C006".equals(response.getBody().getCode())) {
+                                        //無庫存
+                                        msg = String.format("{\n" +
+                                                "  \"type\": \"text\",\n" +
+                                                "  \"text\": \"[%s]無庫存，\\n無需再標記！\"\n" +
+                                                "}", productName);
+                                    } else if ("C007".equals(response.getBody().getCode())) {
+                                        //庫存不足
+                                        msg = String.format("{\n" +
+                                                "  \"type\": \"text\",\n" +
+                                                "  \"text\": \"[%s]庫存不足變更失敗，\\n請聯繫管理員！\"\n" +
+                                                "}", productName);
+                                    }
+                                } catch (RuntimeException e) {
                                     msg = String.format("{\n" +
                                             "  \"type\": \"text\",\n" +
-                                            "  \"text\": \"[%s]變更成功，\\n已標記用完。\"\n" +
-                                            "}", productName);
-                                } else if ("C006".equals(response.getBody().getCode())) {
-                                    //無庫存
-                                    msg = String.format("{\n" +
-                                            "  \"type\": \"text\",\n" +
-                                            "  \"text\": \"[%s]無庫存，\\n無需再標記！\"\n" +
-                                            "}", productName);
-                                } else if ("C007".equals(response.getBody().getCode())) {
-                                    //庫存不足
-                                    msg = String.format("{\n" +
-                                            "  \"type\": \"text\",\n" +
-                                            "  \"text\": \"[%s]庫存不足變更失敗，\\n請聯繫管理員！\"\n" +
+                                            "  \"text\": \"按鈕失效，請再次點擊[%s]的標記用完\"\n" +
                                             "}", productName);
                                 }
                                 break;
