@@ -31,7 +31,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**")
                 .excludePathPatterns("/login.html")
                 .excludePathPatterns("/loginCheck")
-                .excludePathPatterns("/edit-amount-page.html/**")
+                .excludePathPatterns("/edit-amount-page.html/**", "/productInfo/**", "/getFollowerName/**")
                 .excludePathPatterns("/checkInventory", "/checkInventory/**")
                 .excludePathPatterns("/webhook")
 //                .excludePathPatterns("/importAllInventory", "/importAllProduct", "/addToShoppingList")    //測試

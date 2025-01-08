@@ -3,6 +3,7 @@ package com.yfckevin.bingBao.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yfckevin.bingBao.ConfigProperties;
 import com.yfckevin.bingBao.dto.*;
+import com.yfckevin.bingBao.entity.Follower;
 import com.yfckevin.bingBao.entity.Inventory;
 import com.yfckevin.bingBao.entity.Product;
 import com.yfckevin.bingBao.entity.ReceiveItem;
@@ -11,7 +12,6 @@ import com.yfckevin.bingBao.enums.StorePlace;
 import com.yfckevin.bingBao.exception.ResultStatus;
 import com.yfckevin.bingBao.service.*;
 import com.yfckevin.bingBao.utils.FileUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
@@ -28,12 +28,9 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
@@ -55,8 +52,9 @@ public class InventoryController {
     private final RestTemplate restTemplate;
     private final RecordService recordService;
     private final ObjectMapper objectMapper;
+    private final FollowerService followerService;
 
-    public InventoryController(@Qualifier("sdf") SimpleDateFormat sdf, ConfigProperties configProperties, InventoryService inventoryService, ReceiveItemService receiveItemService, ProductService productService, DataProcessService dataProcessService, RestTemplate restTemplate, RecordService recordService, ObjectMapper objectMapper) {
+    public InventoryController(@Qualifier("sdf") SimpleDateFormat sdf, ConfigProperties configProperties, InventoryService inventoryService, ReceiveItemService receiveItemService, ProductService productService, DataProcessService dataProcessService, RestTemplate restTemplate, RecordService recordService, ObjectMapper objectMapper, FollowerService followerService) {
         this.sdf = sdf;
         this.configProperties = configProperties;
         this.inventoryService = inventoryService;
@@ -66,6 +64,7 @@ public class InventoryController {
         this.restTemplate = restTemplate;
         this.recordService = recordService;
         this.objectMapper = objectMapper;
+        this.followerService = followerService;
     }
 
     /**
@@ -132,17 +131,21 @@ public class InventoryController {
     /**
      * 檢查該食材是否有庫存 (line點擊「修改剩餘數量」用)
      * @param receiveItemId
-     * @param productName
-     * @param memberName
+     * @param productId
+     * @param memberId
      * @param response
      * @throws IOException
      */
     @GetMapping("/checkInventory")
     public void checkInventory(@RequestParam("receiveItemId") String receiveItemId,
-                               @RequestParam("productName") String productName,
-                               @RequestParam("memberName") String memberName,
+                               @RequestParam("productId") String productId,
+                               @RequestParam("memberId") String memberId,
                                HttpServletResponse response) throws IOException {
-        if (memberName != null) {
+
+        final Optional<Follower> followerOpt = followerService.findByUserId(memberId);
+        if (followerOpt.isPresent()) {
+            final Follower follower = followerOpt.get();
+            String memberName = follower.getDisplayName();
             logger.info("[" + memberName + "]" + "[checkInventory]");
         }
 
@@ -152,21 +155,12 @@ public class InventoryController {
                         !LocalDate.now().isAfter(LocalDate.parse(inventory.getExpiryDate())))
                 .count();
 
-        // URL 進行編碼
-        try {
-            String encodedProductName = URLEncoder.encode(productName, StandardCharsets.UTF_8);
-            String encodedMemberName = URLEncoder.encode(memberName, StandardCharsets.UTF_8);
-            String url = configProperties.getGlobalDomain() + "edit-amount-page.html" +
-                    "?receiveItemId=" + receiveItemId +
-                    "&productName=" + encodedProductName +
-                    "&memberName=" + encodedMemberName +
-                    "&oldAmount=" + oldAmount;
-
-            response.sendRedirect(url);
-        } catch (UnsupportedEncodingException e) {
-            logger.error("URL encoding failed", e);
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "URL encoding failed");
-        }
+        String url = configProperties.getGlobalDomain() + "edit-amount-page.html" +
+                "?receiveItemId=" + receiveItemId +
+                "&productId=" + productId +
+                "&memberId=" + memberId +
+                "&oldAmount=" + oldAmount;
+        response.sendRedirect(url);
     }
 
 

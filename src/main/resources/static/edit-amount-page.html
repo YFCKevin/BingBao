@@ -76,10 +76,35 @@
     const urlParams = new URLSearchParams(window.location.search);
 	const receiveItemId = urlParams.get('receiveItemId');
 	const oldAmount = urlParams.get('oldAmount');
-	const memberName = urlParams.get('memberName');
-	const productName = urlParams.get('productName');
+	const memberId = urlParams.get('memberId');
+	let memberName = "";
+	const productId = urlParams.get('productId');
+	const productName = "";
 	document.getElementById('oldAmount').textContent = oldAmount;
-	document.getElementById('productName').textContent = productName;
+
+	$(function(){
+	    $.ajax({
+		    url: "getFollowerName/" + memberId,
+			type: "get",
+			contentType: "application/json; charset=utf-8",
+			success: function (response) {
+			    if (response.code == "C000"){
+				    memberName = response.data;
+				}
+			},
+		});
+
+	    $.ajax({
+		    url: "productInfo/" + productId,
+			type: "get",
+			contentType: "application/json; charset=utf-8",
+			success: function (response) {
+			    if (response.code == "C000"){
+				    document.getElementById('productName').textContent = response.data.name;
+				}
+			},
+		});
+	})
 
     if (parseInt(oldAmount, 10) === 0) {
         // 禁用輸入框和按鈕

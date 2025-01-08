@@ -18,10 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.ParseException;
@@ -204,6 +201,20 @@ public class LineController {
     }
 
 
+    @GetMapping("/getFollowerName/{memberId}")
+    public ResponseEntity<?> getFollowerName(@PathVariable String memberId) {
+        logger.info("[getFollowerName]");
+        ResultStatus resultStatus = new ResultStatus();
+        final Optional<Follower> followerOpt = followerService.findByUserId(memberId);
+        if (followerOpt.isPresent()) {
+            final Follower follower = followerOpt.get();
+            resultStatus.setCode("C000");
+            resultStatus.setData(follower.getDisplayName());
+        }
+        return ResponseEntity.ok(resultStatus);
+    }
+
+
     @PostMapping("/webhook")
     public ResponseEntity<?> webhook(@RequestBody LineWebhookRequestDTO dto) throws JsonProcessingException, ParseException {
 
@@ -292,13 +303,16 @@ public class LineController {
 
                     String action = null;
                     String receiveItemId = null;
+                    String productId = null;
                     String productName = null;
                     String memberName = null;
+                    String memberId = null;
                     long oldAmount = 0;
 
                     final Optional<Follower> followerOpt = followerService.findByUserId(userId);
                     if (followerOpt.isPresent()) {
                         memberName = followerOpt.get().getDisplayName();
+                        memberId = followerOpt.get().getUserId();
                     }
 
                     String[] params = postbackData.split("&");
@@ -309,9 +323,9 @@ public class LineController {
                         } else if (param.startsWith("receiveItemId=")) {
                             receiveItemId = param.substring("receiveItemId=".length());
                             logger.info("receiveItemId: " + receiveItemId);
-                        } else if (param.startsWith("productName=")) {
-                            productName = param.substring("productName=".length());
-                            logger.info("productName: " + productName);
+                        } else if (param.startsWith("productId=")) {
+                            productId = param.substring("productId=".length());
+                            logger.info("productId: " + productId);
                         } else if (param.startsWith("memberName=")) {
                             memberName = param.substring("memberName=".length());
                             logger.info("memberName: " + memberName);
@@ -319,6 +333,12 @@ public class LineController {
                             oldAmount = Long.parseLong(param.substring("oldAmount=".length()));
                             logger.info("oldAmount: " + oldAmount);
                         }
+                    }
+
+                    final Optional<Product> productOpt = productService.findById(productId);
+                    if (productOpt.isPresent()) {
+                        final Product product = productOpt.get();
+                        productName = product.getName();
                     }
 
                     if (StringUtils.isNotBlank(action) && StringUtils.isNotBlank(receiveItemId)) {
@@ -376,10 +396,10 @@ public class LineController {
                                         .append("?")
                                         .append("receiveItemId=")
                                         .append(receiveItemId)
-                                        .append("&productName=")
-                                        .append(productName)
-                                        .append("&memberName=")
-                                        .append(memberName).toString();
+                                        .append("&productId=")
+                                        .append(productId)
+                                        .append("&memberId=")
+                                        .append(memberId).toString();
                                 msg = String.format("{\n" +
                                         "  \"type\": \"text\",\n" +
                                         "  \"text\": \"請點擊連結修改[%s]的剩餘數量：\\n%s\"\n" +
@@ -442,7 +462,7 @@ public class LineController {
                                             "          \"action\": {\n" +
                                             "            \"type\": \"postback\",\n" +
                                             "            \"label\": \"確認\",\n" +
-                                            "            \"data\": \"action=confirmMarkAsFinished&receiveItemId=%s&productName=%s&memberName=%s&oldAmount=%d\"\n" +
+                                            "            \"data\": \"action=confirmMarkAsFinished&receiveItemId=%s&productId=%s&memberId=%s&oldAmount=%d\"\n" +
                                             "          }\n" +
                                             "        },\n" +
                                             "        {\n" +
@@ -456,13 +476,13 @@ public class LineController {
                                             "          \"action\": {\n" +
                                             "            \"type\": \"postback\",\n" +
                                             "            \"label\": \"取消\",\n" +
-                                            "            \"data\": \"action=cancelMarkAsFinished&productName=%s&receiveItemId=%s\"\n" +
+                                            "            \"data\": \"action=cancelMarkAsFinished&productId=%s&receiveItemId=%s\"\n" +
                                             "          }\n" +
                                             "        }\n" +
                                             "      ]\n" +
                                             "    }\n" +
                                             "  }\n" +
-                                            "}", productName, productName, oldAmount, receiveItemId, productName, memberName, oldAmount, productName, receiveItemId);
+                                            "}", productName, productName, oldAmount, receiveItemId, productId, memberId, oldAmount, productId, receiveItemId);
                                 }
                                 break;
                             }

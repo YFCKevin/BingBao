@@ -85,20 +85,20 @@ public class FlexMessageUtil {
             List<Map<String, Object>> actions = new ArrayList<>();
 
             final String receiveItemId = inventoryDTO.getReceiveItemId();
-            final String productName = inventoryDTO.getName();
+            final String productId = inventoryDTO.getProductId();
 
             // 標記用完的action
             Map<String, Object> viewDetailAction = new HashMap<>();
             viewDetailAction.put("type", "postback");
             viewDetailAction.put("label", "標記用完");
-            viewDetailAction.put("data", "action=markAsFinished&receiveItemId=" + receiveItemId + "&productName=" + productName);
+            viewDetailAction.put("data", "action=markAsFinished&receiveItemId=" + receiveItemId + "&productId=" + productId);
             actions.add(viewDetailAction);
 
             // 修改有效期限
             Map<String, Object> editExpiryDateAction = new HashMap<>();
             editExpiryDateAction.put("type", "datetimepicker");
             editExpiryDateAction.put("label", "修改有效期限");
-            editExpiryDateAction.put("data", "action=editExpiryDate&receiveItemId=" + receiveItemId + "&productName=" + productName);
+            editExpiryDateAction.put("data", "action=editExpiryDate&receiveItemId=" + receiveItemId + "&productId=" + productId);
             editExpiryDateAction.put("mode", "date");
             actions.add(editExpiryDateAction);
 
@@ -106,7 +106,7 @@ public class FlexMessageUtil {
             Map<String, Object> editAmountAction = new HashMap<>();
             editAmountAction.put("type", "postback");
             editAmountAction.put("label", "修改剩餘數量");
-            editAmountAction.put("data", "action=editAmount&receiveItemId=" + receiveItemId + "&productName=" + productName);
+            editAmountAction.put("data", "action=editAmount&receiveItemId=" + receiveItemId + "&productId=" + productId);
             actions.add(editAmountAction);
 
             column.put("actions", actions);
