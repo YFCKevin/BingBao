@@ -13,6 +13,7 @@
     <link rel="icon" href="images/favicon.ico" type="image/x-icon"/>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"/>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway|Ubuntu&display=swap">
+    <link rel="stylesheet" href="css/audio-to-text.css"/>
     <style>
 		.image-container {
             position: relative;
@@ -269,9 +270,9 @@
                                                 <div class="d-flex flex-column flex-md-row align-items-start mb-3">
                                                     <select class="form-select form-control me-2 mb-2 mb-md-0" x-model="selectedOperator" x-on:change="operatorChange()">
                                                         <option value="">請選擇操作者</option>
-                                                        <option value="王湘蓮">王湘蓮</option>
-                                                        <option value="陳奕州">陳奕州</option>
-                                                        <option value="管理員">陳奕帆</option>
+                                                        <option value="xxx">xxx</option>
+                                                        <option value="ooo">ooo</option>
+                                                        <option value="yyy">yyy</option>
                                                     </select>
                                                     <select class="form-select form-control" x-model="selectedAction" x-on:change="actionSearch()">
                                                         <option value="">請選擇操作狀態</option>
@@ -462,9 +463,12 @@
                                 </div>
                             </template>
                         </div>
-                        <div class="card-footer d-flex">
-                            <textarea id="userText" x-model="userText" placeholder="請輸入訊息" class="form-control me-2"></textarea>
-                            <button id="sendBtn" x-on:click="sendMessage($event)" class="btn btn-dark"><i class="far fa-paper-plane"></i></button>
+                        <div class="card-footer d-flex align-items-center">
+                            <div class="textarea-container d-flex align-items-center me-2">
+                                <textarea id="userText" x-model="userText" placeholder="請輸入訊息" class="form-control flex-grow-1 me-2"></textarea>
+                                <i class="fas fa-microphone ms-2" id="microphone"></i>
+                            </div>
+                            <button id="sendBtn" x-on:click="sendMessage($event)" class="btn btn-dark ms-2 primary"><i class="far fa-paper-plane"></i></button>
                         </div>
                     </template>
                     <template x-if="memberId == '' || memberId == undefined">
@@ -573,6 +577,7 @@
     <script src="js/sockjs.min.js"></script>
     <script src="js/stomp.min.js"></script>
     <script src="js/chatroom.js"></script>
+    <script src="js/audio-to-text.js"></script>
     <script>
 
 		function loadData() {
@@ -746,7 +751,7 @@
 
                     const formatMember = (name) => {
                         if (!name) return "";
-                        return name.replace(/管理員/g, "陳奕帆");
+                        return name.replace(/管理員/g, "yyy");
                     }
 
                     const formattedList = this.recordList.map(record => {

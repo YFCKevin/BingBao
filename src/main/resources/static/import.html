@@ -83,6 +83,8 @@
 	<link rel="stylesheet" href="css/plugins.min.css">
 	<link rel="stylesheet" href="css/kaiadmin.min.css">
 
+    <link rel="stylesheet" href="css/audio-to-text.css"/>
+
 	<!-- CSS Just for demo purpose, don't include it in your project -->
 <!--	<link rel="stylesheet" href="css/demo.css">-->
 </head>
@@ -399,10 +401,13 @@
 								</div>
 							</template>
 						</div>
-						<div class="card-footer d-flex">
-							<textarea id="userText" x-model="userText" placeholder="請輸入訊息" class="form-control me-2"></textarea>
-							<button id="sendBtn" x-on:click="sendMessage($event)" class="btn btn-dark"><i class="far fa-paper-plane"></i></button>
-						</div>
+                        <div class="card-footer d-flex align-items-center">
+                            <div class="textarea-container d-flex align-items-center me-2">
+                                <textarea id="userText" x-model="userText" placeholder="請輸入訊息" class="form-control flex-grow-1 me-2"></textarea>
+                                <i class="fas fa-microphone ms-2" id="microphone"></i>
+                            </div>
+                            <button id="sendBtn" x-on:click="sendMessage($event)" class="btn btn-dark ms-2 primary"><i class="far fa-paper-plane"></i></button>
+                        </div>
 					</template>
 					<template x-if="memberId == '' || memberId == undefined">
 						<div id="chatbox" class="d-flex justify-content-center align-items-center card-body bg-light">
@@ -561,6 +566,7 @@
 	<script src="js/sockjs.min.js"></script>
 	<script src="js/stomp.min.js"></script>
 	<script src="js/chatroom.js"></script>
+    <script src="js/audio-to-text.js"></script>
 	<script>
 
 		function loadData() {

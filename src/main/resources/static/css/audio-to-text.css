@@ -1,0 +1,22 @@
+.textarea-container {
+    display: flex;
+    align-items: center;
+    width: 100%; /* 保證容器佔滿父容器寬度 */
+}
+
+textarea {
+    flex-grow: 1; /* 讓 textarea 彈性填充容器空間 */
+    padding-right: 10px; /* 添加適當內邊距以防止過於靠近邊框 */
+    resize: none; /* 禁止手動調整大小（根據需要） */
+}
+
+#microphone {
+    font-size: 20px;
+    color: #666; /* 原本顏色 */
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+#microphone.recording {
+    color: red; /* 錄音時顯示紅色 */
+}
